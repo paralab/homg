@@ -14,6 +14,7 @@ classdef homg_mesh
   
   methods
     function mesh = homg_mesh(dim,nelem)
+    % dim = 2/3, nelem = number of elements per dimension.
       if nargin > 0 
         if nargin > 1
           mesh.dim    = dim;
@@ -32,23 +33,28 @@ classdef homg_mesh
         mesh.fem = meshextrude(tmp_fem, 'distance', 1, 'elextlayers', {mesh.nelem}, 'report', 'off');
         clear tmp_fem;
       else
-        disp(['Error: mesh is not supported for ',num2str(mesh.dim),' dimensions.'])
+        disp(['Error: mesh is not supported for ',num2str(mesh.dim),'D.'])
       end
     end % constructor
     
     function show(mesh)
+    % display the mesh. Needs X.
         meshplot(mesh.fem);
     end
     
     function M = assemble_mass(mesh, order)
+    % Assembles the mass matrix 
+    % Check that the Stiffness matrix is assembled first
       mesh.fem.dim = {'u'};
       mesh.fem.shape = order;
       
       mesh.fem.equ.weak = '(u*u_test)';
-      M = assemble(mesh.fem);
+      M = assemble(mesh.fem, 'Out', {'K'});
+      M = M(mesh.perm_full, mesh.perm_full);
     end
     
-    function [K,L,M,N] = assemble_poisson(mesh, order)
+    function [K,L,Null,Ud] = assemble_poisson(mesh, order)
+    % Assembles the Stiffness matrix and RHS for the poisson equation
       mesh.fem.dim   = {'u'};
       mesh.fem.shape = order;
       
@@ -63,9 +69,9 @@ classdef homg_mesh
       
       % K system matrix, L rhs, boundary conditions are to be incorporated
       % by imposing N*U = M
-      [K,L,M,N] = assemble(mesh.fem);
+      [K,L] = assemble(mesh.fem,'Out',{'K','L'});
       
-      % [Kc,Lc,Null,Ud] = femlin(fem);
+      [Kc,Lc,Null,Ud] = femlin(mesh.fem);
       
       nodes = xmeshinfo(mesh.fem ,'out', 'nodes');
       dofs = nodes.dofs;
@@ -84,9 +90,25 @@ classdef homg_mesh
       
       [~, p] = sort(sortval);
       mesh.perm_full = p; 
-      %crds2 = Null' * crds;
-      %sortval = crds2(:,3)*1e6 + crds2(:,2)*1e3 + crds2(:,1);
-      %[~,mesh.p2] = sort(sortval);
+      
+      crds2 = Null' * mesh.coords;
+      if (mesh.dim == 2)
+        sortval = crds2(:,2)*fac + crds2(:,1);
+      else
+        sortval = crds2(:,3)*fac*fac + crds2(:,2)*fac + crds2(:,1);
+      end
+
+      [~, pc] = sort(sortval);
+      mesh.perf_rest = pc;
+
+      % re-arrange matrices and coords ...
+      K     = K(p, p);
+      L     = L(p);
+      Null  = Null(p, pc);
+      Ud    = Ud(p); 
+      
+      mesh.coords = mesh.coords(p,:);
+
     end
     
     function P = assemble_interpolation(mesh, order, pts)
