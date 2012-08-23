@@ -14,8 +14,13 @@ classdef homg_mesh
   
   methods
     function mesh = homg_mesh(dim,nelem)
-      mesh.dim    = dim;
-      mesh.nelem  = nelem;
+      if nargin > 0 
+        if nargin > 1
+          mesh.dim    = dim;
+        end
+        mesh.nelem  = nelem;
+      end
+      
       mesh.perm_full = [];
       
       if (mesh.dim == 2)
