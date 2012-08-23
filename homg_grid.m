@@ -1,4 +1,4 @@
-classdef homg_grid
+classdef homg_grid < handle
   %HOMG_GRID grid class for multigrid
   % compare with mgm_grid structure in mgm_multigrid.h 
   

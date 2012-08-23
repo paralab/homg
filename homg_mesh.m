@@ -1,4 +1,4 @@
-classdef homg_mesh
+classdef homg_mesh < handle
   %HOMG_MESH A container class for homg Meshes
   %   Mesh class for homg meshes. Is a wrapper around comsol 
   
@@ -22,7 +22,7 @@ classdef homg_mesh
         mesh.nelem  = nelem;
       end
       
-      mesh.perm_full = [];
+      % mesh.perm_full = [];
       
       if (mesh.dim == 2)
         mesh.fem.geom = rect2(0,1,0,1);
@@ -48,8 +48,10 @@ classdef homg_mesh
       mesh.fem.dim = {'u'};
       mesh.fem.shape = order;
       
-      mesh.fem.equ.weak = '(u*u_test)';
-      M = assemble(mesh.fem, 'Out', {'K'});
+      mesh.fem.equ.weak = '(-u*u_test)';  
+      mesh.fem.xmesh = meshextend(mesh.fem,  'report', 'off');
+      
+      M = assemble(mesh.fem, 'Out', {'K'}, 'report', 'off');
       M = M(mesh.perm_full, mesh.perm_full);
     end
     
@@ -65,13 +67,13 @@ classdef homg_mesh
       end
       
       mesh.fem.bnd.r = {'u-0'};
-      mesh.fem.xmesh = meshextend(mesh.fem);
+      mesh.fem.xmesh = meshextend(mesh.fem,  'report', 'off');
       
       % K system matrix, L rhs, boundary conditions are to be incorporated
       % by imposing N*U = M
-      [K,L] = assemble(mesh.fem,'Out',{'K','L'});
+      [K,L] = assemble(mesh.fem,'Out',{'K','L'}, 'report', 'off');
       
-      [Kc,Lc,Null,Ud] = femlin(mesh.fem);
+      [~,~,Null,Ud] = femlin(mesh.fem,  'report', 'off');
       
       nodes = xmeshinfo(mesh.fem ,'out', 'nodes');
       dofs = nodes.dofs;
@@ -99,7 +101,7 @@ classdef homg_mesh
       end
 
       [~, pc] = sort(sortval);
-      mesh.perf_rest = pc;
+      mesh.perm_rest = pc;
 
       % re-arrange matrices and coords ...
       K     = K(p, p);
@@ -108,7 +110,7 @@ classdef homg_mesh
       Ud    = Ud(p); 
       
       mesh.coords = mesh.coords(p,:);
-
+      return;      
     end
     
     function P = assemble_interpolation(mesh, order, pts)
