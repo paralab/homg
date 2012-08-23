@@ -25,15 +25,20 @@ classdef homg_mesh
       
       if (mesh.dim == 2)
         mesh.fem.geom = rect2(0,1,0,1);
-        mesh.fem.mesh = meshmap(mesh.fem, 'Edgelem', {1,nelem,2,nelem});
+        mesh.fem.mesh = meshmap(mesh.fem, 'Edgelem', {1, mesh.nelem,2, mesh.nelem}, 'report', 'off');
       elseif (mesh.dim == 3)
         tmp_fem.geom = rect2(0,1,0,1);
-        mesh.fem = meshextrude(tmp_fem, 'distance', 1, 'elextlayers', {nelem});
+        tmp_fem.mesh = meshmap(tmp_fem, 'Edgelem', {1, mesh.nelem,2, mesh.nelem}, 'report', 'off');
+        mesh.fem = meshextrude(tmp_fem, 'distance', 1, 'elextlayers', {mesh.nelem}, 'report', 'off');
         clear tmp_fem;
       else
         disp(['Error: mesh is not supported for ',num2str(mesh.dim),' dimensions.'])
       end
     end % constructor
+    
+    function show(mesh)
+        meshplot(mesh.fem);
+    end
     
     function M = assemble_mass(mesh, order)
       mesh.fem.dim = {'u'};
