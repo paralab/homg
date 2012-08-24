@@ -29,7 +29,7 @@ classdef homg_mesh < handle
       elseif (mesh.dim == 3)
         tmp_fem.geom = rect2(0,1,0,1);
         tmp_fem.mesh = meshmap(tmp_fem, 'Edgelem', {1, mesh.nelem,2, mesh.nelem}, 'report', 'off');
-        mesh.fem = meshextrude(tmp_fem, 'distance', 1, 'elextlayers', {mesh.nelem}, 'report', 'off');
+        mesh.fem = meshextrude(tmp_fem, 'distance', 1, 'elextlayers', {mesh.nelem});
         clear tmp_fem;
       else
         error(['Error: mesh is not supported for ',num2str(mesh.dim),'D.'])
@@ -85,8 +85,8 @@ classdef homg_mesh < handle
       mesh.fem.dim   = {'u'};
       mesh.fem.shape = order;
       
+      mesh.fem.equ.expr = {'f' mesh.rhs};
       if (mesh.dim == 2)
-        mesh.fem.equ.expr = {'f' mesh.rhs};
         mesh.fem.equ.weak = '-(ux * ux_test + uy * uy_test + f * u_test)';
       else
         mesh.fem.equ.weak = '-(ux * ux_test + uy * uy_test + uz * uz_test + f * u_test)';
@@ -105,7 +105,7 @@ classdef homg_mesh < handle
       dofs = nodes.dofs;
       crds = nodes.coords';
       
-      mesh.fem.sol = femlin(mesh.fem, 'report', 'off');
+      % mesh.fem.sol = femlin(mesh.fem, 'report', 'off');
       
       [~,idof] = sort(dofs);
       
@@ -148,10 +148,10 @@ classdef homg_mesh < handle
         disp('The order specified in the interpolation does not match the one used for assembly');
       end
       
-      X = mesh.fem.sol.u;
-      no_dofs = length(X);
-      % no_dofs =  (order*mesh.nelem+1)^mesh.dim;
-      % X = zeros(no_dofs);
+      % X = mesh.fem.sol.u;
+      % no_dofs = length(X);
+      no_dofs =  (order*mesh.nelem+1)^mesh.dim;
+      X = zeros(no_dofs,1);
       
       % allocate storage for interpolation operator
       P = zeros(size(pts,2),no_dofs);
