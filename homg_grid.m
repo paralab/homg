@@ -1,5 +1,5 @@
 classdef homg_grid < handle
-  %HOMG_GRID grid class for multigrid
+  %HOMG_GRID A single grid in a multigrid heirarchy
   % compare with mgm_grid structure in mgm_multigrid.h 
   
   properties
@@ -7,6 +7,9 @@ classdef homg_grid < handle
     eig_max
     eig_min
     K
+    L
+    Null
+    Ud
     M
     R
     P
@@ -14,8 +17,8 @@ classdef homg_grid < handle
   end % properties
   
   methods
-    function grid = homg_grid(mesh, coarse) 
-      if ((nargin == 1) || isempty(coarse))
+    function grid = homg_grid(mesh, order, coarse) 
+      if ((nargin < 3) || isempty(coarse))
         grid.level = 0;
         grid.coarse = [];
       else
@@ -23,10 +26,12 @@ classdef homg_grid < handle
         grid.coarse = coarse;
       end
       
-      % grid.K = mesh.assemble_poisson();
-      % grid.M = M;
-      % grid.R = R;
-      % grid.P = P;
+      [grid.K, grid.L, grid.Null, grid.Ud] = mesh.assemble_poisson(order);
+      grid.M = mesh.assemble_mass(order);
+      
+      if (~ isempty(grid.coarse) )
+        grid.P = mesh.assemble_interpolation(order, mesh.coords);
+      end
     end
     
   end %methods

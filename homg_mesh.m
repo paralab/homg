@@ -38,6 +38,11 @@ classdef homg_mesh < handle
       mesh.rhs = '1';
     end % constructor
     
+    function plot(mesh)
+      % display the mesh. Needs X.
+      meshplot(mesh.fem);
+    end
+    
     function show(mesh)
       % display the mesh. Needs X.
       meshplot(mesh.fem);
