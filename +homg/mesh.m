@@ -1,5 +1,5 @@
-classdef homg_mesh < handle
-  %HOMG_MESH A container class for homg Meshes
+classdef mesh < handle
+  %MESH A container class for homg Meshes
   %   Mesh class for homg meshes. Is a wrapper around comsol
   
   properties (SetAccess = private)
@@ -14,7 +14,7 @@ classdef homg_mesh < handle
   end % properties
   
   methods
-    function mesh = homg_mesh(dim,nelem)
+    function mesh = mesh(dim,nelem)
       % dim = 2/3, nelem = number of elements per dimension.
       if nargin > 0
         if nargin > 1

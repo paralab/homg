@@ -1,5 +1,5 @@
-classdef homg_grid < handle
-  %HOMG_GRID A single grid in a multigrid heirarchy
+classdef grid < handle
+  %GRID A single grid in a multigrid heirarchy
   % compare with mgm_grid structure in mgm_multigrid.h 
   
   properties
@@ -17,7 +17,7 @@ classdef homg_grid < handle
   end % properties
   
   methods
-    function grid = homg_grid(mesh, order, coarse) 
+    function grid = grid(mesh, order, coarse) 
       if ((nargin < 3) || isempty(coarse))
         grid.level = 0;
         grid.coarse = [];
