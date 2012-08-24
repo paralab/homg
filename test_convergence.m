@@ -1,10 +1,13 @@
 function test_convergence(dim, order, nelem)
 % function test_convergence(dim, order, nelem)
+% nelem can be an array of grid sizes.
+% 
+% e.g.  test_convergence(2, 3, [8 16 32 64]); 
 
 % disp('grid -> err');
-fprintf('--------------------------------------------.\n');
-fprintf('nelem\t|    err (M-norm)\t|    fac    |\n');
-fprintf('--------------------------------------------|\n');
+fprintf('.-------------------------------------------.\n');
+fprintf('| nelem\t|    err (M-norm)\t|    fac    |\n');
+fprintf('|-------------------------------------------|\n');
 for i=1:length(nelem)
   m = homg.mesh(dim, nelem(i));
   if ( dim==2 )
@@ -42,12 +45,12 @@ for i=1:length(nelem)
   err = u_exact(:) - u_sol(:);
   e = sqrt(err' * M * err );
   if (i==1)
-    fprintf('%d\t|\t%g\t|     -     |\n', nelem(i), e);
+    fprintf('| %d\t|\t%g\t|     -     |\n', nelem(i), e);
   else
-    fprintf('%d\t|\t%g\t|  %g  |\n', nelem(i), e, prev_e/e);
+    fprintf('| %d\t|\t%g\t|  %g  |\n', nelem(i), e, prev_e/e);
   end
   prev_e = e;
   % clean up
   clear m K L Null Ud Kc Lc U u_sol u_exact err;
 end
-fprintf('--------------------------------------------.\n');
+fprintf('`-------------------------------------------.\n');
