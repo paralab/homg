@@ -15,7 +15,7 @@ classdef grid < handle
     M
     R
     P
-    Coarse
+    Coarse  % handle to coarse grid 
   end % properties
   
   methods
@@ -40,13 +40,18 @@ classdef grid < handle
     % compute the residual
     function r = residual(grid, rhs, u)
     % function r = residual(grid, u, rhs)
-      r = rhs - grid.K*u;  
-    
+      if ( nargin < 2 )
+        rhs = grid.L;
+      end
+      if ( nargin < 3 )
+        u = zeros(size(rhs));
+      end
+
       Kc = grid.Null' * grid.K * grid.Null;
       Lc = grid.Null' * rhs;
       
       % r = ƒ - Au 
-      r = Lc - (Kc * grid.Null'(u - grid.Ud));
+      r = Null * (Lc - (Kc * grid.Null'(u - grid.Ud)));
     end
 
     % main v-cycle
