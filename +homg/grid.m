@@ -11,10 +11,12 @@ classdef grid < handle
     K
     L
     Null
+    ZeroBoundary
     Ud
     M
     R
     P
+    Mesh
     Coarse  % handle to coarse grid 
   end % properties
   
@@ -28,15 +30,16 @@ classdef grid < handle
         grid.Coarse = coarse;
       end
       
+      grid.Mesh = mesh;
       [grid.K, grid.L, grid.Null, grid.Ud] = mesh.assemble_poisson(order);
       grid.M = mesh.assemble_mass(order);
-      
+      grid.ZeroBoundary = grid.Null * grid.Null';
       % fixme
       if (~ isempty(grid.Coarse) )
-        grid.P = mesh.assemble_interpolation(order, mesh.coords);
+         grid.P = grid.Coarse.Mesh.assemble_interpolation(order, mesh.coords);
       end
     end
- 
+    
     % compute the residual
     function r = residual(grid, rhs, u)
     % function r = residual(grid, u, rhs)
@@ -47,11 +50,8 @@ classdef grid < handle
         u = zeros(size(rhs));
       end
 
-      Kc = grid.Null' * grid.K * grid.Null;
-      Lc = grid.Null' * rhs;
-      
-      % r = ƒ - Au 
-      r = Null * (Lc - (Kc * grid.Null'(u - grid.Ud)));
+      % r = Au - f 
+      r = grid.ZeroBoundary * (grid.K*(grid.ZeroBoundary*u+grid.Ud) - grid.L) + (u - grid.ZeroBoundary*u - grid.Ud);
     end
 
     % main v-cycle
@@ -64,7 +64,7 @@ classdef grid < handle
       if ( isempty( grid.Coarse ) )
         Kc = grid.Null' * grid.K * grid.Null;
         Lc = grid.Null' * rhs;
-        u = grid.Null *(Kc \ Lc) + grid.Ud;
+        u = grid.Null * (Kc \ Lc) + grid.Ud;
         return;
       end
       
@@ -75,7 +75,7 @@ classdef grid < handle
       u = grid.smooth ( v1, rhs, u );
       
       % 2. compute residual
-      res = Lc - Kc * grid.Null' * (u - grid.Ud);
+      res = grid.residual(rhs, u);
       
       % 3. restrict
       res_coarse = grid.R * res;
@@ -84,7 +84,7 @@ classdef grid < handle
       u_corr_coarse = grid.coarse.vcycle(v1, v2, res_coarse, zeros(size(res_coarse)));
       
       % 5. prolong and correct
-      u = u - grid.P * u_corr_coarse;
+      u = u + grid.P * u_corr_coarse;
       
       % 6. post-smooth
       u = grid.smooth ( v2, rhs, u );
