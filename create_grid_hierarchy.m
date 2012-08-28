@@ -11,6 +11,11 @@ for i=2:num_grids
   disp(['Creating grid: ' num2str(i) ' of ' num2str(num_grids) ', nelem = ' num2str(nelems(i))]);
   m = homg.mesh(dim, nelems(i));
   grid = homg.grid(m, order, coarse);
+  if ( dim==2 )
+    m.set_rhs('-8*pi^2*(sin(2*pi*x) * sin(2*pi*y))');
+  else
+    m.set_rhs('-12*pi^2*(sin(2*pi*x) * sin(2*pi*y) * sin(2*pi*z) )');
+  end
   coarse = grid;
 end
 

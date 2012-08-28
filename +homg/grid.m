@@ -36,6 +36,7 @@ classdef grid < handle
       grid.M = mesh.assemble_mass(order);
       grid.ZeroBoundary = grid.Null * grid.Null';
       grid.smoother = 'jacobi';
+      grid.jacobi_omega = 2/3;
       % fixme
       if (~ isempty(grid.Coarse) )
          grid.P = grid.Coarse.Mesh.assemble_interpolation(order, mesh.coords);
@@ -53,7 +54,7 @@ classdef grid < handle
       end
 
       % r = Au - f 
-      r = grid.ZeroBoundary * (grid.K*(grid.ZeroBoundary*u+grid.Ud) - grid.L) + (u - grid.ZeroBoundary*u - grid.Ud);
+      r = grid.ZeroBoundary * (grid.K*(grid.ZeroBoundary*u+grid.Ud) - rhs) + (u - grid.ZeroBoundary*u - grid.Ud);
     end
 
     % main v-cycle
@@ -93,10 +94,18 @@ classdef grid < handle
     % smoothers
     function u = smooth (grid, v, rhs, u)
       switch(grid.smoother)
-        case 'jacobi', return grid.smoother_jacobi(v, rhs, u);
-        case 'chebyshev', return grid.smoother_chebyshev(v, rhs, u);
-        case '2sr', return grid.smoother_2sr(v, rhs, u);
-        otherwise disp('ERROR: Unrecognized smoother type'), return;
+        case 'jacobi', 
+          u = grid.smoother_jacobi(v, rhs, u); 
+          return;
+        case 'chebyshev', 
+          u = grid.smoother_chebyshev(v, rhs, u); 
+          return;
+        case '2sr', 
+          u = grid.smoother_2sr(v, rhs, u); 
+          return;
+        otherwise
+          disp('ERROR: Unrecognized smoother type'); 
+          return;
       end
     end
 
@@ -113,7 +122,8 @@ classdef grid < handle
       
       for i=1:v
         r  = grid.jacobi_invdiag .* grid.residual(rhs, u);
-        u = u + omega*r;
+        u = u - grid.jacobi_omega.*r;
+        norm(r)
       end
     end % jacobi
     
@@ -127,7 +137,7 @@ classdef grid < handle
       end
 
       l_max = grid.eig_max;
-      l_min = grid.eig_min;
+      l_min = (grid.eig_min + grid.eig_max)/2;
       
       rho       = (1 - l_min/l_max)/(1 + l_min/l_max);
       alpha     = 2/( 1 + sqrt(1-rho*rho));
@@ -135,15 +145,16 @@ classdef grid < handle
       epsalpha  = epsilon * alpha;
       
       % variables
-      res  = -rhs ?
+      res  = -rhs;
       u0 = zeros(size(u));
-      u1 = epsilon * r ;
+      u1 = epsilon * res ;
       
       for iter = 1:v,                            % begin iteration
         res = grid.residual ( rhs, u );
  
         u = alpha*u1 + (1-alpha)*u0 - epsalpha*res;
         u0 = u1; u1 = u;
+        norm(res)
       end % end iteration
       
     end % 2sr
@@ -151,13 +162,13 @@ classdef grid < handle
     function u = smoother_chebyshev (grid, v, rhs, u)
       if ( isempty ( grid.eig_max ) )
         Kc = grid.Null' * grid.K * grid.Null;
-        grid.eig_max = eigs(Kc,1, 'LM');  
-        grid.eig_min = eigs(Kc,1, 'SM');  
+        grid.eig_max = eigs(Kc, 1, 'LM');  
+        grid.eig_min = eigs(Kc, 1, 'SM');  
       end
       
       % FIXME adjust the eigenvalues to hit the upper spectrum
       l_max = grid.eig_max;
-      l_min = grid.eig_min;
+      l_min = (grid.eig_min + grid.eig_max)/2;
       
       c = (l_min - l_max)/2;
       d = (l_min + l_max)/2;
@@ -166,10 +177,10 @@ classdef grid < handle
 
       for iter = 1:v
         res = grid.residual ( rhs, u ); 
-
+        norm(res)  
         if ( iter == 1 )
           alpha = 1.0/d;
-        else if (iter == 2)
+        elseif (iter == 2)
           alpha = 2*d / (2*d*d - c*c);
         else
           alpha = 1.0/(d - alpha*c*c*0.25);
@@ -177,7 +188,7 @@ classdef grid < handle
 
         beta = alpha * d - 1.0;
 
-        p = alpha * res + beta * p;
+        p = -alpha * res + beta * p;
         u = u + p;  
       end
     end % chebyshev
