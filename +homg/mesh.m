@@ -159,15 +159,15 @@ classdef mesh < handle
       X = zeros(no_dofs,1);
       
       % allocate storage for interpolation operator
-      P = zeros(size(pts,2),no_dofs);
+      P = zeros(size(pts,1),no_dofs);
       
       % build interpolation operator
       for i = 1:no_dofs
         X(:) = 0;
         X(i) = 1;
-        P(:,i) = postinterp(mesh.fem, 'u', pts, 'U', X)';
+        P(:,i) = postinterp(mesh.fem, 'u', pts', 'U', X)';
       end
-      
+      P = sparse(P);
     end
     
   end % methods
