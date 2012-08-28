@@ -8,6 +8,7 @@ classdef grid < handle
     eig_min
     jacobi_omega
     jacobi_invdiag
+    smoother
     K
     L
     Null
@@ -34,6 +35,7 @@ classdef grid < handle
       [grid.K, grid.L, grid.Null, grid.Ud] = mesh.assemble_poisson(order);
       grid.M = mesh.assemble_mass(order);
       grid.ZeroBoundary = grid.Null * grid.Null';
+      grid.smoother = 'jacobi';
       % fixme
       if (~ isempty(grid.Coarse) )
          grid.P = grid.Coarse.Mesh.assemble_interpolation(order, mesh.coords);
@@ -68,9 +70,6 @@ classdef grid < handle
         return;
       end
       
-      Kc = grid.Null' * grid.K * grid.Null;
-      Lc = grid.Null' * rhs;
-      
       % 1. pre-smooth
       u = grid.smooth ( v1, rhs, u );
       
@@ -92,7 +91,19 @@ classdef grid < handle
     end % v-cycle
     
     % smoothers
-    
+    function u = smooth (grid, v, rhs, u)
+      switch(grid.smoother)
+        case 'jacobi', return grid.smoother_jacobi(v, rhs, u);
+        case 'chebyshev', return grid.smoother_chebyshev(v, rhs, u);
+        case '2sr', return grid.smoother_2sr(v, rhs, u);
+        otherwise disp('ERROR: Unrecognized smoother type'), return;
+      end
+    end
+
+    function set_smoother(grid, sm)
+      grid.smoother = sm;
+    end
+
     function u = smoother_jacobi (grid, v, rhs, u)
       % standard jacobi smoother
       if ( isempty(grid.jacobi_invdiag) )
