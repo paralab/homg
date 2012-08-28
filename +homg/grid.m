@@ -100,41 +100,77 @@ classdef grid < handle
         grid.jacobi_invdiag = 1./D;
       end
       
-      Kc = grid.Null' * grid.K * grid.Null;
-      Lc = grid.Null' * rhs;
-      
       for i=1:v
-        r  = grid.jacobi_invdiag .* (Lc - Kc * u);
+        r  = grid.jacobi_invdiag .* grid.residual(rhs, u);
         u = u + omega*r;
       end
-    end
+    end % jacobi
     
     function u = smoother_2sr (grid, v, rhs, u)
       % 2-step stationary iterative smoother
       % factors
+      if ( isempty ( grid.eig_max ) )
+        Kc = grid.Null' * grid.K * grid.Null;
+        grid.eig_max = eigs(Kc,1, 'LM');  
+        grid.eig_min = eigs(Kc,1, 'SM');  
+      end
+
       l_max = grid.eig_max;
       l_min = grid.eig_min;
+      
       rho       = (1 - l_min/l_max)/(1 + l_min/l_max);
       alpha     = 2/( 1 + sqrt(1-rho*rho));
       epsilon   = 2/(l_min + l_max);
       epsalpha  = epsilon * alpha;
       
-      Kc = grid.Null' * grid.K * grid.Null;
-      Lc = grid.Null' * rhs;
-      
       % variables
-      r = -Lc; % or rhs ?
-      d0 = zeros(size(u));
-      d1 = epsilon * r ;
+      res  = -rhs ?
+      u0 = zeros(size(u));
+      u1 = epsilon * r ;
       
       for iter = 1:v,                            % begin iteration
-        r = Kc*d1 - Lc;
-        d = alpha*d1 + (1-alpha)*d0 - epsalpha*r;
-        d0 = d1; d1 = d;
+        res = grid.residual ( rhs, u );
+ 
+        u = alpha*u1 + (1-alpha)*u0 - epsalpha*res;
+        u0 = u1; u1 = u;
       end % end iteration
       
-    end
+    end % 2sr
     
+    function u = smoother_chebyshev (grid, v, rhs, u)
+      if ( isempty ( grid.eig_max ) )
+        Kc = grid.Null' * grid.K * grid.Null;
+        grid.eig_max = eigs(Kc,1, 'LM');  
+        grid.eig_min = eigs(Kc,1, 'SM');  
+      end
+      
+      % FIXME adjust the eigenvalues to hit the upper spectrum
+      l_max = grid.eig_max;
+      l_min = grid.eig_min;
+      
+      c = (l_min - l_max)/2;
+      d = (l_min + l_max)/2;
+
+      p = zeros(size(u));
+
+      for iter = 1:v
+        res = grid.residual ( rhs, u ); 
+
+        if ( iter == 1 )
+          alpha = 1.0/d;
+        else if (iter == 2)
+          alpha = 2*d / (2*d*d - c*c);
+        else
+          alpha = 1.0/(d - alpha*c*c*0.25);
+        end
+
+        beta = alpha * d - 1.0;
+
+        p = alpha * res + beta * p;
+        u = u + p;  
+      end
+    end % chebyshev
+
   end %methods
   
 end %classdef
