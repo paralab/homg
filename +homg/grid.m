@@ -37,10 +37,13 @@ classdef grid < handle
       grid.ZeroBoundary = grid.Null * grid.Null';
       grid.smoother = 'jacobi';
       grid.jacobi_omega = 2/3;
-      % fixme
+      
       if (~ isempty(grid.Coarse) )
          grid.P = grid.Coarse.Mesh.assemble_interpolation(order, mesh.coords);
+         % grid.R = inv(grid.Coarse.M) * grid.P' * grid.M ; 
+         grid.R = grid.P';
       end
+
     end
     
     % compute the residual
@@ -53,8 +56,19 @@ classdef grid < handle
         u = zeros(size(rhs));
       end
 
-      % r = Au - f 
+      % r = f - Au
       r = grid.ZeroBoundary * (grid.K*(grid.ZeroBoundary*u+grid.Ud) - rhs) + (u - grid.ZeroBoundary*u - grid.Ud);
+    end
+
+    function u = solve(grid, num_vcyc, smoother, smooth_steps, rhs, u)
+      grid.set_smoother(smoother);
+      r = grid.residual(rhs, u);
+      disp(['Initial residual is ' num2str(norm(r))]);
+      for i=1:num_vcyc
+        u = grid.vcycle(smooth_steps, smooth_steps, rhs, u);
+        r = grid.residual(rhs, u);
+        disp([num2str(i) ' residual is ' num2str(norm(r))]);
+      end
     end
 
     % main v-cycle
@@ -65,6 +79,7 @@ classdef grid < handle
       
       % handle for the coarsest level
       if ( isempty( grid.Coarse ) )
+        % disp('coarse solve');
         Kc = grid.Null' * grid.K * grid.Null;
         Lc = grid.Null' * rhs;
         u = grid.Null * (Kc \ Lc) + grid.Ud;
@@ -81,10 +96,10 @@ classdef grid < handle
       res_coarse = grid.R * res;
       
       % 4. recurse
-      u_corr_coarse = grid.coarse.vcycle(v1, v2, res_coarse, zeros(size(res_coarse)));
+      u_corr_coarse = grid.Coarse.vcycle(v1, v2, res_coarse, zeros(size(res_coarse)));
       
       % 5. prolong and correct
-      u = u + grid.P * u_corr_coarse;
+      u = u - grid.P * u_corr_coarse;
       
       % 6. post-smooth
       u = grid.smooth ( v2, rhs, u );
@@ -123,7 +138,6 @@ classdef grid < handle
       for i=1:v
         r  = grid.jacobi_invdiag .* grid.residual(rhs, u);
         u = u - grid.jacobi_omega.*r;
-        norm(r)
       end
     end % jacobi
     
@@ -154,7 +168,7 @@ classdef grid < handle
  
         u = alpha*u1 + (1-alpha)*u0 - epsalpha*res;
         u0 = u1; u1 = u;
-        norm(res)
+        % norm(res)
       end % end iteration
       
     end % 2sr
@@ -177,7 +191,7 @@ classdef grid < handle
 
       for iter = 1:v
         res = grid.residual ( rhs, u ); 
-        norm(res)  
+        % norm(res)  
         if ( iter == 1 )
           alpha = 1.0/d;
         elseif (iter == 2)

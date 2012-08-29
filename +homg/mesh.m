@@ -167,6 +167,7 @@ classdef mesh < handle
         X(i) = 1;
         P(:,i) = postinterp(mesh.fem, 'u', pts', 'U', X)';
       end
+      P = P(:, mesh.perm_full);
       P = sparse(P);
     end
     
