@@ -19,6 +19,7 @@ classdef grid < handle
     P
     Mesh
     Coarse  % handle to coarse grid 
+    dbg_spaces
   end % properties
   
   methods
@@ -31,12 +32,19 @@ classdef grid < handle
         grid.Coarse = coarse;
       end
       
+      grid.dbg_spaces = '      ';
+      grid.dbg_spaces = grid.dbg_spaces(1:end-4*grid.level);
+
+      % for i=1:(grid.level)
+      %  grid.dbg_spaces = [grid.dbg_spaces  '  '];
+      % end
+
       grid.Mesh = mesh;
       [grid.K, grid.L, grid.Null, grid.Ud] = mesh.assemble_poisson(order);
       grid.M = mesh.assemble_mass(order);
       grid.ZeroBoundary = grid.Null * grid.Null';
       grid.smoother = 'jacobi';
-      grid.jacobi_omega = 2/3;
+      grid.jacobi_omega = 1.0; % 2/3;
       
       if (~ isempty(grid.Coarse) )
          grid.P = grid.Coarse.Mesh.assemble_interpolation(order, mesh.coords);
@@ -56,7 +64,7 @@ classdef grid < handle
         u = zeros(size(rhs));
       end
 
-      % r = f - Au
+      % r = Au - f
       r = grid.ZeroBoundary * (grid.K*(grid.ZeroBoundary*u+grid.Ud) - rhs) + (u - grid.ZeroBoundary*u - grid.Ud);
     end
 
@@ -67,7 +75,9 @@ classdef grid < handle
       for i=1:num_vcyc
         u = grid.vcycle(smooth_steps, smooth_steps, rhs, u);
         r = grid.residual(rhs, u);
+        disp('------------------------------------------');
         disp([num2str(i) ' residual is ' num2str(norm(r))]);
+        disp('------------------------------------------');
       end
     end
 
@@ -77,9 +87,11 @@ classdef grid < handle
       % solve system using initial guess u, given rhs
       % with v1 pre and v2 post-smoothing steps
       
+      disp( [grid.dbg_spaces 'v-cycle at level ' num2str(grid.level)]);
       % handle for the coarsest level
       if ( isempty( grid.Coarse ) )
-        % disp('coarse solve');
+        % disp('------- coarse solve -------');
+        % disp( [' grid level is ' num2str(grid.level)]);
         Kc = grid.Null' * grid.K * grid.Null;
         Lc = grid.Null' * rhs;
         u = grid.Null * (Kc \ Lc) + grid.Ud;
@@ -118,6 +130,9 @@ classdef grid < handle
         case '2sr', 
           u = grid.smoother_2sr(v, rhs, u); 
           return;
+        case 'hybrid',
+          u = grid.smoother_hybrid(v, rhs, u);
+          return;
         otherwise
           disp('ERROR: Unrecognized smoother type'); 
           return;
@@ -126,6 +141,9 @@ classdef grid < handle
 
     function set_smoother(grid, sm)
       grid.smoother = sm;
+      if (~ isempty(grid.Coarse) )
+        grid.Coarse.set_smoother(sm);
+      end
     end
 
     function u = smoother_jacobi (grid, v, rhs, u)
@@ -136,10 +154,18 @@ classdef grid < handle
       end
       
       for i=1:v
-        r  = grid.jacobi_invdiag .* grid.residual(rhs, u);
-        u = u - grid.jacobi_omega.*r;
+        res  = grid.jacobi_invdiag .* grid.residual(rhs, u);
+        u = u - grid.jacobi_omega.*res;
+        r = norm(res);
+        % disp([grid.dbg_spaces 'residual: ' num2str(r)]); 
+        % norm(r)
       end
     end % jacobi
+    
+    function u = smoother_hybrid (grid, v, rhs, u)
+      u = grid.smoother_jacobi(v, rhs, u);
+      u = grid.smoother_2sr(v, rhs, u);
+    end
     
     function u = smoother_2sr (grid, v, rhs, u)
       % 2-step stationary iterative smoother
@@ -159,8 +185,8 @@ classdef grid < handle
       epsalpha  = epsilon * alpha;
       
       % variables
-      res  = -rhs;
-      u0 = zeros(size(u));
+      u0  = u; %zeros(size(u));
+      res = grid.residual(rhs, u);
       u1 = epsilon * res ;
       
       for iter = 1:v,                            % begin iteration
@@ -168,7 +194,10 @@ classdef grid < handle
  
         u = alpha*u1 + (1-alpha)*u0 - epsalpha*res;
         u0 = u1; u1 = u;
-        % norm(res)
+        r = norm(res);
+        % n0 = norm(u0);
+        % n1 = norm(u1);
+        disp([grid.dbg_spaces 'residual: ' num2str(r)]); % ' u0: ' num2str(n0) ' u1: ' num2str(n1)]);
       end % end iteration
       
     end % 2sr
@@ -180,7 +209,7 @@ classdef grid < handle
         grid.eig_min = eigs(Kc, 1, 'SM');  
       end
       
-      % FIXME adjust the eigenvalues to hit the upper spectrum
+      % adjust the eigenvalues to hit the upper spectrum
       l_max = grid.eig_max;
       l_min = (grid.eig_min + grid.eig_max)/2;
       
@@ -191,7 +220,8 @@ classdef grid < handle
 
       for iter = 1:v
         res = grid.residual ( rhs, u ); 
-        % norm(res)  
+        r = norm(res);
+        % disp([grid.dbg_spaces 'residual: ' num2str(r)]); 
         if ( iter == 1 )
           alpha = 1.0/d;
         elseif (iter == 2)
@@ -206,6 +236,13 @@ classdef grid < handle
         u = u + p;  
       end
     end % chebyshev
+
+    function evec = get_eigenvectors(grid)
+      % generate the correct matrix 
+      % Kc = grid.Null' * grid.K * grid.Null;
+      Kc = (eye(size(grid.K)) - grid.ZeroBoundary) + grid.ZeroBoundary*grid.K*grid.ZeroBoundary;
+      [evec, lam] = eig(full(Kc));
+    end
 
   end %methods
   
