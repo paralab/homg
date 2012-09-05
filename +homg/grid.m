@@ -149,7 +149,8 @@ classdef grid < handle
     function u = smoother_jacobi (grid, v, rhs, u)
       % standard jacobi smoother
       if ( isempty(grid.jacobi_invdiag) )
-        D = diag(grid.K);
+        Kc = (eye(size(grid.K)) - grid.ZeroBoundary) + grid.ZeroBoundary * grid.K * grid.ZeroBoundary;
+        D = diag(Kc);
         grid.jacobi_invdiag = 1./D;
       end
       
@@ -163,21 +164,22 @@ classdef grid < handle
     end % jacobi
     
     function u = smoother_hybrid (grid, v, rhs, u)
-      u = grid.smoother_jacobi(v, rhs, u);
-      u = grid.smoother_2sr(v, rhs, u);
+      u = grid.smoother_chebyshev(v, rhs, u);
     end
     
     function u = smoother_2sr (grid, v, rhs, u)
       % 2-step stationary iterative smoother
       % factors
       if ( isempty ( grid.eig_max ) )
-        Kc = grid.Null' * grid.K * grid.Null;
+        % Kc = grid.Null' * grid.K * grid.Null;
+        Kc = (eye(size(grid.K)) - grid.ZeroBoundary) + grid.ZeroBoundary * grid.K * grid.ZeroBoundary;
         grid.eig_max = eigs(Kc,1, 'LM');  
         grid.eig_min = eigs(Kc,1, 'SM');  
       end
 
       l_max = grid.eig_max;
-      l_min = (grid.eig_min + grid.eig_max)/2;
+      l_min = grid.eig_max*.9; 
+      % l_min = (grid.eig_min + grid.eig_max)/2;
       
       rho       = (1 - l_min/l_max)/(1 + l_min/l_max);
       alpha     = 2/( 1 + sqrt(1-rho*rho));
@@ -204,7 +206,8 @@ classdef grid < handle
     
     function u = smoother_chebyshev (grid, v, rhs, u)
       if ( isempty ( grid.eig_max ) )
-        Kc = grid.Null' * grid.K * grid.Null;
+        % Kc = grid.Null' * grid.K * grid.Null;
+        Kc = (eye(size(grid.K)) - grid.ZeroBoundary) + grid.ZeroBoundary * grid.K * grid.ZeroBoundary;
         grid.eig_max = eigs(Kc, 1, 'LM');  
         grid.eig_min = eigs(Kc, 1, 'SM');  
       end
@@ -239,9 +242,8 @@ classdef grid < handle
 
     function evec = get_eigenvectors(grid)
       % generate the correct matrix 
-      % Kc = grid.Null' * grid.K * grid.Null;
-      Kc = (eye(size(grid.K)) - grid.ZeroBoundary) + grid.ZeroBoundary*grid.K*grid.ZeroBoundary;
-      [evec, lam] = eig(full(Kc));
+      Kc = (eye(size(grid.K)) - grid.ZeroBoundary) + grid.ZeroBoundary * grid.K * grid.ZeroBoundary;
+      [evec, ~] = eig(full(Kc));
     end
 
   end %methods
