@@ -6,6 +6,7 @@ classdef grid < handle
     level
     eig_max
     eig_min
+    k_evec
     jacobi_omega
     jacobi_invdiag
     smoother
@@ -44,7 +45,7 @@ classdef grid < handle
       grid.M = mesh.assemble_mass(order);
       grid.ZeroBoundary = grid.Null * grid.Null';
       grid.smoother = 'jacobi';
-      grid.jacobi_omega = 1.0; % 2/3;
+      grid.jacobi_omega = 2/3;
       
       if (~ isempty(grid.Coarse) )
          grid.P = grid.Coarse.Mesh.assemble_interpolation(order, mesh.coords);
@@ -70,6 +71,9 @@ classdef grid < handle
 
     function u = solve(grid, num_vcyc, smoother, smooth_steps, rhs, u)
       grid.set_smoother(smoother);
+      % bdy conditions ...
+      u = grid.ZeroBoundary*u;
+      
       r = grid.residual(rhs, u);
       disp(['Initial residual is ' num2str(norm(r))]);
       for i=1:num_vcyc
@@ -99,7 +103,10 @@ classdef grid < handle
       end
       
       % 1. pre-smooth
+      clf;
+      grid.plot_spectrum(u, 'k', rhs); hold on;
       u = grid.smooth ( v1, rhs, u );
+      grid.plot_spectrum(u, 'b', rhs);
       
       % 2. compute residual
       res = grid.residual(rhs, u);
@@ -112,9 +119,10 @@ classdef grid < handle
       
       % 5. prolong and correct
       u = u - grid.P * u_corr_coarse;
-      
+      grid.plot_spectrum(u, 'r', rhs);
       % 6. post-smooth
       u = grid.smooth ( v2, rhs, u );
+      grid.plot_spectrum(u, 'g', rhs);
       
     end % v-cycle
     
@@ -178,8 +186,8 @@ classdef grid < handle
       end
 
       l_max = grid.eig_max;
-      l_min = grid.eig_max*.9; 
-      % l_min = (grid.eig_min + grid.eig_max)/2;
+      % l_min = grid.eig_max*.9; 
+      l_min = (grid.eig_min + grid.eig_max)/2;
       
       rho       = (1 - l_min/l_max)/(1 + l_min/l_max);
       alpha     = 2/( 1 + sqrt(1-rho*rho));
@@ -213,8 +221,9 @@ classdef grid < handle
       end
       
       % adjust the eigenvalues to hit the upper spectrum
-      l_max = grid.eig_max;
-      l_min = (grid.eig_min + grid.eig_max)/2;
+      l_max = grid.eig_max*1.1;
+      l_min = grid.eig_max*0.35; 
+      %l_min =  (grid.eig_min + grid.eig_max)/2;
       
       c = (l_min - l_max)/2;
       d = (l_min + l_max)/2;
@@ -244,8 +253,27 @@ classdef grid < handle
       % generate the correct matrix 
       Kc = (eye(size(grid.K)) - grid.ZeroBoundary) + grid.ZeroBoundary * grid.K * grid.ZeroBoundary;
       [evec, ~] = eig(full(Kc));
+      grid.k_evec = evec;
+    end
+    
+    function plot_spectrum(grid, u, clr, rhs)
+      subplot(1,2,1);
+      q = repmat(u,size(u'));
+      b = abs(dot (grid.k_evec, q));
+      % plot eigenvalues 
+      plot(b, clr); hold on;
+      subplot(1,2,2); 
+      rr = grid.residual(rhs, u);
+      n = sqrt(length(rr));
+      imagesc(reshape(rr, n, n)); colorbar; hold off;
     end
 
+    function u0 = get_u0(grid)
+      n = size(grid.k_evec, 1);
+      lam = ones(n,1);
+      u0 = grid.k_evec*lam;
+    end
+    
   end %methods
   
 end %classdef
