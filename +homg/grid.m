@@ -9,6 +9,8 @@ classdef grid < handle
     k_evec
     jacobi_omega
     jacobi_invdiag
+    gs_G
+    gs_c
     smoother
     K
     L
@@ -132,6 +134,9 @@ classdef grid < handle
         case 'jacobi', 
           u = grid.smoother_jacobi(v, rhs, u); 
           return;
+        case 'gs', 
+          u = grid.smoother_gauss_seidel(v, rhs, u); 
+          return;
         case 'chebyshev', 
           u = grid.smoother_chebyshev(v, rhs, u); 
           return;
@@ -171,6 +176,19 @@ classdef grid < handle
       end
     end % jacobi
     
+    function u = smoother_gauss_seidel (grid, v, rhs, u)
+      if ( isempty ( grid.gs_G ) )
+        Kc = (eye(size(grid.K)) - grid.ZeroBoundary) + grid.ZeroBoundary * grid.K * grid.ZeroBoundary;
+        LD = tril(Kc);
+        grid.gs_G = -LD \ triu(Kc, 1);
+        grid.gs_c = grid.ZeroBoundary *( LD \ rhs );
+      end
+
+      for i=1:v
+         u = grid.gs_G*u + grid.gs_c;
+      end
+    end
+
     function u = smoother_hybrid (grid, v, rhs, u)
       u = grid.smoother_chebyshev(v, rhs, u);
     end
@@ -195,19 +213,18 @@ classdef grid < handle
       epsalpha  = epsilon * alpha;
       
       % variables
-      u0  = u; %zeros(size(u));
-      res = grid.residual(rhs, u);
+      u0  = zeros(size(u));
+      res = -rhs; % grid.residual(rhs, u);
       u1 = epsilon * res ;
       
       for iter = 1:v,                            % begin iteration
-        res = grid.residual ( rhs, u );
- 
+        res = grid.residual ( rhs, u );  
         u = alpha*u1 + (1-alpha)*u0 - epsalpha*res;
         u0 = u1; u1 = u;
-        r = norm(res);
+        % r = norm(res);
         % n0 = norm(u0);
         % n1 = norm(u1);
-        disp([grid.dbg_spaces 'residual: ' num2str(r)]); % ' u0: ' num2str(n0) ' u1: ' num2str(n1)]);
+        % disp([grid.dbg_spaces 'residual: ' num2str(r)]); % ' u0: ' num2str(n0) ' u1: ' num2str(n1)]);
       end % end iteration
       
     end % 2sr
@@ -221,9 +238,9 @@ classdef grid < handle
       end
       
       % adjust the eigenvalues to hit the upper spectrum
-      l_max = grid.eig_max*1.1;
-      l_min = grid.eig_max*0.35; 
-      %l_min =  (grid.eig_min + grid.eig_max)/2;
+      l_max = grid.eig_max;  % *1.1;
+      % l_min = grid.eig_max*0.35; 
+      l_min =  (grid.eig_min + grid.eig_max)/2;
       
       c = (l_min - l_max)/2;
       d = (l_min + l_max)/2;
