@@ -4,6 +4,7 @@ function test_smoother (dim, order, nelem, smoother)
 % valid smoothers are,
 %       'jacobi'
 %       'chebyshev'
+%       'gs'
 %       '2sr'
 
 % generate matrix 
@@ -24,8 +25,8 @@ lam = ones(n,1);
 g.set_smoother(smoother);
 g.jacobi_omega = 2.0/3.0;
 clrs = 'bkrgcym';
-% stps = [1 2 3 4 5 6 8 12 16 20];
-stps = [order-1 order order+3];
+stps = [1 2 3 4 5 6 8 12 16 20];
+% stps = [order-1 order order+3];
 
 clf;
 u0 = evec*lam;
