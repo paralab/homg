@@ -149,29 +149,51 @@ classdef mesh < handle
     function P = assemble_interpolation(mesh, order, pts)
       % todo: check if matrices assembled before this ...
       % vector of FEM coefficients and its length
+
+      % making change to allow order to be different ...
       if (order ~= mesh.fem.shape)
-        disp('The order specified in the interpolation does not match the one used for assembly');
-      end
-      
-      % X = mesh.fem.sol.u;
-      % no_dofs = length(X);
-      no_dofs =  (order*mesh.nelem+1)^mesh.dim;
-      X = zeros(no_dofs,1);
-      
-      % allocate storage for interpolation operator
-      P = zeros(size(pts,1),no_dofs);
-      
-      % build interpolation operator
-      for i = 1:no_dofs
-        X(:) = 0;
-        X(i) = 1;
-        P(:,i) = postinterp(mesh.fem, 'u', pts', 'U', X)';
-      end
-      P = P(:, mesh.perm_full);
-      P = sparse(P);
-    end
-    
-  end % methods
-  
+        if ( order ~= 1 )
+          disp('The order specified in the interpolation does not match the one used for assembly');
+        else
+          % Create a new fem that is linear ...
+          lin_nelem = mesh.fem.shape * mesh.nelem;
+          meshlin = homg.mesh(mesh.dim, lin_nelem);
+          meshlin.assemble_poisson(order);
+        
+          no_dofs =  (lin_nelem+1)^meshlin.dim;
+          X = zeros(no_dofs,1);
+        
+          % allocate storage for interpolation operator
+          P = zeros(size(pts,1), no_dofs);
+         
+          % build interpolation operator
+          for i = 1:no_dofs
+            X(:) = 0;
+            X(i) = 1;
+            P(:,i) = postinterp(meshlin.fem, 'u', pts', 'U', X)';
+          end
+          P = P(:, meshlin.perm_full);
+          P = sparse(P);
+
+        end % if order != 1
+      else 
+        no_dofs =  (order*mesh.nelem+1)^mesh.dim;
+        X = zeros(no_dofs,1);
+
+        % allocate storage for interpolation operator
+        P = zeros(size(pts,1),no_dofs);
+
+        % build interpolation operator
+        for i = 1:no_dofs
+          X(:) = 0;
+          X(i) = 1;
+          P(:,i) = postinterp(mesh.fem, 'u', pts', 'U', X)';
+        end
+        P = P(:, mesh.perm_full);
+        P = sparse(P);
+      end 
+    end 
+end % methods
+
 end % classdef
 
