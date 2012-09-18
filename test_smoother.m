@@ -24,8 +24,8 @@ lam = ones(n,1);
 g.set_smoother(smoother);
 g.jacobi_omega = 2.0/3.0;
 clrs = 'bkrgcym';
-% stps = [1 2 3 4 5 6 8 12 16 20];
-stps = [order-1 order order+3];
+stps = [1 2 3 4 5 6 8 12 16 20];
+% stps = [order-1 order order+3];
 
 clf;
 u0 = evec*lam;
@@ -33,7 +33,7 @@ q = repmat(u0,size(u0'));
 b = dot (evec, q);
 plot(b, 'k'); hold on;
 
-for i=1:3
+for i=1:4
   u0 = evec*lam; % compare with sum(evec, 2);
   u = g.smooth(stps(i), g.L, u0);
   % compute projections ...

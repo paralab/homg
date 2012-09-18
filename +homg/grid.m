@@ -7,6 +7,7 @@ classdef grid < handle
     eig_max
     eig_min
     k_evec
+    k_lam
     jacobi_omega
     jacobi_invdiag
     gs_G
@@ -47,7 +48,7 @@ classdef grid < handle
       grid.M = mesh.assemble_mass(order);
       grid.ZeroBoundary = grid.Null * grid.Null';
       grid.smoother = 'jacobi';
-      grid.jacobi_omega = 2/3;
+      grid.jacobi_omega = 1.0; % 2/3;
       
       if (~ isempty(grid.Coarse) )
          grid.P = grid.Coarse.Mesh.assemble_interpolation(order, mesh.coords);
@@ -191,6 +192,7 @@ classdef grid < handle
 
     function u = smoother_hybrid (grid, v, rhs, u)
       u = grid.smoother_chebyshev(v, rhs, u);
+      u = grid.smoother_jacobi(1, rhs, u);
     end
     
     function u = smoother_2sr (grid, v, rhs, u)
@@ -238,8 +240,7 @@ classdef grid < handle
       end
       
       % adjust the eigenvalues to hit the upper spectrum
-      l_max = grid.eig_max;  % *1.1;
-      % l_min = grid.eig_max*0.35; 
+      l_max = grid.eig_max;
       l_min =  (grid.eig_min + grid.eig_max)/2;
       
       c = (l_min - l_max)/2;
@@ -269,8 +270,9 @@ classdef grid < handle
     function evec = get_eigenvectors(grid)
       % generate the correct matrix 
       Kc = (eye(size(grid.K)) - grid.ZeroBoundary) + grid.ZeroBoundary * grid.K * grid.ZeroBoundary;
-      [evec, ~] = eig(full(Kc));
+      [evec, eval] = eig(full(Kc));
       grid.k_evec = evec;
+      grid.k_lam = eval;
     end
     
     function plot_spectrum(grid, u, clr, rhs)
