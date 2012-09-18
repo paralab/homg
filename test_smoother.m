@@ -4,6 +4,7 @@ function test_smoother (dim, order, nelem, smoother)
 % valid smoothers are,
 %       'jacobi'
 %       'chebyshev'
+%       'gs'
 %       '2sr'
 
 % generate matrix 
