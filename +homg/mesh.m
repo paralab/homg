@@ -92,12 +92,12 @@ classdef mesh < handle
       
       mesh.fem.equ.expr = {'f' mesh.rhs};
       if (mesh.dim == 2)
-        mesh.fem.equ.weak = '-(ux * ux_test + uy * uy_test + f * u_test)';
+        mesh.fem.equ.weak = '-(u*u_test + ux * ux_test + uy * uy_test + f * u_test)';
       else
         mesh.fem.equ.weak = '-(ux * ux_test + uy * uy_test + uz * uz_test + f * u_test)';
       end
       
-      mesh.fem.bnd.r = {'u-0'};
+      % mesh.fem.bnd.r = {'u-0'};
       mesh.fem.xmesh = meshextend(mesh.fem,  'report', 'off');
       
       % K system matrix, L rhs, boundary conditions are to be incorporated
@@ -152,15 +152,16 @@ classdef mesh < handle
 
       % making change to allow order to be different ...
       if (order ~= mesh.fem.shape)
-        if ( order ~= 1 )
-          disp('The order specified in the interpolation does not match the one used for assembly');
-        else
+        % if ( order ~= 1 )
+        %  disp('The order specified in the interpolation does not match the one used for assembly');
+        % else
           % Create a new fem that is linear ...
-          lin_nelem = mesh.fem.shape * mesh.nelem;
+          num_dups = mesh.fem.shape / order;
+          lin_nelem = num_dups * mesh.nelem;
           meshlin = homg.mesh(mesh.dim, lin_nelem);
           meshlin.assemble_poisson(order);
         
-          no_dofs =  (lin_nelem+1)^meshlin.dim;
+          no_dofs =  (order*lin_nelem+1)^meshlin.dim;
           X = zeros(no_dofs,1);
         
           % allocate storage for interpolation operator
@@ -175,19 +176,24 @@ classdef mesh < handle
           P = P(:, meshlin.perm_full);
           P = sparse(P);
 
-        end % if order != 1
+        % end % if order != 1
       else 
         no_dofs =  (order*mesh.nelem+1)^mesh.dim;
-        X = zeros(no_dofs,1);
+        Xi = zeros(no_dofs,1);
 
         % allocate storage for interpolation operator
         P = zeros(size(pts,1),no_dofs);
-
+        
+        prog_step = ceil(no_dofs/100);
         % build interpolation operator
         for i = 1:no_dofs
-          X(:) = 0;
-          X(i) = 1;
-          P(:,i) = postinterp(mesh.fem, 'u', pts', 'U', X)';
+          % if ( mod(i, prog_step) == 0 )
+          %   disp(['Assembling P ' num2str(i/prog_step) ' %']);
+          % end
+          Xi(:) = 0;
+          % Xi = zeros(no_dofs,1);
+          Xi(i) = 1;
+          P(:,i) = postinterp(mesh.fem, 'u', pts', 'U', Xi)';
         end
         P = P(:, mesh.perm_full);
         P = sparse(P);

@@ -12,6 +12,9 @@ classdef grid < handle
     jacobi_invdiag
     gs_G
     gs_c
+    sor_G
+    sor_c
+    sor_omega
     smoother
     K
     L
@@ -47,9 +50,9 @@ classdef grid < handle
       [grid.K, grid.L, grid.Null, grid.Ud] = mesh.assemble_poisson(order);
       grid.M = mesh.assemble_mass(order);
       grid.ZeroBoundary = grid.Null * grid.Null';
-      grid.smoother = 'jacobi';
-      grid.jacobi_omega = 1.0; % 2/3;
-      
+      grid.smoother = 'sor';
+      grid.jacobi_omega = 2/3;
+      grid.sor_omega = 1;
       if (~ isempty(grid.Coarse) )
          grid.P = grid.Coarse.Mesh.assemble_interpolation(order, mesh.coords);
          % grid.R = inv(grid.Coarse.M) * grid.P' * grid.M ; 
@@ -69,23 +72,36 @@ classdef grid < handle
       end
 
       % r = Au - f
-      r = grid.ZeroBoundary * (grid.K*(grid.ZeroBoundary*u+grid.Ud) - rhs) + (u - grid.ZeroBoundary*u - grid.Ud);
+      % r = grid.ZeroBoundary * (grid.K*(grid.ZeroBoundary*u+grid.Ud) - rhs) + (u - grid.ZeroBoundary*u - grid.Ud);
+      r = grid.K*u - rhs;
     end
 
-    function u = solve(grid, num_vcyc, smoother, smooth_steps, rhs, u)
+    function u = solve_pcg(grid, num_vcyc, smoother, smooth_steps, rhs, u)
+      
+    end
+    
+    function [u, rr, iter] = solve(grid, num_vcyc, smoother, smooth_steps, rhs, u)
       grid.set_smoother(smoother);
       % bdy conditions ...
-      u = grid.ZeroBoundary*u;
+      % u = grid.ZeroBoundary*u;
       
       r = grid.residual(rhs, u);
       disp(['Initial residual is ' num2str(norm(r))]);
+      r0 = norm(r);
       for i=1:num_vcyc
         u = grid.vcycle(smooth_steps, smooth_steps, rhs, u);
         r = grid.residual(rhs, u);
         disp('------------------------------------------');
         disp([num2str(i) ' residual is ' num2str(norm(r))]);
         disp('------------------------------------------');
+        if (norm(r)/r0 < 1e-8)
+          iter = i;
+          rr = norm(r)/r0;
+          return;
+        end
       end
+      iter = num_vcyc;
+      rr = norm(r)/r0;
     end
 
     % main v-cycle
@@ -135,11 +151,15 @@ classdef grid < handle
         case 'jacobi', 
           u = grid.smoother_jacobi(v, rhs, u); 
           return;
-        case 'gs', 
+        case 'gs',
+          grid.sor_omega = 1.0;
           u = grid.smoother_gauss_seidel(v, rhs, u); 
           return;
         case 'chebyshev', 
           u = grid.smoother_chebyshev(v, rhs, u); 
+          return;
+        case 'sor',
+          u = grid.smoother_sor(v, rhs, u);
           return;
         case '2sr', 
           u = grid.smoother_2sr(v, rhs, u); 
@@ -174,8 +194,30 @@ classdef grid < handle
         r = norm(res);
         % disp([grid.dbg_spaces 'residual: ' num2str(r)]); 
         % norm(r)
-      end
+      end  
     end % jacobi
+    
+    
+    function u = smoother_sor (grid, v, rhs, u)
+      if ( isempty ( grid.sor_G ) )
+        Kc = (eye(size(grid.K)) - grid.ZeroBoundary) + grid.ZeroBoundary * grid.K * grid.ZeroBoundary;
+        kL = tril(Kc, -1);
+        kD = diag(diag(Kc));
+        kU = triu(Kc, 1);
+        grid.sor_G = - (kD + grid.sor_omega*kL) \ (grid.sor_omega*kU + (grid.sor_omega - 1.0)*kD );
+        grid.sor_c = grid.ZeroBoundary *( (kD + grid.sor_omega*kL) \ (grid.sor_omega*rhs) );
+      end
+
+      for i=1:v
+         u = grid.sor_G*u + grid.sor_c;
+      end
+    end
+    
+    function set_sor_omega(grid, w)
+      grid.sor_omega = w;
+      grid.sor_G = [];
+      grid.sor_c = [];
+    end
     
     function u = smoother_gauss_seidel (grid, v, rhs, u)
       if ( isempty ( grid.gs_G ) )
@@ -191,8 +233,8 @@ classdef grid < handle
     end
 
     function u = smoother_hybrid (grid, v, rhs, u)
-      u = grid.smoother_chebyshev(v, rhs, u);
-      u = grid.smoother_jacobi(1, rhs, u);
+      u = grid.smoother_gauss_seidel (v, rhs, u);
+      u = grid.smoother_chebyshev (v, rhs, u);
     end
     
     function u = smoother_2sr (grid, v, rhs, u)
@@ -269,27 +311,33 @@ classdef grid < handle
 
     function evec = get_eigenvectors(grid)
       % generate the correct matrix 
-      Kc = (eye(size(grid.K)) - grid.ZeroBoundary) + grid.ZeroBoundary * grid.K * grid.ZeroBoundary;
-      [evec, eval] = eig(full(Kc));
+      Kc = grid.K; %(eye(size(grid.K)) - grid.ZeroBoundary) + grid.ZeroBoundary * grid.K * grid.ZeroBoundary;
+      [evec, eval] = eig(full(Kc), full(grid.M));
       grid.k_evec = evec;
       grid.k_lam = eval;
     end
     
-    function plot_spectrum(grid, u, clr, rhs)
+    function plot_spectrum(g, u, clr, rhs)
       subplot(1,2,1);
-      q = repmat(u,size(u'));
-      b = abs(dot (grid.k_evec, q));
+      a = g.M * u;
+      q = repmat(a,size(a'));
+      b = abs(dot (g.k_evec, q));
       % plot eigenvalues 
       plot(b, clr); hold on;
       subplot(1,2,2); 
-      rr = grid.residual(rhs, u);
+      rr = g.residual(rhs, u);
       n = sqrt(length(rr));
       imagesc(reshape(rr, n, n)); colorbar; hold off;
+      grid on;
+      odr = g.Mesh.fem.shape;
+      set(gca, 'xtick', odr+0.5:odr:odr*g.Mesh.nelem);
+      set(gca, 'ytick', odr+0.5:odr:odr*g.Mesh.nelem);
     end
 
     function u0 = get_u0(grid)
       n = size(grid.k_evec, 1);
       lam = ones(n,1);
+      % lam(1:n/4) = 1;
       u0 = grid.k_evec*lam;
     end
     
