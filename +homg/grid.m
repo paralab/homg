@@ -12,6 +12,8 @@ classdef grid < handle
     jacobi_invdiag
     gs_G
     gs_c
+    ssor_M
+    ssor_N
     sor_G
     sor_c
     sor_omega
@@ -76,8 +78,42 @@ classdef grid < handle
       r = grid.K*u - rhs;
     end
 
-    function u = solve_pcg(grid, num_vcyc, smoother, smooth_steps, rhs, u)
+    function [u, rr, iter] = solve_pcg(grid, num_vcyc, smoother, smooth_steps, rhs, u)
+      grid.set_smoother(smoother);
       
+      r = grid.residual(rhs, u);
+      rho = zeros(size(u));
+      rho = grid.vcycle(smooth_steps, smooth_steps, r, rho);
+      p = rho;
+      disp(['Initial residual is ' num2str(norm(r))]);
+      r0 = norm(r);
+      for i=1:num_vcyc
+        h = grid.K * p;
+        rho_res = dot (rho, r);
+        alpha = rho_res / dot ( p, h );
+        u = u + alpha*p;
+        r = r - alpha*h;
+
+        % rho_res_prev = rho_res;
+        
+        disp('------------------------------------------');
+        disp([num2str(i) ' residual is ' num2str(norm(r))]);
+        disp('------------------------------------------');
+        if (norm(r)/r0 < 1e-8)
+          iter = i;
+          rr = norm(r)/r0;
+          return;
+        end
+        
+        % precondition ..
+        rho = zeros(size(u)); % needed ?
+        rho = grid.vcycle(smooth_steps, smooth_steps, r, rho);
+        
+        beta = dot(rho, r) / rho_res ;
+        p = rho + beta*p;
+      end
+      iter = num_vcyc;
+      rr = norm(r)/r0;
     end
     
     function [u, rr, iter] = solve(grid, num_vcyc, smoother, smooth_steps, rhs, u)
@@ -161,6 +197,9 @@ classdef grid < handle
         case 'sor',
           u = grid.smoother_sor(v, rhs, u);
           return;
+        case 'ssor',
+          u = grid.smoother_sym_sor(v, rhs, u);
+          return;
         case '2sr', 
           u = grid.smoother_2sr(v, rhs, u); 
           return;
@@ -213,10 +252,27 @@ classdef grid < handle
       end
     end
     
+    function u = smoother_sym_sor (grid, v, rhs, u)
+      if ( isempty ( grid.ssor_M ) )
+        w = grid.sor_omega;
+        n = length(u);
+        grid.ssor_M = spdiags( (1/w)*diag(grid.K), 0, n, n) + tril(grid.K,-1);
+        grid.ssor_N = spdiags(((1-w)/w)*diag(grid.K), 0, n, n) - triu(grid.K,1);
+      end
+
+      for i=1:v
+        r = grid.residual(rhs, u);
+        u = u - grid.ssor_M \ r;
+        u = grid.ssor_M' \ (grid.ssor_N'*u + rhs);
+      end
+    end
+    
     function set_sor_omega(grid, w)
       grid.sor_omega = w;
       grid.sor_G = [];
       grid.sor_c = [];
+      grid.ssor_M = [];
+      grid.ssor_N = [];
     end
     
     function u = smoother_gauss_seidel (grid, v, rhs, u)
