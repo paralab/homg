@@ -28,6 +28,7 @@ classdef grid < handle
     P
     Mesh
     Coarse  % handle to coarse grid 
+    debug
     dbg_spaces
   end % properties
   
@@ -43,7 +44,7 @@ classdef grid < handle
       
       grid.dbg_spaces = '      ';
       grid.dbg_spaces = grid.dbg_spaces(1:end-4*grid.level);
-
+      grid.debug = 0;
       % for i=1:(grid.level)
       %  grid.dbg_spaces = [grid.dbg_spaces  '  '];
       % end
@@ -86,6 +87,7 @@ classdef grid < handle
       rho = grid.vcycle(smooth_steps, smooth_steps, r, rho);
       p = rho;
       disp(['Initial residual is ' num2str(norm(r))]);
+      disp('------------------------------------------');
       r0 = norm(r);
       for i=1:num_vcyc
         h = grid.K * p;
@@ -96,9 +98,7 @@ classdef grid < handle
 
         % rho_res_prev = rho_res;
         
-        disp('------------------------------------------');
-        disp([num2str(i) ' residual is ' num2str(norm(r))]);
-        disp('------------------------------------------');
+        disp([num2str(i) ': |res| = ' num2str(norm(r))]);
         if (norm(r)/r0 < 1e-8)
           iter = i;
           rr = norm(r)/r0;
@@ -112,6 +112,7 @@ classdef grid < handle
         beta = dot(rho, r) / rho_res ;
         p = rho + beta*p;
       end
+      disp('------------------------------------------');
       iter = num_vcyc;
       rr = norm(r)/r0;
     end
@@ -123,19 +124,19 @@ classdef grid < handle
       
       r = grid.residual(rhs, u);
       disp(['Initial residual is ' num2str(norm(r))]);
+      disp('------------------------------------------');
       r0 = norm(r);
       for i=1:num_vcyc
         u = grid.vcycle(smooth_steps, smooth_steps, rhs, u);
         r = grid.residual(rhs, u);
-        disp('------------------------------------------');
-        disp([num2str(i) ' residual is ' num2str(norm(r))]);
-        disp('------------------------------------------');
+        disp([num2str(i) ': |res| = ' num2str(norm(r))]);
         if (norm(r)/r0 < 1e-8)
           iter = i;
           rr = norm(r)/r0;
           return;
         end
       end
+      disp('------------------------------------------');
       iter = num_vcyc;
       rr = norm(r)/r0;
     end
@@ -146,7 +147,7 @@ classdef grid < handle
       % solve system using initial guess u, given rhs
       % with v1 pre and v2 post-smoothing steps
       
-      disp( [grid.dbg_spaces 'v-cycle at level ' num2str(grid.level)]);
+      % disp( [grid.dbg_spaces 'v-cycle at level ' num2str(grid.level)]);
       % handle for the coarsest level
       if ( isempty( grid.Coarse ) )
         % disp('------- coarse solve -------');
@@ -374,24 +375,29 @@ classdef grid < handle
     end
     
     function plot_spectrum(g, u, clr, rhs)
-      subplot(1,2,1);
-      a = g.M * u;
-      q = repmat(a,size(a'));
-      b = abs(dot (g.k_evec, q));
-      % plot eigenvalues 
-      plot(b, clr); hold on;
-      subplot(1,2,2); 
-      rr = g.residual(rhs, u);
-      n = sqrt(length(rr));
-      imagesc(reshape(rr, n, n)); colorbar; hold off;
-      grid on;
-      odr = g.Mesh.fem.shape;
-      set(gca, 'xtick', odr+0.5:odr:odr*g.Mesh.nelem);
-      set(gca, 'ytick', odr+0.5:odr:odr*g.Mesh.nelem);
+      if (g.debug)  
+        subplot(1,2,1);
+        a = g.M * u;
+        q = repmat(a,size(a'));
+        b = abs(dot (g.k_evec, q));
+        % plot eigenvalues 
+        plot(b, clr); hold on;
+        subplot(1,2,2); 
+        rr = g.residual(rhs, u);
+        n = sqrt(length(rr));
+        imagesc(reshape(rr, n, n)); colorbar; hold off;
+        grid on;
+        odr = g.Mesh.fem.shape;
+        set(gca, 'xtick', odr+0.5:odr:odr*g.Mesh.nelem);
+        set(gca, 'ytick', odr+0.5:odr:odr*g.Mesh.nelem);
+      end
     end
 
     function u0 = get_u0(grid)
-      n = size(grid.k_evec, 1);
+      if ( isempty( grid.k_evec ) )
+        [grid.k_evec, ~] = eigs(grid.K, grid.M, 80, 'BE');
+      end
+      n = size(grid.k_evec, 2);
       lam = ones(n,1);
       % lam(1:n/4) = 1;
       u0 = grid.k_evec*lam;

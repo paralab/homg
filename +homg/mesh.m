@@ -14,7 +14,7 @@ classdef mesh < handle
   end % properties
   
   methods
-    function mesh = mesh(dim,nelem)
+    function mesh = mesh(dim,nelem, sp)
       % dim = 2/3, nelem = number of elements per dimension.
       if nargin > 0
         if nargin > 1
@@ -24,7 +24,7 @@ classdef mesh < handle
       end
       
       if (mesh.dim == 2)
-        mesh.fem.geom = rect2(0,1,0,1);
+        mesh.fem.geom = rect2(0,sp,0,1);
         mesh.fem.mesh = meshmap(mesh.fem, 'Edgelem', {1, mesh.nelem,2, mesh.nelem}, 'report', 'off');
       elseif (mesh.dim == 3)
         tmp_fem.geom = rect2(0,1,0,1);
