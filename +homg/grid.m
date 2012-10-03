@@ -192,6 +192,12 @@ classdef grid < handle
           grid.sor_omega = 1.0;
           u = grid.smoother_gauss_seidel(v, rhs, u); 
           return;
+        case 'chebssor'
+          u = grid.smoother_chebyshev_ssor (v, rhs, u);
+          return;
+        case 'chebjac'
+          u = grid.smoother_chebyshev_jacobi (v, rhs, u);
+          return;
         case 'chebyshev', 
           u = grid.smoother_chebyshev(v, rhs, u); 
           return;
@@ -267,7 +273,64 @@ classdef grid < handle
         u = grid.ssor_M' \ (grid.ssor_N'*u + rhs);
       end
     end
-    
+   
+    function u = smoother_chebyshev_jacobi (grid, v, rhs, u)
+      if ( isempty ( grid.eig_max ) )
+        % Kc = grid.Null' * grid.K * grid.Null;
+        Kc = (eye(size(grid.K)) - grid.ZeroBoundary) + grid.ZeroBoundary * grid.K * grid.ZeroBoundary;
+        grid.eig_max = eigs(Kc, 1, 'LM');  
+        grid.eig_min = eigs(Kc, 1, 'SM');  
+      end
+      
+      l_max = grid.eig_max;
+      l_min =  (grid.eig_min + grid.eig_max)/2;
+      
+      rho = 2/(l_min + l_max);
+      
+      mu_0 = 1;
+      mu_1 = rho;
+      y_0 = u;
+      y_1 = grid.smoother_jacobi(1, rhs, u); 
+      for i=2:v
+        mu_2 = 1.0 / ( 2.0/(rho*mu_1) - 1.0/mu_0);
+        u = (2.0*mu_2)/(rho*mu_1)* grid.smoother_jacobi(1, rhs, y_1) - (mu_2/mu_1)*y_0;
+        y_0 = y_1; mu_0 = mu_1;
+        y_1 =  u ; mu_1 = mu_2; 
+      end
+    end
+
+    function u = smoother_chebyshev_ssor (grid, v, rhs, u)
+      if ( isempty ( grid.eig_max ) )
+        % Kc = grid.Null' * grid.K * grid.Null;
+        Kc = (eye(size(grid.K)) - grid.ZeroBoundary) + grid.ZeroBoundary * grid.K * grid.ZeroBoundary;
+        grid.eig_max = eigs(Kc, 1, 'LM');  
+        grid.eig_min = eigs(Kc, 1, 'SM');  
+      end
+      if ( isempty ( grid.ssor_M ) )
+        w = grid.sor_omega;
+        n = length(u);
+        grid.ssor_M = spdiags( (1/w)*diag(grid.K), 0, n, n) + tril(grid.K,-1);
+        grid.ssor_N = spdiags(((1-w)/w)*diag(grid.K), 0, n, n) - triu(grid.K,1);
+      end
+      
+      l_max = grid.eig_max;
+      l_min =  (grid.eig_min + grid.eig_max)/2;
+      
+      rho = 2/(l_min + l_max);
+      
+      mu_0 = 1;
+      mu_1 = rho;
+      y_0 = u;
+      y_1 = grid.smoother_sym_sor(1, rhs, u); 
+      for i=2:v
+        mu_2 = 1.0 / ( 2.0/(rho*mu_1) - 1.0/mu_0);
+        u = (2.0*mu_2)/(rho*mu_1)* grid.smoother_sym_sor(1, rhs, y_1) - (mu_2/mu_1)*y_0;
+        y_0 = y_1; mu_0 = mu_1;
+        y_1 =  u ; mu_1 = mu_2; 
+      end
+
+    end
+
     function set_sor_omega(grid, w)
       grid.sor_omega = w;
       grid.sor_G = [];
