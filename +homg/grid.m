@@ -278,6 +278,9 @@ classdef grid < handle
       if ( isempty ( grid.eig_max ) )
         % Kc = grid.Null' * grid.K * grid.Null;
         Kc = (eye(size(grid.K)) - grid.ZeroBoundary) + grid.ZeroBoundary * grid.K * grid.ZeroBoundary;
+        D = diag(Kc);
+        grid.jacobi_invdiag = 1./D;
+        Kc = (eye(size(Kc)) - (diag(D) \ Kc) );
         grid.eig_max = eigs(Kc, 1, 'LM');  
         grid.eig_min = eigs(Kc, 1, 'SM');  
       end

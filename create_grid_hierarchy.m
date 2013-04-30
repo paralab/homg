@@ -25,9 +25,12 @@ for i=2:num_grids
   % grid.debug = 1;
   % evc = grid.get_eigenvectors();
   if ( dim==2 )
-    m.set_rhs('-8*pi^2*(sin(2*pi*x) * sin(2*pi*y))');
+    m.set_rhs('(1 - 8*pi^2)*(sin(2*pi*x) * sin(2*pi*y))');
+    % m.set_coeff('1');
+    % m.set_coeff('1 + 1000000*((cos(2*pi*x))^2 + (cos(2*pi*y))^2 )');
   else
-    m.set_rhs('-12*pi^2*(sin(2*pi*x) * sin(2*pi*y) * sin(2*pi*z) )');
+    m.set_rhs('(1 - 12*pi^2)*(sin(2*pi*x) * sin(2*pi*y) * sin(2*pi*z) )');
+    m.set_coeff('1');
   end
   coarse = grid;
 end

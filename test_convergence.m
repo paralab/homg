@@ -9,7 +9,7 @@ fprintf('.-------------------------------------------.\n');
 fprintf('| nelem\t|    err (M-norm)\t|    fac    |\n');
 fprintf('|-------------------------------------------|\n');
 for i=1:length(nelem)
-  m = homg.mesh(dim, nelem(i));
+  m = homg.mesh(dim, nelem(i),1);
   if ( dim==2 )
     m.set_rhs('-8*pi^2*(sin(2*pi*x) * sin(2*pi*y))');
   else

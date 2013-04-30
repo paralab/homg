@@ -7,6 +7,7 @@ classdef mesh < handle
     nelem=8;
     fem
     rhs
+    coeff
     % permutations
     perm_full
     perm_rest
@@ -35,7 +36,8 @@ classdef mesh < handle
         error(['Error: mesh is not supported for ',num2str(mesh.dim),'D.'])
       end
       % default rhs
-      mesh.rhs = '1';
+      mesh.rhs   = '1';
+      mesh.coeff = '1';
     end % constructor
     
     function plot(mesh)
@@ -48,6 +50,10 @@ classdef mesh < handle
       meshplot(mesh.fem);
     end
     
+    function set_coeff(mesh, coeff)
+      mesh.coeff = coeff;
+    end
+
     function set_rhs(mesh, rhs)
       mesh.rhs = rhs;
     end
@@ -90,11 +96,12 @@ classdef mesh < handle
       mesh.fem.dim   = {'u'};
       mesh.fem.shape = order;
       
-      mesh.fem.equ.expr = {'f' mesh.rhs};
+      mesh.fem.equ.expr = {'f' mesh.rhs 'q' mesh.coeff};
+      % mesh.fem.equ.expr = {'mu' mesh.coeff};
       if (mesh.dim == 2)
-        mesh.fem.equ.weak = '-(u*u_test + ux * ux_test + uy * uy_test + f * u_test)';
+        mesh.fem.equ.weak = '-(u*u_test + q*ux*ux_test + q*uy*uy_test + f * u_test)';
       else
-        mesh.fem.equ.weak = '-(ux * ux_test + uy * uy_test + uz * uz_test + f * u_test)';
+        mesh.fem.equ.weak = '-(u*u_test + q*ux*ux_test + q*uy*uy_test + q*uz*uz_test + f*u_test)';
       end
       
       % mesh.fem.bnd.r = {'u-0'};
