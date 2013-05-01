@@ -12,10 +12,11 @@ classdef mesh < handle
     perm_full
     perm_rest
     coords
+    geom_shape
   end % properties
   
   methods
-    function mesh = mesh(dim,nelem, sp)
+    function mesh = mesh(dim, geom, nelem, sp)
       % dim = 2/3, nelem = number of elements per dimension.
       if nargin > 0
         if nargin > 1
@@ -24,14 +25,47 @@ classdef mesh < handle
         mesh.nelem  = nelem;
       end
       
+      mesh.geom_shape = geom;
+
       if (mesh.dim == 2)
-        mesh.fem.geom = rect2(0,sp,0,1);
-        mesh.fem.mesh = meshmap(mesh.fem, 'Edgelem', {1, mesh.nelem,2, mesh.nelem}, 'report', 'off');
+        if (geom == 'box')
+          mesh.fem.geom = rect2(0,sp,0,1);
+          mesh.fem.mesh = meshmap(mesh.fem, 'Edgelem', {1, mesh.nelem,2, mesh.nelem}, 'report', 'off');
+        elseif (geom == 'fan')
+          % Geometry
+          g1 = ellip2(1.0, 1.0, 'base','center','pos',[0.,0.0]);
+          g2=ellip2(0.55,0.55,'base','center','pos',[0.0,0.0]);
+          g3=geomcomp({g1,g2},'ns',{'g1','g2'},'sf','g1-g2','edge','none');
+          g4=rect2(1.0,1.0,'base','corner','pos',[0.0,0.0]);
+          g5=geomcomp({g3,g4},'ns',{'g3','g4'},'sf','g3*g4','edge','none');
+
+          % Analyzed geometry
+          s.objs={g5};
+          s.name={'Sector'};
+          % s.tags={'g5'};
+
+          mesh.fem.draw=struct('s',s);
+          mesh.fem.geom = geomcsg(mesh.fem);
+
+          % Create mapped quad mesh
+          mesh.fem.mesh=meshmap(mesh.fem, ...
+                           'edgegroups',{{[4],[2],[3],[1]}}, ...
+                           'Edgelem', {1,mesh.nelem,2,mesh.nelem,3,3*mesh.nelem,4,3*mesh.nelem}, 'report', 'off'); 
+          
+          clear g* s
+        else
+          error(['Error: Unknown mesh shape' geom])
+        end
+
       elseif (mesh.dim == 3)
-        tmp_fem.geom = rect2(0,1,0,1);
-        tmp_fem.mesh = meshmap(tmp_fem, 'Edgelem', {1, mesh.nelem,2, mesh.nelem}, 'report', 'off');
-        mesh.fem = meshextrude(tmp_fem, 'distance', 1, 'elextlayers', {mesh.nelem});
-        clear tmp_fem;
+        if (geom == 'box')
+          tmp_fem.geom = rect2(0,1,0,1);
+          tmp_fem.mesh = meshmap(tmp_fem, 'Edgelem', {1, mesh.nelem,2, mesh.nelem}, 'report', 'off');
+          mesh.fem = meshextrude(tmp_fem, 'distance', 1, 'elextlayers', {mesh.nelem});
+          clear tmp_fem;
+        else
+          error(['Error: Unknown mesh shape' geom])
+        end
       else
         error(['Error: mesh is not supported for ',num2str(mesh.dim),'D.'])
       end
@@ -185,7 +219,13 @@ classdef mesh < handle
 
         % end % if order != 1
       % else 
-        no_dofs =  (mesh.fem.shape * mesh.nelem + 1)^mesh.dim;
+        
+       %if (mesh.geom_shape == 'box')
+       %   no_dofs =  (mesh.fem.shape * mesh.nelem + 1)^mesh.dim;
+       % else
+          no_dofs = size(mesh.coords, 1);
+       % end
+
         Xi = zeros(no_dofs,1);
 
         % allocate storage for interpolation operator
