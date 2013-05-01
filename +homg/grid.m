@@ -57,7 +57,7 @@ classdef grid < handle
       grid.jacobi_omega = 2/3;
       grid.sor_omega = 1;
       if (~ isempty(grid.Coarse) )
-         grid.P = grid.Coarse.Mesh.assemble_interpolation(order, mesh.coords);
+         grid.P = grid.Coarse.Mesh.assemble_interpolation(mesh.coords);
          % grid.R = inv(grid.Coarse.M) * grid.P' * grid.M ; 
          grid.R = grid.P';
       end
@@ -159,8 +159,9 @@ classdef grid < handle
       end
       
       % 1. pre-smooth
-      clf;
-      grid.plot_spectrum(u, 'k', rhs); hold on;
+      if (grid.debug) clf; end
+      grid.plot_spectrum(u, 'k', rhs); 
+      if (grid.debug) hold on; end
       u = grid.smooth ( v1, rhs, u );
       grid.plot_spectrum(u, 'b', rhs);
       
@@ -444,7 +445,7 @@ classdef grid < handle
       if (g.debug)  
         subplot(1,2,1);
         a = g.M * u;
-        q = repmat(a,size(a'));
+        q = repmat(a, 1, 80);
         b = abs(dot (g.k_evec, q));
         % plot eigenvalues 
         plot(b, clr); hold on;

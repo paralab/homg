@@ -153,43 +153,43 @@ classdef mesh < handle
       
     end
     
-    function P = assemble_interpolation(mesh, order, pts)
+    function P = assemble_interpolation(mesh, pts)
       % todo: check if matrices assembled before this ...
       % vector of FEM coefficients and its length
 
       % making change to allow order to be different ...
-      if (order ~= mesh.fem.shape)
+      % if (order ~= mesh.fem.shape)
         % if ( order ~= 1 )
         %  disp('The order specified in the interpolation does not match the one used for assembly');
         % else
           % Create a new fem that is linear ...
-          num_dups = mesh.fem.shape / order;
-          lin_nelem = num_dups * mesh.nelem;
-          meshlin = homg.mesh(mesh.dim, lin_nelem);
-          meshlin.assemble_poisson(order);
-        
-          no_dofs =  (order*lin_nelem+1)^meshlin.dim;
-          X = zeros(no_dofs,1);
-        
-          % allocate storage for interpolation operator
-          P = zeros(size(pts,1), no_dofs);
-         
-          % build interpolation operator
-          for i = 1:no_dofs
-            X(:) = 0;
-            X(i) = 1;
-            P(:,i) = postinterp(meshlin.fem, 'u', pts', 'U', X)';
-          end
-          P = P(:, meshlin.perm_full);
-          P = sparse(P);
+         % num_dups = mesh.fem.shape / order;
+         % lin_nelem = num_dups * mesh.nelem;
+         % meshlin = homg.mesh(mesh.dim, lin_nelem);
+         %  meshlin.assemble_poisson(order);
+         %
+         % no_dofs =  (order*lin_nelem+1)^meshlin.dim;
+         %  X = zeros(no_dofs,1);
+         %
+         % % allocate storage for interpolation operator
+         %  P = zeros(size(pts,1), no_dofs);
+         %
+         % % build interpolation operator
+         %  for i = 1:no_dofs
+         %   X(:) = 0;
+         %   X(i) = 1;
+         %    P(:,i) = postinterp(meshlin.fem, 'u', pts', 'U', X)';
+         % end
+         % P = P(:, meshlin.perm_full);
+         %  P = sparse(P);
 
         % end % if order != 1
-      else 
-        no_dofs =  (order*mesh.nelem+1)^mesh.dim;
+      % else 
+        no_dofs =  (mesh.fem.shape * mesh.nelem + 1)^mesh.dim;
         Xi = zeros(no_dofs,1);
 
         % allocate storage for interpolation operator
-        P = zeros(size(pts,1),no_dofs);
+        P = zeros(size(pts,1), no_dofs);
         
         prog_step = ceil(no_dofs/100);
         % build interpolation operator
@@ -204,7 +204,7 @@ classdef mesh < handle
         end
         P = P(:, mesh.perm_full);
         P = sparse(P);
-      end 
+      % end 
     end 
 end % methods
 
