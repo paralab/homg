@@ -223,8 +223,9 @@ classdef mesh < handle
        %if (mesh.geom_shape == 'box')
        %   no_dofs =  (mesh.fem.shape * mesh.nelem + 1)^mesh.dim;
        % else
-          no_dofs = size(mesh.coords, 1);
+       no_dofs = size(mesh.coords, 1);
        % end
+       elsize = 1.5 / mesh.nelem;
 
         Xi = zeros(no_dofs,1);
 
@@ -234,13 +235,16 @@ classdef mesh < handle
         prog_step = ceil(no_dofs/100);
         % build interpolation operator
         for i = 1:no_dofs
+           hat = mesh.coords(i,:);                                                                                                                                                                                  
+           ind = find(((pts(:,1)-hat(1)).^2 + (pts(:,2)-hat(2)).^2)<=elsize^2);   
           % if ( mod(i, prog_step) == 0 )
           %   disp(['Assembling P ' num2str(i/prog_step) ' %']);
           % end
           Xi(:) = 0;
-          % Xi = zeros(no_dofs,1);
+          %% Xi = zeros(no_dofs,1);
           Xi(i) = 1;
-          P(:,i) = postinterp(mesh.fem, 'u', pts', 'U', Xi)';
+          
+          P(ind,i) = postinterp(mesh.fem, 'u', pts(ind,:)', 'U', Xi)';
         end
         P = P(:, mesh.perm_full);
         P = sparse(P);

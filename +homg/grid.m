@@ -57,7 +57,9 @@ classdef grid < handle
       grid.jacobi_omega = 2/3;
       grid.sor_omega = 1;
       if (~ isempty(grid.Coarse) )
+         ts1 = tic;
          grid.P = grid.Coarse.Mesh.assemble_interpolation(mesh.coords);
+         toc(ts1);
          % grid.R = inv(grid.Coarse.M) * grid.P' * grid.M ; 
          grid.R = grid.P';
       end

@@ -34,7 +34,9 @@ coarse = homg.grid(m, orders(1) );
 for i=2:num_hgrids
   disp(['Creating h-grid: ' num2str(i) ' of ' num2str(num_grids) ', order = ' num2str(orders(1)) ', nelem = ' num2str(nelems(i))]);
   m = homg.mesh(dim, geom, nelems(i), sp);
+  disp('---- created mesh')
   grid = homg.grid(m, orders(1), coarse);
+  disp('---- created grid')
   % grid.debug = 1;
   % evc = grid.get_eigenvectors();
   if ( dim==2 )
