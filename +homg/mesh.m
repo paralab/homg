@@ -231,11 +231,8 @@ classdef mesh < handle
 
         % allocate storage for interpolation operator
         P = zeros(size(pts,1), no_dofs);
-        
         prog_step = ceil(no_dofs/100);
         % build interpolation operator
-	nodes = xmeshinfo(mesh.fem ,'out', 'nodes');
-	dofs = nodes.dofs;
 	for i = 1:no_dofs
 	    crds = mesh.coords(i,:);
 	    ind = find(((pts(:,1)-crds(1)).^2 + (pts(:,2)-crds(2)).^2)<=elsize^2);
@@ -244,11 +241,14 @@ classdef mesh < handle
 	    % end
 	    Xi(:) = 0;
 	    %% Xi = zeros(no_dofs,1);
-	    Xi(dofs(i)) = 1;
-
-	    P(ind,i) = postinterp(mesh.fem, 'u', pts(ind,:)', 'U', Xi)';
-        end
-        P = P(:, mesh.perm_full);
+	    Xi(mesh.perm_full(i)) = 1;
+	    P(ind,mesh.perm_full(i)) = postinterp(mesh.fem, 'u', pts(ind,:)', 'U', Xi)';
+	   % plot(pts(ind,1),pts(ind,2)','ro'); hold on;
+	   % plot(crds(1),crds(2),'bo','MarkerFaceColor', 'b'); hold off;
+	   % axis([0,1,0,1]);
+	   % pause(.4);
+       end
+	P = P(:, mesh.perm_full);
         P = sparse(P);
       % end 
     end 
