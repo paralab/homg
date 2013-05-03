@@ -234,17 +234,19 @@ classdef mesh < handle
         
         prog_step = ceil(no_dofs/100);
         % build interpolation operator
-        for i = 1:no_dofs
-           hat = mesh.coords(i,:);                                                                                                                                                                                  
-           ind = find(((pts(:,1)-hat(1)).^2 + (pts(:,2)-hat(2)).^2)<=elsize^2);   
-          % if ( mod(i, prog_step) == 0 )
-          %   disp(['Assembling P ' num2str(i/prog_step) ' %']);
-          % end
-          Xi(:) = 0;
-          %% Xi = zeros(no_dofs,1);
-          Xi(i) = 1;
-          
-          P(ind,i) = postinterp(mesh.fem, 'u', pts(ind,:)', 'U', Xi)';
+	nodes = xmeshinfo(mesh.fem ,'out', 'nodes');
+	dofs = nodes.dofs;
+	for i = 1:no_dofs
+	    crds = mesh.coords(i,:);
+	    ind = find(((pts(:,1)-crds(1)).^2 + (pts(:,2)-crds(2)).^2)<=elsize^2);
+	    % if ( mod(i, prog_step) == 0 )
+	    %   disp(['Assembling P ' num2str(i/prog_step) ' %']);
+	    % end
+	    Xi(:) = 0;
+	    %% Xi = zeros(no_dofs,1);
+	    Xi(dofs(i)) = 1;
+
+	    P(ind,i) = postinterp(mesh.fem, 'u', pts(ind,:)', 'U', Xi)';
         end
         P = P(:, mesh.perm_full);
         P = sparse(P);
