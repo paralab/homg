@@ -82,16 +82,20 @@ classdef grid < handle
     end
 
     function [u, rr, iter] = solve_pcg(grid, num_vcyc, smoother, smooth_steps, rhs, u)
+      % disp('setting smoother');
       grid.set_smoother(smoother);
       
+      % disp('computing initial residual');
       r = grid.residual(rhs, u);
       rho = zeros(size(u));
+      % disp('outer v-cycle');
       rho = grid.vcycle(smooth_steps, smooth_steps, r, rho);
       p = rho;
       disp(['Initial residual is ' num2str(norm(r))]);
       disp('------------------------------------------');
       r0 = norm(r);
       for i=1:num_vcyc
+        % disp(['inner v-cycle: ' num2str(i)]);
         h = grid.K * p;
         rho_res = dot (rho, r);
         alpha = rho_res / dot ( p, h );
@@ -100,7 +104,7 @@ classdef grid < handle
 
         % rho_res_prev = rho_res;
         
-        disp([num2str(i) ': |res| = ' num2str(norm(r))]);
+        disp([num2str(i, '%03d\t') ': |res| = ' num2str(norm(r),'\t%8.4e')]);
         if (norm(r)/r0 < 1e-8)
           iter = i;
           rr = norm(r)/r0;
@@ -463,15 +467,18 @@ classdef grid < handle
     end
 
     function u0 = get_u0(grid)
-      if ( isempty( grid.k_evec ) )
-        [grid.k_evec, ~] = eigs(grid.K, grid.M, 80, 'BE');
+      if (grid.debug)
+        if ( isempty( grid.k_evec ) )
+          [grid.k_evec, ~] = eigs(grid.K, grid.M, 80, 'BE');
+        end
+        n = size(grid.k_evec, 2);
+        lam = ones(n,1);
+        % lam(1:n/4) = 1;
+        u0 = grid.k_evec*lam;
+      else
+        u0 = rand(size(grid.L()));
       end
-      n = size(grid.k_evec, 2);
-      lam = ones(n,1);
-      % lam(1:n/4) = 1;
-      u0 = grid.k_evec*lam;
     end
-    
   end %methods
   
 end %classdef
