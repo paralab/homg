@@ -57,7 +57,7 @@ very fast $\mathcal{O}(N^{-(p+1)})$ convergence for sufficiently
 smooth problems while improving the locality and thus the CPU
 efficiency of the calculations.
 
- Our method is designed for meshes that are built from an unstructured
+Our method is designed for meshes that are built from an unstructured
 hexahedral macro mesh, in which each macro element is adaptively
 refined as an octree. This forest-of-octrees approach enables us to
 generate meshes for complex geometries with arbitrary levels of local
@@ -70,7 +70,74 @@ discretization that demonstrate high parallel scalability. Here we
 explore various approaches for extending our geometric multigrid
 solver to support higher-order discretizations.
 
-For higher-order finite-element discretizations, the following approaches are commonly used, 
+
+In summary, the overall theme of existing work appears to use
+low-order approximations as preconditioners.  The advantages of doing
+this are mainly in the simplicity of the approach and the availability
+of parallel multigrid solvers capable of solving such lower-order
+operators. The sparsity of the lower-order operators also permits the
+use of AMG for solving the lower-order operators, possibly obtained
+via discretizations on unstructured meshes.  Although there are
+examples of using Algebraic Multigrid directly on operators resulting
+from higher-order discretizations, limited work has been done on using
+geometric multigrid with higher-order discretizations. To the best of
+our knowledge, no prior work on using geometric multigrid for solving
+systems arising from higher-order discretizations on arbitrary
+geometries using highly adapted meshes.  In this work, we develop
+geometric multigrid methods to support higher-order discretizations
+($1\le p\le 8$) and compare compare against preconditioning using the
+co-located linear operator. We evaluate using variable-coefficient
+Poisson problems on $2D$ and $3D$ domains. We demonstrate that by
+using appropriate inter-grid transfer operators and smoothers,
+mesh-independent convergence is possible ($1\le p\le8$) for the {\em
+direct} approach. For the direct approach, best results are obtained
+using the symmetric successive over-relaxation (SSOR) smoother. We
+conclude with thoughts on the parallelization of the proposed
+approach.
+
+
+{\bf Targets:} We target multigrid for large-scale problems using
+adaptively refined meshes on complex geometries, and their
+implementation on parallel high performance computing platforms. Thus,
+we are interested in
+\begin{itemize}
+\item matrix-free methods, i.e., method that do not require assembled
+  finite element matrices,
+\item methods that can be parallelized using shared or distributed
+  memory and that can make efficient use of current multicore
+  architectures
+\item cache-efficient methods that access memory hierarchies locally
+\end{itemize}
+
+
+\section{Meshing, High-order FEM}
+
+High order spatial discretizations can have significant advantages
+over low order methods, especially when the solution is smooth and
+high accuracy is desired. However, the sparsity of finite element (or
+finite difference) operators decreases rapidly as the polynomial
+approximation order increases, which makes the application of high
+order operators to vectors computationally significantly more
+expensive. This is also true if matrix-free methods are used, i.e.,
+system matrices are never assembled, but their application on vectors
+is implemented thorugh elemental loops.
+
+Element matrices in three dimensionlal finite element discretizations
+high-order discretizations
+
+
+% In addition, matrices stemming from high-order
+% discretizations...no M-matrices etc
+
+
+
+
+
+\section{Approaches for High-order Multigrid}
+
+%talk about the 4 main approaches and prior work.
+For higher-order finite-element discretizations, the following
+approaches are commonly used,
 \begin{description}
 
 	\item[Schwarz-based methods] This is the most common approach for
@@ -108,38 +175,7 @@ For higher-order finite-element discretizations, the following approaches are co
 	suggest that such an approach is the most general.
 \end{description} 
 
-% GB: there is a lot of repetition in this text, but it is ok for the abstract
-In summary, the overall theme of existing work appears to use
-low-order approximations as preconditioners.  The advantages of doing
-this are mainly in the simplicity of the approach and the availability
-of parallel multigrid solvers capable of solving such lower-order
-operators. The sparsity of the lower-order operators also permits the
-use of AMG for solving the lower-order operators, possibly obtained
-via discretizations on unstructured meshes.  Although there are
-examples of using Algebraic Multigrid directly on operators resulting
-from higher-order discretizations, limited work has been done on using
-geometric multigrid with higher-order discretizations. To the best of
-our knowledge, no prior work on using geometric multigrid for solving
-systems arising from higher-order discretizations on arbitrary
-geometries using highly adapted meshes.  In this work, we develop
-geometric multigrid methods to support higher-order discretizations
-($1\le p\le 8$) and compare compare against preconditioning using the
-co-located linear operator. We evaluate using variable-coefficient
-Poisson problems on $2D$ and $3D$ domains. We demonstrate that by
-using appropriate inter-grid transfer operators and smoothers,
-mesh-independent convergence is possible ($1\le p\le8$) for the {\em
-direct} approach. For the direct approach, best results are obtained
-using the symmetric successive over-relaxation (SSOR) smoother. We
-conclude with thoughts on the parallelization of the proposed
-approach.
 
-\section{Meshing, High-order FEM}
-
-talk about octrees, tensor products etc. basically our setup.
-
-\section{Approaches for High-order Multigrid}
-
-talk about the 4 main approaches and prior work.
 
 \section{Performance Model}
 
@@ -157,7 +193,7 @@ Finalize and discuss ramifications.
 
 
 \bibliographystyle{wileyj}
-\bibliography{mg}
+\bibliography{mg,ccgo}
 
 
 \end{document}
