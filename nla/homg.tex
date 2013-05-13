@@ -143,15 +143,27 @@ $\mathcal O(p^7)$ operations.
 
 % talk about the 4 main approaches and prior work.
 
-In this section, we summarize common multigrid approaches for
+In this section, we summarize different approaches for geometric
+multigrid based solvers and preconditioners in the case of
 higher-order finite-element discretizations.
 
 \subsection{High-order $h$-multigrid}
-Directly apply multigrid to iteratively solve the linear systems that
-result from the higher-order discretizations. This approach is more
-difficult to implement and the cost per iteration increases. However,
-our preliminary results suggest that such an approach is the most
-general.
+A direct generalization of geometric multigrid from first order to
+higher order discretizations is to use high-order restriction and
+prolongation operators together with the linear systems that result
+from the higher-order discretizations on each coarse level.  One
+difficulty in this approach is that it requires smoothers for high
+order systems matrices, which usually have less favorable properties
+compared to their low order counterparts; For instance, higher-order
+discretizations of scalar elliptic operators are usually not
+M-matrices---a useful property to prove the convergence of the Jacobi
+and the Gauss-Seidel smoother.
+
+
+% This
+%approach is more difficult to implement and the cost per iteration
+%increases. However, our preliminary results suggest that such an
+%approach is the most general.
 
 
 \subsection{$p$-multigrid}
