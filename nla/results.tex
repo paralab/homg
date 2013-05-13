@@ -1,0 +1,43 @@
+
+
+\begin{table}
+  \caption{\label{tab:homg} Number of CG iterations/v-cycles to converge to a relative tolerance of $10^{-8}$ for $h$-Multigrid applied to high-order operators on a rectangular domain. A total of 3 grids were used, the finest grid was $32\times 32$, and the coarsest was $8\times 8$.}
+		\centering
+    \begin{tabular}{|l|c|c|c|c|c|c|} 
+	    \hline
+				    & \multicolumn{3}{c|}{Multigrid} & \multicolumn{3}{c|}{MG pCG}\\  \cline{2-7}
+			order & \scriptsize Jacobi(3)  &\scriptsize  Chebyshev(3)  &\scriptsize SSOR(2) &\scriptsize Jacobi(3)  &\scriptsize  Chebyshev(3)  &\scriptsize SSOR(2) \\
+			\hline
+				1 & 6 &  5 & 4  &  4  & 4  & 4 \\ 
+	    	2 & 7 &  9 & 4  &  5  & 6  & 4 \\
+				3 & 8 & 22 & 5  &  6  & 10 & 4 \\
+				4 & - & 48 & 8  & 43  & 15 & 6 \\
+				5 & - & 150 & 12 & 295 & 27 & 8 \\
+				6 & - & - & 27  & - & 51 & 12 \\
+				7 & - & - & 81 & - & 105 & 21 \\
+				8 & - & - & 298 & - & 204 & 39 \\
+			\hline
+	  \end{tabular}
+\end{table}
+
+\begin{table}
+  \caption{\label{tab:hpmg} Number of CG iterations/v-cycles to converge to a relative tolerance of $10^{-8}$ for $hp$-Multigrid applied to high-order operators on a rectangular domain. Starting with a $32\times 32$ high-order grid, we first coarsen in $p$ till $p=1$, and then coarsen in $h$. The coarsest grid in all cases is a $8\times 8$ grid with $p=1$}
+		\centering
+		\begin{tabular}{|l|c|c|c|c|c|c|} 
+	    \hline
+				    & \multicolumn{3}{c|}{Multigrid} & \multicolumn{3}{c|}{MG pCG}\\  \cline{2-7}
+			order & \scriptsize Jacobi(3)  &\scriptsize  Chebyshev(3)  &\scriptsize SSOR(2) &\scriptsize Jacobi(3)  &\scriptsize  Chebyshev(3)  &\scriptsize SSOR(2) \\
+			\hline
+				1 & 6  &  5 &  4 & 4 & 4 & 4 \\ 
+	    	2 & 7 & 9  & 4 & 5 & 6 & 4 \\
+				%3 & 8 & 24 & 5 & 6 & 11 & 4 \\
+				4 & - & 46 & 7 & 39 & 15 & 5 \\
+				%5 & - & 178 & 13 & - & 28 & 8 \\
+				%6 & - & - & 24 & - & 51 & 12 \\
+				%7 & - & - & 70 & - & 105 & 19 \\
+				8 & - & - & 267 & - & 182 & 36 \\
+			\hline
+	  \end{tabular}
+\end{table}
+
+
