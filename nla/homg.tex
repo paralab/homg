@@ -34,12 +34,12 @@ T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 
 \section{Introduction}
 
-We are interested on asymptotically
-optimal---$\mathcal{O}(N)$---complexity solvers for approximating the
-solution of elliptic partial differential equations (PDEs), where $N$
-is the number of unknowns.  Multigrid is such a solver. In practice
-however, multigrid performs best for low-order uniform discretizations
-with smooth coefficients. 
+%We are interested on asymptotically
+%optimal---$\mathcal{O}(N)$---complexity solvers for approximating the
+%solution of elliptic partial differential equations (PDEs), where $N$
+%is the number of unknowns.  Multigrid is such a solver. In practice
+%however, multigrid performs best for low-order uniform discretizations
+%with smooth coefficients. 
 
 Our goal is to develop a parallel geometric multigrid for solving
 systems arising from higher-order discretizations of
@@ -142,18 +142,12 @@ $\mathcal O(p^7)$ operations.
 
 \section{Approaches for High-order Multigrid}
 
-%talk about the 4 main approaches and prior work.
+% talk about the 4 main approaches and prior work.
+
 For higher-order finite-element discretizations, the following
 approaches are commonly used,
-\begin{description}
 
-	\item[Schwarz-based methods] This is the most common approach for
-	solving systems arising from higher-order discretizations, which
-	consists of local block solves and a coarse-grid solve. The main
-	challenge with these approaches is they require solving dense local
-	blocks with direct methods. Additionally, the coarse-grid solve can
-	become fairly expensive and is not straightforward to achieve good
-	parallel scalability. 
+\begin{description}
 
  \item[$p$-multigrid] These methods are a direct extension of
 	multigrid concepts to higher-order discretization. The usual
@@ -180,7 +174,21 @@ approaches are commonly used,
 	discretizations. This approach is more difficult to implement and
 	the cost per iteration increases. However, our preliminary results
 	suggest that such an approach is the most general.
+
+\item[Schwarz-based methods] This is the most common approach for
+	solving systems arising from higher-order discretizations, which
+	consists of local block solves and a coarse-grid solve. The main
+	challenge with these approaches is they require solving dense local
+	blocks with direct methods. Additionally, the coarse-grid solve can
+	become fairly expensive and is not straightforward to achieve good
+	parallel scalability. 
+
+
 \end{description} 
+
+
+\section{Smoothers}
+% Chebyshef, Jacobi, SSOR
 
 
 
