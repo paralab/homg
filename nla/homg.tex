@@ -5,6 +5,8 @@
 \usepackage{moreverb}
 
 \usepackage[colorlinks,bookmarksopen,bookmarksnumbered,citecolor=red,urlcolor=red]{hyperref}
+\newcommand{\gsnote}[1]{\textcolor{blue}{GS: #1}}
+
 
 \newcommand\BibTeX{{\rmfamily B\kern-.05em \textsc{i\kern-.025em b}\kern-.08em
 T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
@@ -40,6 +42,8 @@ T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 %is the number of unknowns.  Multigrid is such a solver. In practice
 %however, multigrid performs best for low-order uniform discretizations
 %with smooth coefficients. 
+
+\gsnote{Unify notion of mesh/grid etc}
 
 Our goal is to develop a parallel geometric multigrid for solving
 systems arising from higher-order discretizations of
@@ -159,40 +163,52 @@ discretizations of scalar elliptic operators are usually not
 M-matrices---a useful property to prove the convergence of the Jacobi
 and the Gauss-Seidel smoother.
 
-
 % This
 %approach is more difficult to implement and the cost per iteration
 %increases. However, our preliminary results suggest that such an
 %approach is the most general.
 
-
 \subsection{$p$-multigrid}
-These methods are a direct extension of multigrid concepts to
-higher-order discretization. The usual approach has been to use coarse
-grids based on lower-order polynomials. Starting from a fine grid with
-order-$p$ polynomial basis, the coarser grids correspond to
+These methods do not coarsen the grid geometrically, but coarsen the
+system by reducing the polynomial order. Starting from a fine grid
+with order-$p$ polynomial basis, the coarser grids correspond to
 polynomials of order $p/2, p/4,\ldots,1$, followed by geometric
-coarsening of the $p=1$ grid. The main shortcoming of this approach
-has been the dependence of the convergence factor on the order of the
-polynomial basis. \textsc{Revisit. any other disadvantages}?
+coarsening of the $p=1$ grid. Coarsening the polynomial order is
+rather simple and element-local. The latter is particularly useful for
+discretizations with nonconforming meshes. \gsnote{Is that actually
+  true?}  The main shortcomings of this approach has been the
+dependence of the convergence factor on the order of the polynomial
+basis. \textsc{Revisit. any other disadvantages}?
 
 
-\subsection{Preconditioning using lower-order sparsified operator}
+\subsection{Preconditioning by lower-order operator}
 This approach preconditions the higher-order operator using a
 lower-order operator obtained by overlaying the higher-order nodes
-with a lower-order (typically linear) finite element mesh. Multigrid
-is used to solve the lower-order operator. Although this approach is
-nearly independent of $p$, and is relatively straightforward to
-parallelize, it is not work optimal and the convergence factors are
-lower than multigrid applied directly to the higher-order operator.
+with a lower-order (typically linear) finite element mesh using the
+same same nodes.  Multigrid is used to solve the lower-order operator,
+which has more favorable sparsity properties and thus allows for
+faster multigrid cycles compared to multigrid for the high order
+discretized systems.  Although this approach is nearly independent of
+$p$, and is relatively straightforward to parallelize, it is not work
+optimal and the convergence factors are lower than multigrid applied
+directly to the higher-order operator. \gsnote{Revisit statement.}
+For nonconforming meshes, constructing the low order operator can be
+technical at edges and faces of different size; while the basis
+functions for the high order operators can be made continuous through
+the use of proper algebraic constraints at nonconforming faces, the
+corresponding low order discretization has discontinuities at
+nonconforming faces.  The construction of a low-order preconditioner
+based on the nodes of the high order discretization is a popular
+approach \cite{Brown10,Kim07,DevilleMund?}.
 
 \subsection{Schwarz-based methods}
-This is the most common approach for solving systems arising from
-higher-order discretizations, which consists of local block solves and
-a coarse-grid solve. The main challenge with these approaches is they
-require solving dense local blocks with direct methods. Additionally,
-the coarse-grid solve can become fairly expensive and is not
-straightforward to achieve good parallel scalability.
+Another common approach for solving systems arising from higher-order
+discretizations is based on local block solves.  The main challenge
+with these approaches is that they require solving dense local blocks
+either using direct methods or approximations that allow for fast
+iterative solution \cite{LottesFischer05,FischerLottes05}.
+Additionally, the coarse-grid solve can become fairly expensive and is
+not straightforward to achieve good parallel scalability.
 
 
 \section{Smoothers}
