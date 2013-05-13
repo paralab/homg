@@ -112,22 +112,28 @@ we are interested in
 
 \section{Meshing, High-order FEM}
 
+% high order is often good, but comes with problems
+
 High order spatial discretizations can have significant advantages
 over low order methods, especially when the solution is smooth and
 high accuracy is desired. However, the sparsity of finite element (or
-finite difference) operators decreases rapidly as the polynomial
-approximation order increases, which makes the application of high
-order operators to vectors computationally significantly more
-expensive. This is also true if matrix-free methods are used, i.e.,
-system matrices are never assembled, but their application on vectors
-is implemented thorugh elemental loops.
+finite difference) operators decreases as the polynomial approximation
+order increases, which makes the application of high order operators
+to vectors computationally significantly more expensive. This is also
+true if matrix-free methods are used, i.e., system matrices are never
+assembled, but their application on vectors is implemented through
+elemental loops.  Besides the loss of sparsity, another challenge in
+high-order discretizations is due to that fact that the discretization
+matrices loose useful structural properties, such as the M-matrix
+property that allows to prove convergence of iterative solvers such as
+the Jacobi or Gauss-Seidel.
 
-Element matrices in three dimensionlal finite element discretizations
-high-order discretizations
-
-
-% In addition, matrices stemming from high-order
-% discretizations...no M-matrices etc
+For three-dimensional hexahedral mesh finite element discretizations
+with polynomial degree $p$, element matrices are of size
+$n=(p+1)^3$. The naive assembly and application of these elemental
+matrices requires $\mathcal O(p^9)$ operatrions. Exploiting the tensor
+structure of the basis functions allows to reduce this to $\mathcal
+O(p^7)$ operations.
 
 
 
