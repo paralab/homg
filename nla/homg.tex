@@ -93,7 +93,8 @@ mesh-independent convergence is possible ($1\le p\le8$) for the {\em
 direct} approach. For the direct approach, best results are obtained
 using the symmetric successive over-relaxation (SSOR) smoother. We
 conclude with thoughts on the parallelization of the proposed
-approach.
+approach.\\[2ex]
+
 
 
 {\bf Targets:} We target multigrid for large-scale problems using
@@ -131,9 +132,9 @@ the Jacobi or Gauss-Seidel.
 For three-dimensional hexahedral mesh finite element discretizations
 with polynomial degree $p$, element matrices are of size
 $n=(p+1)^3$. The naive assembly and application of these elemental
-matrices requires $\mathcal O(p^9)$ operatrions. Exploiting the tensor
-structure of the basis functions allows to reduce this to $\mathcal
-O(p^7)$ operations.
+matrices requires $\mathcal O(p^9)$ operatrions, but exploiting the
+tensor structure of the basis functions allows to reduce this to
+$\mathcal O(p^7)$ operations.
 
 
 
