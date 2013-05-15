@@ -5,6 +5,8 @@
 \usepackage{moreverb}
 
 \usepackage[colorlinks,bookmarksopen,bookmarksnumbered,citecolor=red,urlcolor=red]{hyperref}
+\newcommand{\gsnote}[1]{\textcolor{blue}{GS: #1}}
+
 
 \newcommand\BibTeX{{\rmfamily B\kern-.05em \textsc{i\kern-.025em b}\kern-.08em
 T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
@@ -34,112 +36,187 @@ T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 
 \section{Introduction}
 
-We are interested on asymptotically
-optimal---$\mathcal{O}(N)$---complexity solvers for approximating the
-solution of elliptic partial differential equations (PDEs), where $N$
-is the number of unknowns.  Multigrid is such a solver. In practice
-however, multigrid performs best for low-order uniform discretizations
-with smooth coefficients. 
+%We are interested on asymptotically
+%optimal---$\mathcal{O}(N)$---complexity solvers for approximating the
+%solution of elliptic partial differential equations (PDEs), where $N$
+%is the number of unknowns.  Multigrid is such a solver. In practice
+%however, multigrid performs best for low-order uniform discretizations
+%with smooth coefficients. 
 
-Our goal is to develop a parallel geometric multigrid for solving
-systems arising from higher-order discretizations of
-variable-coefficient elliptic partial differential equations on
-arbitrary geometries using highly adapted meshes.
-High-order discretizations offer several advantages.  According to
-standard isoparametric polynomial approximation theory,
-% the approximation error in the $L_2$-norm is bounded by,
-% \[
-% \|u-u_h\|_{L_2} \le Ch^{p+1}\|u\|_{H^{p+1}(\Omega)},
-% \]   
-% where $\|\cdot\|_{H^p}$ is the standard $H^p$ Sobolev norm, $\|\cdot\|_{L_2}$ is the $L_2$-norm, $u$ is the exact solution of the PDE, and $u_h$ is the solution of the $h$-discrete problem. Therefore, 
-by using a finite element basis of at least degree $p$, we can achieve
-very fast $\mathcal{O}(N^{-(p+1)})$ convergence for sufficiently
-smooth problems while improving the locality and thus the CPU
-efficiency of the calculations.
+We target parallel geometric multigrid methods for solving systems
+arising from higher order (we target polynomial orders up to 8)
+discretizations of elliptic partial differential equations. In
+particular, our interest is on large-scale problems with complex
+geometry and adaptively refined meshes, and the implementation of
+these methods on parallel high performance computing platforms. Thus,
+we favor (1) matrix-free methods, i.e., method that do not require
+assembled finite element matrices, (2) methods that can be
+parallelized on shared or distributed memory architectures, and (3)
+cache-efficient methods with dominantly local memory access.
 
- Our method is designed for meshes that are built from an unstructured
+High order spatial discretizations can have significant advantages
+over low order methods, especially when the solution is smooth and
+high accuracy is desired. However, the sparsity of finite element (or
+finite difference) operators decreases as the polynomial approximation
+order increases, which makes the application of high order operators
+to vectors computationally significantly more expensive. This is also
+true if matrix-free methods are used, i.e., system matrices are never
+assembled, but their application on vectors is implemented through
+elemental loops.  Besides the loss of sparsity, another challenge in
+high-order discretizations is due to that fact that the discretization
+matrices loose useful structural properties, such as the M-matrix
+property that allows to prove convergence of iterative solvers such as
+the Jacobi or Gauss-Seidel method.
+
+\gsnote{Needs a literature review.}
+
+%High-order discretizations offer several advantages.  According to
+%standard isoparametric polynomial approximation theory,
+%% the approximation error in the $L_2$-norm is bounded by,
+%% \[
+%% \|u-u_h\|_{L_2} \le Ch^{p+1}\|u\|_{H^{p+1}(\Omega)},
+%% \]   
+%% where $\|\cdot\|_{H^p}$ is the standard $H^p$ Sobolev norm, $\|\cdot\|_{L_2}$ is the $L_2$-norm, $u$ is the exact solution of the PDE, and $u_h$ is the solution of the $h$-discrete problem. Therefore, 
+%by using a finite element basis of at least degree $p$, we can achieve
+%very fast $\mathcal{O}(N^{-(p+1)})$ convergence for sufficiently
+%smooth problems while improving the locality and thus the CPU
+%efficiency of the calculations.
+
+
+Although there are examples of using Algebraic Multigrid directly on
+operators resulting from higher-order discretizations, limited work
+has been done on using geometric multigrid with higher-order
+discretizations. To the best of our knowledge, no prior work on using
+geometric multigrid for solving systems arising from higher-order
+discretizations on arbitrary geometries using highly adapted meshes.
+
+
+
+%In this work, we develop
+%geometric multigrid methods to support higher-order discretizations
+%($1\le p\le 8$) and compare  against preconditioning using the
+%co-located linear operator.
+
+% We evaluate using variable-coefficient
+%Poisson problems on $2D$ and $3D$ domains. We demonstrate that by
+%using appropriate inter-grid transfer operators and smoothers,
+%mesh-independent convergence is possible ($1\le p\le8$) for the {\em
+%direct} approach. For the direct approach, best results are obtained
+%using the symmetric successive over-relaxation (SSOR) smoother. We
+%conclude with thoughts on the parallelization of the proposed
+%approach.\\[2ex]
+
+
+\gsnote{Unify notion of mesh/grid etc}
+
+
+
+\section{Meshing, High-order FEM}
+
+Our method is designed for meshes that are built from an unstructured
 hexahedral macro mesh, in which each macro element is adaptively
 refined as an octree. This forest-of-octrees approach enables us to
 generate meshes for complex geometries with arbitrary levels of local
 refinement. We use geometric multigrid (GMG) for each of the octrees
 and algebraic multigrid (AMG) as the coarse grid solver. We designed
 our GMG sweeps to entirely avoid collectives, thus minimizing
-communication cost. Recently \cite{sundar12}, we presented weak and strong scaling
-results for the 3D variable-coefficient Poisson problem using linear
-discretization that demonstrate high parallel scalability. Here we
-explore various approaches for extending our geometric multigrid
-solver to support higher-order discretizations.
+communication cost. Recently \cite{SundarBirosBursteddeEtAl12}, we
+presented weak and strong scaling results for the 3D
+variable-coefficient Poisson problem using linear discretization that
+demonstrate high parallel scalability. Here we explore various
+approaches for extending our geometric multigrid solver to support
+higher-order discretizations.
 
-For higher-order finite-element discretizations, the following approaches are commonly used, 
-\begin{description}
+For three-dimensional hexahedral mesh finite element discretizations
+with polynomial degree $p$, element matrices are of size
+$n=(p+1)^3$. The naive assembly and application of these elemental
+matrices requires $\mathcal O(p^9)$ operatrions, but exploiting the
+tensor structure of the basis functions allows to reduce this to
+$\mathcal O(p^7)$ operations.
 
-	\item[Schwarz-based methods] This is the most common approach for
-	solving systems arising from higher-order discretizations, which
-	consists of local block solves and a coarse-grid solve. The main
-	challenge with these approaches is they require solving dense local
-	blocks with direct methods. Additionally, the coarse-grid solve can
-	become fairly expensive and is not straightforward to achieve good
-	parallel scalability. 
 
- \item[$p$-multigrid] These methods are a direct extension of
-	multigrid concepts to higher-order discretization. The usual
-	approach has been to use coarse grids based on lower-order
-	polynomials. Starting from a fine grid with order-$p$ polynomial
-	basis, the coarser grids correspond to polynomials of order $p/2,
-	p/4,\ldots,1$, followed by geometric coarsening of the $p=1$
-	grid. The main shortcoming of this approach has been the dependence
-	of the convergence factor on the order of the polynomial
-	basis. \textsc{Revisit. any other disadvantages}?
+\section{Approaches for High-order Multigrid}
 
-\item[precondition using lower-order operator] This
-	approach preconditions the higher-order operator using a lower-order
-	operator obtained by overlaying the higher-order nodes with a
-	lower-order (typically linear) finite element mesh. Multigrid is
-	used to solve the lower-order operator. Although this approach is
-	nearly independent of $p$, and is relatively straightforward to
-	parallelize, it is not work optimal and the convergence factors are
-	lower than multigrid applied directly to the higher-order
-	operator.  
+% talk about the 4 main approaches and prior work.
 
-\item[direct] Directly apply multigrid to iteratively
-	solve the linear systems that result from the higher-order
-	discretizations. This approach is more difficult to implement and
-	the cost per iteration increases. However, our preliminary results
-	suggest that such an approach is the most general.
-\end{description} 
+In this section, we summarize different approaches for geometric
+multigrid-based solvers and preconditioners for higher-order
+finite-element discretizations. These methods can also be
+appropriately combined.
 
-% GB: there is a lot of repetition in this text, but it is ok for the abstract
-In summary, the overall theme of existing work appears to use
-low-order approximations as preconditioners.  The advantages of doing
+\subsection{High-order $h$-multigrid}
+A direct generalization of geometric multigrid from first order to
+higher order discretizations is to use high order restriction and
+prolongation operators together with the linear systems that result
+from the higher-order discretizations on each coarse level.  The main
+difficulty in this approach is that it requires smoothers for high
+order systems matrices, which usually have less favorable properties
+compared to their low order counterparts; For instance, higher-order
+discretizations of scalar elliptic operators are usually not
+M-matrices, which is a useful property to prove the convergence of
+smoothers such as Jacobi of Gauss-Seidel.
+
+% This
+%approach is more difficult to implement and the cost per iteration
+%increases. However, our preliminary results suggest that such an
+%approach is the most general.
+
+\subsection{$p$-multigrid}
+The $p$-multigrid approach initially does not coarsen the mesh
+geometrically, but coarsens the system by reducing the polynomial
+order. Starting from an order-$p$ polynomial basis, the coarser grids
+correspond to polynomials of order $p/2, p/4,\ldots,1$, followed by
+geometric coarsening of the $p=1$ grid (i.e., the usual low order
+geometric multigrid). Coarsening the polynomial order is rather simple
+and element-local. The latter is particularly useful for
+discretizations with nonconforming meshes. \gsnote{Is that actually
+  true?}. Challenges for $p$-multigrid are devising appropriate
+smoothers and the dependence of the convergence factor on the order of
+the polynomial basis. \gsnote{We need a citation here.}
+
+
+\subsection{Preconditioning by lower-order operator}
+This approach preconditions the higher-order operator using a
+lower-order operator obtained by overlaying the higher-order nodes
+with a lower-order (typically linear) finite element mesh using the
+same same nodes.  Multigrid is used to solve the lower-order operator,
+which has more favorable sparsity properties and thus allows for
+faster multigrid cycles compared to multigrid for the high order
+discretized systems.  Although this approach is nearly independent of
+$p$, and is relatively straightforward to parallelize, it is not work
+optimal and the convergence factors are lower than multigrid applied
+directly to the higher-order operator. \gsnote{Revisit statement.}
+For nonconforming meshes, constructing the low order operator can be
+technical at edges and faces of different size; while the basis
+functions for the high order operators can be made continuous through
+the use of proper algebraic constraints at nonconforming faces, the
+corresponding low order discretization has discontinuities at
+nonconforming faces.  The construction of a low-order preconditioner
+based on the nodes of the high order discretization is a popular
+approach \cite{Brown10,Kim07,DevilleMund?}.
+
+The advantages of doing
 this are mainly in the simplicity of the approach and the availability
 of parallel multigrid solvers capable of solving such lower-order
 operators. The sparsity of the lower-order operators also permits the
 use of AMG for solving the lower-order operators, possibly obtained
-via discretizations on unstructured meshes.  Although there are
-examples of using Algebraic Multigrid directly on operators resulting
-from higher-order discretizations, limited work has been done on using
-geometric multigrid with higher-order discretizations. To the best of
-our knowledge, no prior work on using geometric multigrid for solving
-systems arising from higher-order discretizations on arbitrary
-geometries using highly adapted meshes.  In this work, we develop
-geometric multigrid methods to support higher-order discretizations
-($1\le p\le 8$) and compare compare against preconditioning using the
-co-located linear operator. We evaluate using variable-coefficient
-Poisson problems on $2D$ and $3D$ domains. We demonstrate that by
-using appropriate inter-grid transfer operators and smoothers,
-mesh-independent convergence is possible ($1\le p\le8$) for the {\em
-direct} approach. For the direct approach, best results are obtained
-using the symmetric successive over-relaxation (SSOR) smoother. We
-conclude with thoughts on the parallelization of the proposed
-approach.
+via discretizations on unstructured meshes.
 
-\section{Meshing, High-order FEM}
 
-talk about octrees, tensor products etc. basically our setup.
+\subsection{Schwarz-based methods}
+Another common approach for solving systems arising from higher-order
+discretizations is based on local block solves.  The main challenge
+with these approaches is that they require solving dense local blocks
+either using direct methods or approximations that allow for fast
+iterative solution \cite{LottesFischer05,FischerLottes05}.
+Additionally, the coarse-grid solve can become fairly expensive and is
+not straightforward to achieve good parallel scalability.
 
-\section{Approaches for High-order Multigrid}
 
-talk about the 4 main approaches and prior work.
+\section{Smoothers}
+% Chebyshef, Jacobi, SSOR
+
+
 
 \section{Performance Model}
 
@@ -157,7 +234,7 @@ Finalize and discuss ramifications.
 
 
 \bibliographystyle{wileyj}
-\bibliography{mg}
+\bibliography{mg,ccgo}
 
 
 \end{document}
