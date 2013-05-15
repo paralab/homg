@@ -144,7 +144,7 @@ multigrid-based solvers and preconditioners for higher-order
 finite-element discretizations. These methods can also be
 appropriately combined.
 
-\subsection{High-order $h$-multigrid}
+\subsection{High-order $h$-multigrid}\label{subsec:h}
 A direct generalization of geometric multigrid from first order to
 higher order discretizations is to use high order restriction and
 prolongation operators together with the linear systems that result
@@ -161,50 +161,59 @@ smoothers such as Jacobi of Gauss-Seidel.
 %increases. However, our preliminary results suggest that such an
 %approach is the most general.
 
-\subsection{$p$-multigrid}
-The $p$-multigrid approach initially does not coarsen the mesh
-geometrically, but coarsens the system by reducing the polynomial
+\subsection{$p$-multigrid}\label{subsec:p}
+In the $p$-multigrid approach to high order multigrid, one (initially)
+does not coarsen the mesh geometrically, but coarsens the system by
+reducing the polynomial 
 order. Starting from an order-$p$ polynomial basis, the coarser grids
 correspond to polynomials of order $p/2, p/4,\ldots,1$, followed by
 geometric coarsening of the $p=1$ grid (i.e., the usual low order
-geometric multigrid). Coarsening the polynomial order is rather simple
-and element-local. The latter is particularly useful for
+geometric multigrid). Decreasing the polynomial order is rather simple
+and element-local. The latter is particularly simple for
 discretizations with nonconforming meshes. \gsnote{Is that actually
-  true?}. It is a challenge for $p$-multigrid to devising appropriate
-smoothers. Moreover, one often finds dependence of the convergence
+  true?}. Devising appropriate smoothers is a challenge for $p$-multigrid.
+Moreover, one often finds dependence of the convergence
 factor on the order of the polynomial basis. \gsnote{We need a
   citation here.}
 
-
-\subsection{Preconditioning by lower-order operator}
-This approach preconditions the higher-order operator using a
-lower-order operator obtained by overlaying the higher-order nodes
-with a lower-order (typically linear) finite element mesh using the
-same same nodes.  Multigrid is used to solve the lower-order operator,
-which has more favorable sparsity properties and thus allows for
-faster multigrid cycles compared to multigrid for the high order
-discretized systems.  Although this approach is nearly independent of
-$p$, and is relatively straightforward to parallelize, it is not work
-optimal and the convergence factors are lower than multigrid applied
-directly to the higher-order operator. \gsnote{Revisit statement.}
-For nonconforming meshes, constructing the low order operator can be
-technical at edges and faces of different size; while the basis
-functions for the high order operators can be made continuous through
-the use of proper algebraic constraints at nonconforming faces, the
-corresponding low order discretization has discontinuities at
-nonconforming faces.  The construction of a low-order preconditioner
-based on the nodes of the high order discretization is a popular
-approach \cite{Brown10,Kim07,DevilleMund?}.
-
-The advantages of doing
-this are mainly in the simplicity of the approach and the availability
-of parallel multigrid solvers capable of solving such lower-order
-operators. The sparsity of the lower-order operators also permits the
-use of AMG for solving the lower-order operators, possibly obtained
-via discretizations on unstructured meshes.
+\subsection{Preconditioning by lower-order operator}\label{subsec:low}
+This approach preconditions the higher-order operator by a low order
+operator obtained by overlaying the higher-order nodes with a
+lower-order (typically linear) finite element mesh. Standard multigrid
+is then used for the low order operator, which has more favorable
+sparsity properties and thus allows for standard smoothers.  The
+construction of a low-order preconditioner based on the nodes of the
+high order discretization is a relatively popular approach
+\cite{Brown10,Kim07,DevilleMund?}. The resulting method nearly
+independent of $p$, and is relatively straightforward to parallelize.
+In addition, due to the sparsity of the low order operators,
+performing multigrid cycles is faster compared to high order multigrid
+(see Section~\ref{subsec:h} above).  However, this speedup does not
+come into play on the finest mesh level where the high-order residual
+must be computed. Thus, the speedup for a full multigrid cycle when
+using the low order operator is limited.  This low-order
+preconditioning is not work optimal and the convergence factors can be
+lower than when multigrid is applied directly to the higher-order
+operator. Also, for nonconforming meshes, constructing the low order
+operator can be technical at edges and faces of different size; while
+the basis functions for the high order operators can be made
+continuous through the use of algebraic constraints at nonconforming
+faces, the corresponding low order discretization has discontinuities
+at nonconforming faces.
 
 
-\subsection{Schwarz-based methods}
+
+
+
+%The advantages of doing
+%this are mainly in the simplicity of the approach and the availability
+%of parallel multigrid solvers capable of solving such lower-order
+%operators.
+% The sparsity of the lower-order operators also permits the
+%use of AMG for solving the lower-order operators, possibly obtained
+%via discretizations on unstructured meshes.
+
+\subsection{Schwarz-based methods}\label{subsec:schwarz}
 Another common approach for solving systems arising from higher-order
 discretizations is based on local block solves.  The main challenge
 with these approaches is that they require solving dense local blocks
@@ -229,9 +238,28 @@ Present results here and analyze based on performance model.
 
 \input{results.tex}
 
-\section{Conclusions}
+\section{Discussion and conclusions}
 
-Finalize and discuss ramifications.
+%Finalize and discuss ramifications.
+
+\begin{itemize}
+\item Using multigrid with Jacobi and Jacobi-based Chebyshev smoothing
+  as solver either fails to converge or converges slowly at orders
+  $p\ge 4$.
+\item Using Jacobi-based multigrid as preconditioner in the conjugate
+  gradient method, the number of iterations for polynomial orders
+  $p=2,3$ is similar to the number of iterations for linear elements.
+  In general, for the same number of unknowns one can expect better
+  accuracy for higher polynomial order. This advantage has to be
+  contrasted with the fact that higher order operators are less sparse
+  and thus their application to vectors is more time consuming.  Using
+  Jacobi-based smoothers is attractive from a parallel perspective
+  since no coloring of unknowns as in SSOR is necessary.
+\item Both, using high-order $h$-multigrid as well as $p$-multigrid
+  yield significantly faster convergence than preconditioning with the
+  low-order operator.
+
+\end{itemize}
 
 
 \bibliographystyle{wileyj}
