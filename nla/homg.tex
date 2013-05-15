@@ -164,17 +164,16 @@ smoothers such as Jacobi of Gauss-Seidel.
 \subsection{$p$-multigrid}\label{subsec:p}
 In the $p$-multigrid approach to high order multigrid, one (initially)
 does not coarsen the mesh geometrically, but coarsens the system by
-reducing the polynomial 
-order. Starting from an order-$p$ polynomial basis, the coarser grids
-correspond to polynomials of order $p/2, p/4,\ldots,1$, followed by
-geometric coarsening of the $p=1$ grid (i.e., the usual low order
-geometric multigrid). Decreasing the polynomial order is rather simple
-and element-local. The latter is particularly simple for
-discretizations with nonconforming meshes. \gsnote{Is that actually
-  true?}. Devising appropriate smoothers is a challenge for $p$-multigrid.
-Moreover, one often finds dependence of the convergence
-factor on the order of the polynomial basis. \gsnote{We need a
-  citation here.}
+reducing the polynomial order. Starting from an order-$p$ polynomial
+basis, the coarser grids correspond to polynomials of order $p/2,
+p/4,\ldots,1$, followed by geometric coarsening of the $p=1$ grid
+(i.e., the usual low order geometric multigrid). Decreasing the
+polynomial order is rather simple and element-local. The latter is
+particularly simple for discretizations with nonconforming
+meshes. \gsnote{Is that actually true?}. Devising appropriate
+smoothers is a challenge for $p$-multigrid.  Moreover, one often finds
+dependence of the convergence factor on the order of the polynomial
+basis. \gsnote{We need a citation here.}
 
 \subsection{Preconditioning by lower-order operator}\label{subsec:low}
 This approach preconditions the higher-order operator by a low order
@@ -201,10 +200,6 @@ continuous through the use of algebraic constraints at nonconforming
 faces, the corresponding low order discretization has discontinuities
 at nonconforming faces.
 
-
-
-
-
 %The advantages of doing
 %this are mainly in the simplicity of the approach and the availability
 %of parallel multigrid solvers capable of solving such lower-order
@@ -218,9 +213,11 @@ Another common approach for solving systems arising from higher-order
 discretizations is based on local block solves.  The main challenge
 with these approaches is that they require solving dense local blocks
 either using direct methods or approximations that allow for fast
-iterative solution \cite{LottesFischer05,FischerLottes05}.
-Additionally, the coarse-grid solve can become fairly expensive and is
-not straightforward to achieve good parallel scalability.
+iterative solution \cite{LottesFischer05,FischerLottes05}. These
+methods have been used successfully for spectral element
+discretizations with orders significantly larger than 8. However, the
+coarse-grid solves can become fairly expensive and is not
+straightforward to achieve good parallel scalability. \gsnote{Why?}
 
 
 \section{Smoothers}
@@ -255,10 +252,15 @@ Present results here and analyze based on performance model.
   and thus their application to vectors is more time consuming.  Using
   Jacobi-based smoothers is attractive from a parallel perspective
   since no coloring of unknowns as in SSOR is necessary.
-\item Both, using high-order $h$-multigrid as well as $p$-multigrid
-  yield significantly faster convergence than preconditioning with the
-  low-order operator.
-
+\item Both, high-order $h$-multigrid as well as $p$-multigrid yield
+  significantly faster convergence in terms of the number of
+  iterations than preconditioning with the low-order
+  operator. Although the low order operators are sparser and thus
+  faster to apply, the larger number of iterations results in larger
+  time-to-solution.
+\item Simple problems Chebyshev looses even compared to Jacobi, for
+  more complicated problems SSOR still seems faster than Jacobi-based
+  Chebyshev smoothing.
 \end{itemize}
 
 
