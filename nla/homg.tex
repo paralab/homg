@@ -289,30 +289,34 @@ smoothers is a challenge for $p$-multigrid.  Moreover, one often finds
 dependence of the convergence factor on the order of the polynomial
 basis. \gsnote{We need a citation here.}
 
-\subsection{Preconditioning by lower-order operator}\label{subsec:low}
-This approach preconditions the higher-order operator by a low order
-operator obtained by overlaying the higher-order nodes with a
-lower-order (typically linear) finite element mesh. Standard multigrid
-is then used for the low order operator, which has more favorable
-sparsity properties and thus allows for standard smoothers.  The
-construction of a low-order preconditioner based on the nodes of the
-high order discretization is a relatively popular approach
-\cite{Brown10,Kim07,DevilleMund?}. The resulting method nearly
-independent of $p$, and is relatively straightforward to parallelize.
-In addition, due to the sparsity of the low order operators,
-performing multigrid cycles is faster compared to high order multigrid
-(see Section~\ref{subsec:h} above).  However, this speedup does not
-come into play on the finest mesh level where the high-order residual
-must be computed. Thus, the speedup for a full multigrid cycle when
-using the low order operator is limited.  This low-order
-preconditioning is not work optimal and the convergence factors can be
-lower than when multigrid is applied directly to the higher-order
-operator. Also, for nonconforming meshes, constructing the low order
-operator can be technical at edges and faces of different size; while
-the basis functions for the high order operators can be made
-continuous through the use of algebraic constraints at nonconforming
-faces, the corresponding low order discretization has discontinuities
-at nonconforming faces.
+\subsection{Defect correction using lower-order operator}\label{subsec:low}
+In the defect correction appraoch (see
+\cite{TrottenbergOosterleeSchuller01}) the high order defect is
+iteratively corrected using a low order operator obtained by
+overlaying the higher-order nodes with a lower-order (typically
+linear) finite element mesh. Standard multigrid is then used for the
+low order operator, which has more favorable sparsity properties and
+thus allows for standard smoothers.  The construction of a low-order
+preconditioner based on the nodes of the high order discretization is
+a relatively popular approach \cite{Brown10,Kim07,DevilleMund90}. The
+resulting method is nearly independent of $p$, and is relatively
+straightforward to parallelize.  Due to the fact that only the
+residual for the high order operator is computed and since the low
+order operator is sparse and thus faster to apply, multigrid cycles
+are faster compared to high order $h$-multigrid or $p$-multigrid
+discussed in Section~\ref{subsec:h} and Section~\ref{subsec:p},
+respectively. 
+%  Thus, the speedup for a full multigrid cycle when using the
+%low order operator is limited.
+Howerver, this low-order preconditioning is not
+work optimal and the convergence factors can be lower than when
+multigrid is applied directly to the higher-order operator. Also, for
+nonconforming meshes, constructing the low order operator can be
+technical at edges and faces of different size; while the basis
+functions for the high order operators can be made continuous through
+the use of algebraic constraints at nonconforming faces, the
+corresponding low order discretization has discontinuities at
+nonconforming faces.
 
 %The advantages of doing
 %this are mainly in the simplicity of the approach and the availability
