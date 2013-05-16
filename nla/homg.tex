@@ -5,6 +5,20 @@
 \usepackage{moreverb}
 
 \usepackage[colorlinks,bookmarksopen,bookmarksnumbered,citecolor=red,urlcolor=red]{hyperref}
+\usepackage{tikz}
+\usetikzlibrary{shapes,arrows,trees,snakes,decorations.pathreplacing,fit}
+\usepackage{tkz-euclide}
+\usepackage{pgfplots}
+\usetkzobj{all} 
+
+\definecolor{utorange}{RGB}{203,96,21}
+\definecolor{utblack}{RGB}{99,102,106}
+\definecolor{utbrown}{RGB}{110,98,89}
+\definecolor{utsecbrown}{RGB}{217,200,158}
+\definecolor{utsecgreen}{RGB}{208,222,187}
+\definecolor{utsecblue}{RGB}{127,169,174}
+
+
 \newcommand{\gsnote}[1]{\textcolor{blue}{GS: #1}}
 
 
@@ -155,6 +169,117 @@ compared to their low order counterparts; For instance, higher-order
 discretizations of scalar elliptic operators are usually not
 M-matrices, which is a useful property to prove the convergence of
 smoothers such as Jacobi of Gauss-Seidel.
+
+\begin{figure}
+		% illustration for p-multigrid
+		\begin{tikzpicture}
+	
+		% homg
+		\draw (-5,4) grid +(4,1);
+		\foreach \e in {-5,...,-2}
+		\foreach \x in {0,0.1727,0.5,0.8273, 1.0} {
+			\draw[fill=utsecblue] (\e+\x, 4) circle (0.03);
+			\draw[fill=utsecblue] (\e+\x, 4.1727) circle (0.03);
+			\draw[fill=utsecblue] (\e+\x, 4.5) circle (0.03);
+			\draw[fill=utsecblue] (\e+\x, 4.8273) circle (0.03);
+			\draw[fill=utsecblue] (\e+\x, 5) circle (0.03);
+		}
+		%\node at (5,4.5) {\small $p=4$};
+	
+		\draw[-latex',thick] (-3, 3.75) -- node[right] {{\scriptsize coarsen}} (-3, 3.25);
+	
+		\draw (-5,2) rectangle +(4,1);
+		\draw (-3,2) -- (-3,3);
+		
+		\foreach \e in {-5,-3}
+		\foreach \x in {0,0.1727,0.5,0.8273, 1.0} {
+			\draw[fill=utsecblue] (\e+2*\x, 2) circle (0.03);
+			\draw[fill=utsecblue] (\e+2*\x, 2.1727) circle (0.03);
+			\draw[fill=utsecblue] (\e+2*\x, 2.5) circle (0.03);
+			\draw[fill=utsecblue] (\e+2*\x, 2.8273) circle (0.03);
+			\draw[fill=utsecblue] (\e+2*\x, 3) circle (0.03);
+		}
+		%\node at (5,2.5) {\small $p=2$};
+	
+		\draw[-latex',thick] (-3, 1.75) -- node[right] {{\scriptsize coarsen}} (-3, 1.25);
+	
+		\draw (-5,0) rectangle +(4,1);
+		\foreach \x in {0,0.1727,0.5,0.8273, 1.0} {
+			\draw[fill=utsecblue] (-5+4*\x, 0) circle (0.03);
+			\draw[fill=utsecblue] (-5+4*\x, 0.1727) circle (0.03);
+			\draw[fill=utsecblue] (-5+4*\x, 0.5) circle (0.03);
+			\draw[fill=utsecblue] (-5+4*\x, 0.8273) circle (0.03);
+			\draw[fill=utsecblue] (-5+4*\x, 1) circle (0.03);
+		}
+		
+	%% p-multigrid
+		\draw (0,4) grid +(4,1);
+		\foreach \e in {0,...,3}
+		\foreach \x in {0,0.1727,0.5,0.8273, 1.0} {
+			\draw[fill=utsecblue] (\e+\x, 4) circle (0.03);
+			\draw[fill=utsecblue] (\e+\x, 4.1727) circle (0.03);
+			\draw[fill=utsecblue] (\e+\x, 4.5) circle (0.03);
+			\draw[fill=utsecblue] (\e+\x, 4.8273) circle (0.03);
+			\draw[fill=utsecblue] (\e+\x, 5) circle (0.03);
+		}
+		%\node at (5,4.5) {\small $p=4$};
+	
+		\draw[-latex',thick] (2, 3.75) -- node[right] {{\scriptsize coarsen}} (2, 3.25);
+	
+		\draw (0,2) grid +(4,1);
+		\foreach \x in {0,0.5,...,4} {
+			\draw[fill=utsecblue] (\x, 2) circle (0.03);
+			\draw[fill=utsecblue] (\x, 2.5) circle (0.03);
+			\draw[fill=utsecblue] (\x, 3) circle (0.03);
+		}
+		%\node at (5,2.5) {\small $p=2$};
+	
+		\draw[-latex',thick] (2, 1.75) -- node[right] {{\scriptsize coarsen}} (2, 1.25);
+	
+		\draw (0,0) grid +(4,1);
+		\foreach \x in {0,1,2,3,4} {
+			\draw[fill=utsecblue] (\x, 0) circle (0.05);
+			\draw[fill=utsecblue] (\x, 1) circle (0.05);
+		}
+		%\node at (5,0.5) {\small $p=1$};
+		
+		%% collocated
+			\draw (5,4) grid +(4,1);
+			\foreach \e in {5,...,8}
+			\foreach \x in {0,0.1727,0.5,0.8273, 1.0} {
+				\draw[fill=utsecblue] (\e+\x, 4) circle (0.03);
+				\draw[fill=utsecblue] (\e+\x, 4.1727) circle (0.03);
+				\draw[fill=utsecblue] (\e+\x, 4.5) circle (0.03);
+				\draw[fill=utsecblue] (\e+\x, 4.8273) circle (0.03);
+				\draw[fill=utsecblue] (\e+\x, 5) circle (0.03);
+			}
+			%\node at (2, 1.8) {\tiny $p=4$};
+	
+			\draw[-latex',thick] (7, 3.75) -- node[right] {{\scriptsize precondition}} (7, 1.25);
+	
+			\draw[step=0.5] (4.99,0) grid +(4.01,1);
+			\draw (5,0.1727) -- (9,0.1727);
+			\draw (5,0.8273) -- (9,0.8273);
+			\foreach \e in {5,...,8} {
+				\draw (\e+0.1727,0) -- (\e+0.1727,1);
+				\draw (\e+0.8273,0) -- (\e+0.8273,1);
+				\foreach \x in {0,0.1727,0.5,0.8273, 1.0} {
+					\draw[fill=utsecblue] (\e+\x, 0) circle (0.03);
+					\draw[fill=utsecblue] (\e+\x, 0.1727) circle (0.03);
+					\draw[fill=utsecblue] (\e+\x, 0.5) circle (0.03);
+					\draw[fill=utsecblue] (\e+\x, 0.8273) circle (0.03);
+					\draw[fill=utsecblue] (\e+\x, 1) circle (0.03);
+				}
+			}
+			% \node at (2, -0.2) {\tiny $p=1$ collocated with $p=4$};
+		
+		
+		
+		
+		\end{tikzpicture}
+		\caption{\label{fig:approaches} Different approaches for high-order multigrid.}
+\end{figure}
+
 
 % This
 %approach is more difficult to implement and the cost per iteration
