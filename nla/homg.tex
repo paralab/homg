@@ -31,7 +31,7 @@ T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 
 \runningheads{Sundar~et~al.}{High-order Geometric Multigrid}
 
-\title{On Geometric Multigrid Algorithms for High-order Finite Element Discretizations}
+\title{Comparison of Geometric Multigrid Algorithms for High-order Finite Element Discretizations}
 
 \author{Hari Sundar\corrauth, Georg Stadler, Omar Ghattas and George Biros}
 
@@ -186,7 +186,7 @@ smoothers such as Jacobi of Gauss-Seidel.
 		}
 		%\node at (5,4.5) {\small $p=4$};
 	
-		\draw[-latex',thick] (-3, 3.75) -- node[right] {{\scriptsize coarsen}} (-3, 3.25);
+		\draw[-latex',thick] (-3, 3.75) -- node[right] {{\scriptsize $h$-coarsen}} (-3, 3.25);
 	
 		\draw (-5,2) rectangle +(4,1);
 		\draw (-3,2) -- (-3,3);
@@ -201,7 +201,7 @@ smoothers such as Jacobi of Gauss-Seidel.
 		}
 		%\node at (5,2.5) {\small $p=2$};
 	
-		\draw[-latex',thick] (-3, 1.75) -- node[right] {{\scriptsize coarsen}} (-3, 1.25);
+		\draw[-latex',thick] (-3, 1.75) -- node[right] {{\scriptsize $h$-coarsen}} (-3, 1.25);
 	
 		\draw (-5,0) rectangle +(4,1);
 		\foreach \x in {0,0.1727,0.5,0.8273, 1.0} {
@@ -224,7 +224,7 @@ smoothers such as Jacobi of Gauss-Seidel.
 		}
 		%\node at (5,4.5) {\small $p=4$};
 	
-		\draw[-latex',thick] (2, 3.75) -- node[right] {{\scriptsize coarsen}} (2, 3.25);
+		\draw[-latex',thick] (2, 3.75) -- node[right] {{\scriptsize $p$-coarsen}} (2, 3.25);
 	
 		\draw (0,2) grid +(4,1);
 		\foreach \x in {0,0.5,...,4} {
@@ -234,7 +234,7 @@ smoothers such as Jacobi of Gauss-Seidel.
 		}
 		%\node at (5,2.5) {\small $p=2$};
 	
-		\draw[-latex',thick] (2, 1.75) -- node[right] {{\scriptsize coarsen}} (2, 1.25);
+		\draw[-latex',thick] (2, 1.75) -- node[right] {{\scriptsize $p$-coarsen}} (2, 1.25);
 	
 		\draw (0,0) grid +(4,1);
 		\foreach \x in {0,1,2,3,4} {
@@ -272,10 +272,6 @@ smoothers such as Jacobi of Gauss-Seidel.
 				}
 			}
 			% \node at (2, -0.2) {\tiny $p=1$ collocated with $p=4$};
-		
-		
-		
-		
 		\end{tikzpicture}
 		\caption{\label{fig:approaches} Different approaches for high-order multigrid.}
 \end{figure}
