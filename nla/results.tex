@@ -19,20 +19,22 @@ Describe meshes and material properties used for testing.
 \begin{table}
   \caption{\label{tab:box} Number of CG iterations/v-cycles to converge to a relative tolerance of $10^{-8}$ for $h$-Multigrid applied to high-order operators on a rectangular domain. A total of 3 grids were used, the finest grid was $32\times 32$, and the coarsest was $8\times 8$. For orders $2,4$, and $8$, we also evaluated the option of first coarsening in $p$ as $p_{coarse} = p_{fine}/2$, till $p=1$, and then coarsen in $h$. The coarsest grid in this case is a $8\times 8$ grid with $p=1$. The number of CG iterations/v-cycles for this case is given in parenthesis.}
 		\centering
-    \begin{tabular}{|l|c|c|c|c|c|c|c|} 
+    \begin{tabular}{|l|c|c|c|c|c|c|c|c|c|c|c|c|r|} 
 \hline
-                     & \multicolumn{3}{c|}{Multigrid} & \multicolumn{3}{c|}{MG pCG} &          linearized \\
-										 \cline{2-7}
-			order &          \scriptsize Jacobi(3) &   \scriptsize  Chebyshev(3) & \scriptsize SSOR(2) & \scriptsize Jacobi(3) & \scriptsize  Chebyshev(3) & \scriptsize SSOR(2) & pCG\\
+                     & \multicolumn{6}{c|}{Multigrid} & \multicolumn{6}{c|}{MG pCG} &          linearized \\
+										 \cline{2-13}
+			order &  \multicolumn{2}{c|}{\scriptsize  Jacobi(3)} &  \multicolumn{2}{c|}{\scriptsize Chebyshev(3)} & \multicolumn{2}{c|}{\scriptsize  SSOR(2)} & \multicolumn{2}{c|}{\scriptsize Jacobi(3)} &  \multicolumn{2}{c|}{\scriptsize Chebyshev(3)} & \multicolumn{2}{c|}{\scriptsize SSOR(2)} & pCG\\
 \hline
-                   1 &                              6 &                           5 &                   4 &                     4 &                         4 &                   4 &   4\\
-                   2 &                          7 (7) &                       9 (9) &               4 (4) &                 5 (5) &                     6 (6) &               4 (4) &  14\\
-                   3 &                              8 &                          22 &                   5 &                     6 &                        10 &                   4 &  21\\
-                   4 &                          - (-) &                     48 (46) &               8 (7) &               43 (39) &                   15 (15) &               6 (5) &  30\\
-                   5 &                              - &                         150 &                  12 &                   295 &                        27 &                   8 &  43\\
-                   6 &                              - &                           - &                  27 &                     - &                        51 &                  12 &  65\\
-                   7 &                              - &                           - &                  81 &                     - &                       105 &                  21 &  99\\
-                   8 &                          - (-) &                       - (-) &           298 (267) &                 - (-) &                 204 (182) &             39 (36) & 146\\
+ & $h$ & $p$ & $h$ & $p$& $h$ & $p$& $h$ & $p$& $h$ & $p$& $h$ & $p$& \\
+ \cline{2-14}
+                   1 &       6 &    &                         5 &    &                 4 &   &                    4 &     &                      4 &      &               4 &   &    4\\
+                   2 &   7     & 7  &                         9 & 9  &                 4 & 4 &                    5 &  5  &                      6 &  6   &               4 & 4 &   14\\
+                   3 &       8 &    &                        22 &    &                 5 &   &                    6 &     &                     10 &      &               4 &   &   21\\
+                   4 &       - & -  &                        48 & 46 &                 8 & 7 &                   43 & 39  &                     15 &  15  &               6 & 5 &   30\\
+                   5 &       - &    &                       150 &    &                12 &   &                  295 &     &                     27 &      &               8 &   &   43\\
+                   6 &       - &    &                         - &    &                27 &   &                    - &     &                     51 &      &              12 &   &   65\\
+                   7 &       - &    &                         - &    &                81 &   &                    - &     &                    105 &      &              21 &   &   99\\
+                   8 &       - & -  &                         - & -  &                298&267&                    - &  -  &                    204 &  182 &              39 &36 &  146\\
 \hline
 	  \end{tabular}
 \end{table}
@@ -61,20 +63,23 @@ Describe meshes and material properties used for testing.
 \begin{table}
   \caption{\label{tab:fan} Number of CG iterations/v-cycles to converge to a relative tolerance of $10^{-8}$ for $h$-Multigrid applied to high-order operators on a fan domain. A total of 3 grids were used, the finest grid was $48\times 16$, and the coarsest was $12\times 4$. For orders $2,4$, and $8$, we also evaluated the option of first coarsening in $p$ as $p_{coarse} = p_{fine}/2$, till $p=1$, and then coarsen in $h$. The coarsest grid in this case is a $12\times 4$ grid with $p=1$. The number of CG iterations/v-cycles for this case is given in parenthesis.}
 		\centering
-    \begin{tabular}{|l|c|c|c|c|c|c|c|} 
+    \begin{tabular}{|l|c|c|c|c|c|c|c|c|c|c|c|c|r|} 
 \hline
-                     & \multicolumn{3}{c|}{Multigrid} & \multicolumn{3}{c|}{MG pCG} &          linearized    \\
-\cline{2-7}
-			order &          \scriptsize Jacobi(3) &   \scriptsize  Chebyshev(3) & \scriptsize SSOR(2) & \scriptsize Jacobi(3) & \scriptsize  Chebyshev(3) & \scriptsize SSOR(2) & pCG\\
-\hline
-                   1 &                              7 &                           8 &                   4 &                     5 &                         6 &                   4 &  4  \\
-                   2 &                          9 (9) &                     12 (13) &               5 (5) &                 6 (6) &                     7 (8) &               4 (4) &  55  \\
-                   3 &                             10 &                          26 &                   5 &                     7 &                        12 &                   4 &  129  \\
-                   4 &                          - (-) &                     54 (55) &               8 (7) &              136 (79) &                   17 (17) &               6 (6) &  235  \\
-                   5 &                              - &                         171 &                  14 &                     - &                        31 &                   8 &  430  \\
-                   6 &                              - &                           - &                  42 &                     - &                        53 &                  15 &  663  \\
-                   7 &                              - &                           - &                 146 &                     - &                       109 &                  29 &  804  \\
-                   8 &                              - &                           - &                   - &                     - &                   - (270) &             85 (70) &  1015  \\
+		 & \multicolumn{6}{c|}{Multigrid} & \multicolumn{6}{c|}{MG pCG} &          linearized \\
+		\cline{2-13}
+		order &  \multicolumn{2}{c|}{\scriptsize  Jacobi(3)} &  \multicolumn{2}{c|}{\scriptsize Chebyshev(3)} & \multicolumn{2}{c|}{\scriptsize  SSOR(2)} & \multicolumn{2}{c|}{\scriptsize Jacobi(3)} &  \multicolumn{2}{c|}{\scriptsize Chebyshev(3)} & \multicolumn{2}{c|}{\scriptsize SSOR(2)} & pCG\\
+				 \hline
+				  & $h$ & $p$ & $h$ & $p$& $h$ & $p$& $h$ & $p$& $h$ & $p$& $h$ & $p$& \\
+				  \cline{2-14}
+         
+ 1 &       7 &       &         8 &       &       4 &       &         5 &        &         6 &      &             4 &     &  4  \\
+ 2 &       9 &   9   &        12 &  13   &       5 &   5   &         6 &   6    &         7 &  8   &             4 &  4  &  55  \\
+ 3 &      10 &       &        26 &       &       5 &       &         7 &        &        12 &      &             4 &     &  129  \\
+ 4 &       - &   -   &        54 &  55   &       8 &   7   &       136 &  79    &        17 & 17   &             6 &  6  &  235  \\
+ 5 &       - &       &       171 &       &      14 &       &         - &        &        31 &      &             8 &     &  430  \\
+ 6 &       - &       &         - &       &      42 &       &         - &        &        53 &      &            15 &     &  663  \\
+ 7 &       - &       &         - &       &     146 &       &         - &        &       109 &      &            29 &     &  804  \\
+ 8 &       - &       &         - &   -   &       - &   -   &         - &   -    &        -  & 270  &            85 & 70  &  1015  \\
 \hline
 	  \end{tabular}
 \end{table}
@@ -100,20 +105,22 @@ Describe meshes and material properties used for testing.
 \begin{table}
   \caption{\label{tab:fan-aniso} Number of CG iterations/v-cycles to converge to a relative tolerance of $10^{-8}$ for $h$-Multigrid applied to high-order operators on a stretched fan domain. A total of 3 grids were used, the finest grid was $48\times 16$, and the coarsest was $12\times 4$. For orders $2,4$, and $8$, we also evaluated the option of first coarsening in $p$ as $p_{coarse} = p_{fine}/2$, till $p=1$, and then coarsen in $h$. The coarsest grid in this case is a $12\times 4$ grid with $p=1$. The number of CG iterations/v-cycles for this case is given in parenthesis.}
 		\centering
-    \begin{tabular}{|l|c|c|c|c|c|c|c|} 
+    \begin{tabular}{|l|c|c|c|c|c|c|c|c|c|c|c|c|r|} 
 \hline
-                     & \multicolumn{3}{c|}{Multigrid} & \multicolumn{3}{c|}{MG pCG} &          linearized  \\
-\cline{2-7}
-			order &          \scriptsize Jacobi(3) &   \scriptsize  Chebyshev(3) & \scriptsize SSOR(2) & \scriptsize Jacobi(3) & \scriptsize  Chebyshev(3) & \scriptsize SSOR(2) & pCG\\
-\hline
-                   1 &                             16 &                          21 &                   6 &                     9 &                        10 &                   5 &    \\
-                   2 &                        22 (23) &                     24 (24) &               7 (7) &               10 (11) &                   11 (11) &               5 (5) &    \\
-                   3 &                              - &                          54 &                   8 &                    55 &                        17 &                   6 &    \\
-                   4 &                              - &                     97 (92) &             14 (13) &                     - &                   23 (22) &               9 (8) &    \\
-                   5 &                              - &                         313 &                  22 &                     - &                        41 &                  11 &    \\
-                   6 &                              - &                           - &                  76 &                     - &                        73 &                  21 &    \\
-                   7 &                              - &                           - &                 259 &                     - &                       161 &                  38 &    \\
-                   8 &                              - &                           - &                   - &                     - &                   - (271) &             88 (72) &    \\
+		        & \multicolumn{6}{c|}{Multigrid} & \multicolumn{6}{c|}{MG pCG} &          linearized \\
+												 \cline{2-13}
+					order &  \multicolumn{2}{c|}{\scriptsize  Jacobi(3)} &  \multicolumn{2}{c|}{\scriptsize Chebyshev(3)} & \multicolumn{2}{c|}{\scriptsize  SSOR(2)} & \multicolumn{2}{c|}{\scriptsize Jacobi(3)} &  \multicolumn{2}{c|}{\scriptsize Chebyshev(3)} & \multicolumn{2}{c|}{\scriptsize SSOR(2)} & pCG\\
+		\hline
+		 & $h$ & $p$ & $h$ & $p$& $h$ & $p$& $h$ & $p$& $h$ & $p$& $h$ & $p$& \\
+		 \cline{2-14}
+ 1 &       16 &      &        21 &        &       6 &         &       9 &         &       10 &       &       5 &      & 5  \\
+ 2 &       22 &  23  &        24 &  24    &       7 &   7     &      10 &  11     &       11 &  11   &       5 &   5  & 67  \\
+ 3 &        - &      &        54 &        &       8 &         &      55 &         &       17 &       &       6 &      & 160  \\
+ 4 &        - &  -   &        97 &  92    &      14 &   13    &       - &         &       23 &  22   &       9 &   8  & 262  \\
+ 5 &        - &      &       313 &        &      22 &         &       - &         &       41 &       &      11 &      & 444  \\
+ 6 &        - &      &         - &        &      76 &         &       - &         &       73 &       &      21 &      & 654  \\
+ 7 &        - &      &         - &        &     259 &         &       - &         &      161 &       &      38 &      & 941  \\
+ 8 &        - &  -   &         - &  -     &       - &    -    &       - &         &        - & 271   &      88 &  72  & 1150  \\
 \hline
 	  \end{tabular}
 \end{table}
