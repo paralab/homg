@@ -244,8 +244,8 @@ classdef grid < handle
       for i=1:v
         res  = grid.jacobi_invdiag .* grid.residual(rhs, u);
         u = u - grid.jacobi_omega.*res;
-        r = norm(res);
-        % disp([grid.dbg_spaces 'residual: ' num2str(r)]); 
+        % r = norm(res);
+        % disp([grid.dbg_spaces num2str(r)]); 
         % norm(r)
       end  
     end % jacobi
@@ -405,10 +405,14 @@ classdef grid < handle
     
     function u = smoother_chebyshev (grid, v, rhs, u)
       if ( isempty ( grid.eig_max ) )
+        disp('computing eigenvalues');
+        tic;
         % Kc = grid.Null' * grid.K * grid.Null;
-        Kc = (eye(size(grid.K)) - grid.ZeroBoundary) + grid.ZeroBoundary * grid.K * grid.ZeroBoundary;
-        grid.eig_max = eigs(Kc, 1, 'LM');  
-        grid.eig_min = eigs(Kc, 1, 'SM');  
+        Kc = grid.K; %(eye(size(grid.K)) - grid.ZeroBoundary) + grid.ZeroBoundary * grid.K * grid.ZeroBoundary;
+        % d = eigs(Kc, 2, 'be');
+        grid.eig_max = eigs(Kc, 1, 'lm');  
+        grid.eig_min = eigs(Kc, 1, 'sm');  
+        toc;
       end
       
       % adjust the eigenvalues to hit the upper spectrum
@@ -442,7 +446,7 @@ classdef grid < handle
     function evec = get_eigenvectors(grid)
       % generate the correct matrix 
       Kc = grid.K; %(eye(size(grid.K)) - grid.ZeroBoundary) + grid.ZeroBoundary * grid.K * grid.ZeroBoundary;
-      [evec, eval] = eig(full(Kc), full(grid.M));
+      [evec, eval] = eig(full(Kc)); % eig(full(Kc), full(grid.M));
       grid.k_evec = evec;
       grid.k_lam = eval;
     end
