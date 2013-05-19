@@ -34,7 +34,8 @@ classdef mesh < handle
         elseif (geom == 'fan')
           % Geometry
           g1 = ellip2(1.0, 1.0, 'base','center','pos',[0.,0.0]);
-          g2=ellip2(0.55,0.55,'base','center','pos',[0.0,0.0]);
+          g2=ellip2(0.8,0.8,'base','center','pos',[0.0,0.0]);
+          % g2=ellip2(0.55,0.55,'base','center','pos',[0.0,0.0]);
           g3=geomcomp({g1,g2},'ns',{'g1','g2'},'sf','g1-g2','edge','none');
           g4=rect2(1.0,1.0,'base','corner','pos',[0.0,0.0]);
           g5=geomcomp({g3,g4},'ns',{'g3','g4'},'sf','g3*g4','edge','none');
@@ -64,7 +65,30 @@ classdef mesh < handle
           mesh.fem = meshextrude(tmp_fem, 'distance', 1, 'elextlayers', {mesh.nelem});
           clear tmp_fem;
         else
-          error(['Error: Unknown mesh shape' geom])
+           % Geometry
+          g1 = ellip2(1.0, 1.0, 'base','center','pos',[0.,0.0]);
+          % g2=ellip2(0.8,0.8,'base','center','pos',[0.0,0.0]);
+          g2=ellip2(0.55,0.55,'base','center','pos',[0.0,0.0]);
+          g3=geomcomp({g1,g2},'ns',{'g1','g2'},'sf','g1-g2','edge','none');
+          g4=rect2(1.0,1.0,'base','corner','pos',[0.0,0.0]);
+          g5=geomcomp({g3,g4},'ns',{'g3','g4'},'sf','g3*g4','edge','none');
+
+          % Analyzed geometry
+          s.objs={g5};
+          s.name={'Sector'};
+          % s.tags={'g5'};
+
+          tmp_fem.draw=struct('s',s);
+          tmp_fem.geom = geomcsg(tmp_fem);
+
+          % Create mapped quad mesh
+          tmp_fem.mesh=meshmap(tmp_fem, ...
+                           'edgegroups',{{[4],[2],[3],[1]}}, ...
+                           'Edgelem', {1,mesh.nelem,2,mesh.nelem,3,3*mesh.nelem,4,3*mesh.nelem}, 'report', 'off'); 
+          
+          mesh.fem = meshextrude(tmp_fem, 'distance', 1, 'elextlayers', {mesh.nelem});
+          clear g* s tmp_fem;
+          % error(['Error: Unknown mesh shape' geom])
         end
       else
         error(['Error: mesh is not supported for ',num2str(mesh.dim),'D.'])
@@ -235,8 +259,13 @@ classdef mesh < handle
         % build interpolation operator
 	for i = 1:no_dofs
 	    crds = mesh.coords(i,:);
-	    ind = find(((pts(:,1)-crds(1)).^2 + (pts(:,2)-crds(2)).^2)<=elsize^2);
-	    % if ( mod(i, prog_step) == 0 )
+	    if (mesh.dim == 2)
+        ind = find(((pts(:,1)-crds(1)).^2 + (pts(:,2)-crds(2)).^2)<=elsize^2);
+      else 
+        ind = find(((pts(:,1)-crds(1)).^2 + (pts(:,2)-crds(2)).^2 + (pts(:,3)-crds(3)).^2)<=elsize^2);
+      end
+
+      % if ( mod(i, prog_step) == 0 )
 	    %   disp(['Assembling P ' num2str(i/prog_step) ' %']);
 	    % end
 	    Xi(:) = 0;
