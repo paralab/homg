@@ -85,7 +85,10 @@ matrices loose structural properties such as the M-matrix property
 that allows to prove convergence of iterative solvers such as the
 Jacobi or Gauss-Seidel method.
 
-\gsnote{Needs a literature review.}
+\noindent
+\gsnote{Needs a literature review.}\\
+\gsnote{Unify notion of mesh/grid etc}\\
+\gsnote{Unify use of high order vs.\ higher order}\\
 Although there are examples of using Algebraic Multigrid directly on
 operators resulting from higher-order discretizations, limited work
 has been done on using geometric multigrid with higher-order
@@ -110,17 +113,14 @@ discretizations on arbitrary geometries using highly adapted meshes.
 %approach.\\[2ex]
 
 
-\gsnote{Unify notion of mesh/grid etc}
-
-
-
 \section{Meshing, High-order FEM}
 
 \gsnote{Section should contain:
 \begin{itemize}
 \item We prefer hexahedra, motivated from spectral methods. Main
-  advantage is octree approach and tensorized basis functions.
-\item 
+  advantage is tensorized basis functions (and, octree adaptivity)
+\item High-order maps better to current architectures (could go into
+  intro as well)
 \end{itemize}
 }
 
@@ -147,13 +147,13 @@ $\mathcal O(p^7)$ operations.
 
 
 \section{Approaches for High-order Multigrid}
-
 % talk about the 4 main approaches and prior work.
 
 In this section, we summarize different approaches for geometric
-multigrid-based solvers and preconditioners for higher-order
-finite-element discretizations. These methods can also be
-appropriately combined.
+multigrid for higher-order finite element discretizations. These
+methods can either be directly used as solvers, or as preconditioners,
+e.g., within a Krylov method.
+
 
 \subsection{High-order $h$-multigrid}\label{subsec:h}
 A direct generalization of geometric multigrid from first order to
@@ -170,7 +170,6 @@ smoothers such as Jacobi of Gauss-Seidel.
 \begin{figure}
 		% illustration for p-multigrid
 		\begin{tikzpicture}
-	
 		% homg
 		\draw (-5,4) grid +(4,1);
 		\foreach \e in {-5,...,-2}
@@ -182,12 +181,9 @@ smoothers such as Jacobi of Gauss-Seidel.
 			\draw[fill=utsecblue] (\e+\x, 5) circle (0.03);
 		}
 		%\node at (5,4.5) {\small $p=4$};
-	
 		\draw[-latex',thick] (-3, 3.75) -- node[right] {{\scriptsize $h$-coarsen}} (-3, 3.25);
-	
 		\draw (-5,2) rectangle +(4,1);
 		\draw (-3,2) -- (-3,3);
-		
 		\foreach \e in {-5,-3}
 		\foreach \x in {0,0.1727,0.5,0.8273, 1.0} {
 			\draw[fill=utsecblue] (\e+2*\x, 2) circle (0.03);
@@ -293,30 +289,34 @@ smoothers is a challenge for $p$-multigrid.  Moreover, one often finds
 dependence of the convergence factor on the order of the polynomial
 basis. \gsnote{We need a citation here.}
 
-\subsection{Preconditioning by lower-order operator}\label{subsec:low}
-This approach preconditions the higher-order operator by a low order
-operator obtained by overlaying the higher-order nodes with a
-lower-order (typically linear) finite element mesh. Standard multigrid
-is then used for the low order operator, which has more favorable
-sparsity properties and thus allows for standard smoothers.  The
-construction of a low-order preconditioner based on the nodes of the
-high order discretization is a relatively popular approach
-\cite{Brown10,Kim07,DevilleMund?}. The resulting method nearly
-independent of $p$, and is relatively straightforward to parallelize.
-In addition, due to the sparsity of the low order operators,
-performing multigrid cycles is faster compared to high order multigrid
-(see Section~\ref{subsec:h} above).  However, this speedup does not
-come into play on the finest mesh level where the high-order residual
-must be computed. Thus, the speedup for a full multigrid cycle when
-using the low order operator is limited.  This low-order
-preconditioning is not work optimal and the convergence factors can be
-lower than when multigrid is applied directly to the higher-order
-operator. Also, for nonconforming meshes, constructing the low order
-operator can be technical at edges and faces of different size; while
-the basis functions for the high order operators can be made
-continuous through the use of algebraic constraints at nonconforming
-faces, the corresponding low order discretization has discontinuities
-at nonconforming faces.
+\subsection{Defect correction using lower-order operator}\label{subsec:low}
+In the defect correction appraoch (see
+\cite{TrottenbergOosterleeSchuller01}) the high order defect is
+iteratively corrected using a low order operator obtained by
+overlaying the higher-order nodes with a lower-order (typically
+linear) finite element mesh. Standard multigrid is then used for the
+low order operator, which has more favorable sparsity properties and
+thus allows for standard smoothers.  The construction of a low-order
+preconditioner based on the nodes of the high order discretization is
+a relatively popular approach \cite{Brown10,Kim07,DevilleMund90}. The
+resulting method is nearly independent of $p$, and is relatively
+straightforward to parallelize.  Due to the fact that only the
+residual for the high order operator is computed and since the low
+order operator is sparse and thus faster to apply, multigrid cycles
+are faster compared to high order $h$-multigrid or $p$-multigrid
+discussed in Section~\ref{subsec:h} and Section~\ref{subsec:p},
+respectively. 
+%  Thus, the speedup for a full multigrid cycle when using the
+%low order operator is limited.
+Howerver, this low-order preconditioning is not
+work optimal and the convergence factors can be lower than when
+multigrid is applied directly to the higher-order operator. Also, for
+nonconforming meshes, constructing the low order operator can be
+technical at edges and faces of different size; while the basis
+functions for the high order operators can be made continuous through
+the use of algebraic constraints at nonconforming faces, the
+corresponding low order discretization has discontinuities at
+nonconforming faces.
 
 %The advantages of doing
 %this are mainly in the simplicity of the approach and the availability
