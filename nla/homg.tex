@@ -343,9 +343,20 @@ straightforward to achieve good parallel scalability. \gsnote{Why?}
 
 
 
-\section{Performance Model}
+\section{Performance}
+%talk about a performance model, so we can analyse the various approaches.
+To compare the computational cost of the different methods, we focus
+on the matrix-vector multiplications on the finest multigrid level,
+which dominate the overall computation. Denoting the number of
+unknowns on the finest level by $N$, the cost for a matrix-vector
+product is $Ng_p$, where $g_p>0$ is the cost per unknown for the
+application of an operator originating from a finite element
+approximation with polynomial order $p$. Since higher order
+discretizations results in less sparse operators, $g_1\ge g_2\le
+\ldots$. The actual value of $g_p$ depend on the architecture and the
+implemenation.
 
-talk about a performance model, so we can analyse the various approaches.
+
 
 \section{Evaluation}
 
