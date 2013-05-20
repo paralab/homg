@@ -147,6 +147,7 @@ $\mathcal O(p^7)$ operations.
 
 
 \section{Approaches for High-order Multigrid}
+\label{sec:approaches}
 % talk about the 4 main approaches and prior work.
 
 In this section, we summarize different approaches for geometric
@@ -346,15 +347,37 @@ straightforward to achieve good parallel scalability. \gsnote{Why?}
 \section{Performance}
 %talk about a performance model, so we can analyse the various approaches.
 To compare the computational cost of the different methods, we focus
-on the matrix-vector multiplications on the finest multigrid level,
-which dominate the overall computation. Denoting the number of
-unknowns on the finest level by $N$, the cost for a matrix-vector
-product is $Ng_p$, where $g_p>0$ is the cost per unknown for the
-application of an operator originating from a finite element
-approximation with polynomial order $p$. Since higher order
-discretizations results in less sparse operators, $g_1\ge g_2\le
-\ldots$. The actual value of $g_p$ depend on the architecture and the
-implemenation.
+on matrix-vector multiplications on the finest multigrid level, which
+dominate the overall computation. Denoting the number of unknowns on
+the finest level by $N$, the cost for a matrix-vector product is
+$Ng_p$, where $g_p>0$ is the cost per unknown for the application of
+an operator originating from a discretization with finite element of
+order $p$. Higher order discretizations result in less sparse
+operators and thus $g_1\le g_2\le \ldots$. However, the actual value
+of $g_p$, however, depends strongly on the implemenation and on the
+system architecture. To illustrate this, consider an elemental matrix
+for a hexahedral mesh in three dimensions, which is dense and of size
+$(p+1)^3\times (p+1)^3$. Its naive application to a vector amounts to
+$\mathcal O((p+1)^9)$ operations; for tensor bases, as common in
+spectral element methods, this can be reduced to $\mathcal O((p+1)^7)$
+operations \cite{DevilleFischerMund02}. In addition, high-order
+implementations allow more memory locality, which, compared to low
+order methods, results in higher performance.
+
+Based on this simple performance model, we next summarize the
+computational cost of the different approaches to high-oder multigrid
+discussed in Section~\ref{sec:approaches}. We denote by $s$ the number
+of smoothing steps on the finest multigrid level. Note that smoothers
+such as Jacobi, Gauss-Seidel or Chebyshev requsmoothers amount to
+matrix-vector products.
+
+
+\begin{itemize}
+\item High-order $h$-multigrid: 
+\item p-multigrid
+\end{itemize}
+
+
 
 
 
