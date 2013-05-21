@@ -12,26 +12,27 @@
 % defining custom colors
 \definecolor{mycolor1}{rgb}{1,0,1}
 
-\begin{tikzpicture}
+\begin{tikzpicture}[scale=0.225]
 
 \begin{axis}[%
 width=10.8672222222222in,
 height=10.2056111111111in,
 scale only axis,
 xmin=0,
-xmax=1200,
+xmax=1100,
 xmajorgrids,
+xmajorticks=false,
 ymode=log,
-ymin=0.0001,
-ymax=10,
-yminorticks=true,
+ymin=1e-08,
+ymax=4,
+% yminorticks=false,
 ymajorgrids,
-yminorgrids,
-title={$\text{N = 33}^\text{2}\text{ , p = 4}$}
+% yminorgrids,
+% title={$\text{N = 33}^\text{2}\text{ , p = 1}$}
 ]
 \addplot [
 color=black,
-solid,
+solid,thick,
 forget plot
 ]
 table[row sep=crcr]{
@@ -1127,7 +1128,7 @@ table[row sep=crcr]{
 };
 \addplot [
 color=mycolor1,
-solid,
+solid, very thick,
 line width=3.0pt,
 forget plot
 ]
@@ -2223,8 +2224,9 @@ table[row sep=crcr]{
 1089 0.0101000278915375\\
 };
 \addplot [
-color=green,
-solid,
+color=green!40,
+opacity=0.6,
+solid,thick,
 forget plot
 ]
 table[row sep=crcr]{
@@ -3319,4 +3321,16 @@ table[row sep=crcr]{
 1089 0.0795750193032205\\
 };
 \end{axis}
+
+\draw[rounded corners, thick, fill=white] (1,1) rectangle +(11,6);
+
+\draw[blue, ultra thick] (2,6) -- (4,6);
+\draw[mycolor1, ultra thick] (2,4) -- (4,4);
+\draw[green, ultra thick] (2,2) -- (4,2);
+
+\node at (8,4) {\small Chebyshev};
+\node at (7,6) {\small Jacobi};
+\node at (7,2) {\small SSOR};
+
+
 \end{tikzpicture}%

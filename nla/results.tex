@@ -4,30 +4,55 @@
 Describe meshes and material properties used for testing.
 
 \begin{figure}
-	\includegraphics[width=0.45\textwidth]{figs/box}
-	\includegraphics[width=0.45\textwidth]{figs/fan}
+	\includegraphics[width=0.48\textwidth]{figs/box}
+	\includegraphics[width=0.48\textwidth]{figs/fan}
 	\caption{\label{fig:mesh2d} The 2D meshes used for the tests.}
 \end{figure}
 
 \begin{figure}
-	\includegraphics[width=0.45\textwidth]{figs/box3a}
-	\includegraphics[width=0.45\textwidth]{figs/fan3a}
+	\includegraphics[width=0.48\textwidth]{figs/box3a}
+	\includegraphics[width=0.48\textwidth]{figs/fan3a}
 	\caption{\label{fig:mesh3d} The 3D meshes used for the tests.}
 \end{figure}
 
 
 \subsection{Smoothers}
 
-\begin{figure}
-	\includegraphics[width=0.45\textwidth]{figs/smoothers-order4}
-	\includegraphics[width=0.45\textwidth]{figs/vcycle-order4}
-	\caption{\label{fig:smoothers} The smoothing properties of the smoothers.}
-\end{figure}
+% \begin{figure}
+% 	\includegraphics[width=0.45\textwidth]{figs/smoothers-order4}
+% 	\includegraphics[width=0.45\textwidth]{figs/vcycle-order4}
+% 	\caption{\label{fig:smoothers} The smoothing properties of the smoothers.}
+% \end{figure}
 
 \begin{figure}
-	% \includegraphics[width=0.45\textwidth]{figs/smoothers-order1}
-	% \includegraphics[width=0.45\textwidth]{figs/smoothers-order2}
-	\input{tikz/smoothers-order1.tikz}
+	\centering
+	
+	\begin{subfigure}[b]{0.45\textwidth}
+		\input{tikz/smoothers-order1.tikz}
+		\caption{$p=1$, smoothing}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.45\textwidth}
+		\input{tikz/vcycle-order1.tikz}
+		\caption{$p=1$, single v-cycle}
+	\end{subfigure}
+	\\
+	\begin{subfigure}[b]{0.45\textwidth}
+		\input{tikz/smoothers-order2.tikz}
+		\caption{$p=2$, smoothing}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.45\textwidth}
+		\input{tikz/vcycle-order2.tikz}
+		\caption{$p=2$, single v-cycle}
+	\end{subfigure}
+	\\
+	\begin{subfigure}[b]{0.45\textwidth}
+		\input{tikz/smoothers-order4.tikz}
+		\caption{$p=4$, smoothing}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.45\textwidth}
+		\input{tikz/vcycle-order4.tikz}
+		\caption{$p=4$, single v-cycle}
+	\end{subfigure}
 	\caption{\label{fig:smoothers2} The smoothing properties of the smoothers.}
 \end{figure}
 
