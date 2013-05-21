@@ -16,6 +16,23 @@ Describe meshes and material properties used for testing.
 \end{figure}
 
 
+\subsection{Smoothers}
+
+\begin{figure}
+	\includegraphics[width=0.45\textwidth]{figs/smoothers-order4}
+	\includegraphics[width=0.45\textwidth]{figs/vcycle-order4}
+	\caption{\label{fig:smoothers} The smoothing properties of the smoothers.}
+\end{figure}
+
+\begin{figure}
+	% \includegraphics[width=0.45\textwidth]{figs/smoothers-order1}
+	% \includegraphics[width=0.45\textwidth]{figs/smoothers-order2}
+	\input{tikz/smoothers-order1.tikz}
+	\caption{\label{fig:smoothers2} The smoothing properties of the smoothers.}
+\end{figure}
+
+\subsection{Comparisons}
+
 \begin{table}
   \caption{\label{tab:box} Number of CG iterations/v-cycles to converge to a relative tolerance of $10^{-8}$ for $h$-Multigrid applied to high-order operators on a rectangular domain. A total of 3 grids were used, the finest grid was $32\times 32$, and the coarsest was $8\times 8$. For orders $2,4$, and $8$, we also evaluated the option of first coarsening in $p$ as $p_{coarse} = p_{fine}/2$, till $p=1$, and then coarsen in $h$. The coarsest grid in this case is a $8\times 8$ grid with $p=1$. The number of CG iterations/v-cycles for this case is given in the $p$ column.}
 		\centering
