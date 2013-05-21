@@ -345,7 +345,6 @@ straightforward to achieve good parallel scalability. \gsnote{Why?}
 
 
 \section{Performance}
-%talk about a performance model, so we can analyse the various approaches.
 To compare the computational cost of the different methods, we focus
 on matrix-vector multiplications on the finest multigrid level, which
 dominate the overall computation. Denoting the number of unknowns on
@@ -365,16 +364,36 @@ implementations allow more memory locality, which, compared to low
 order methods, results in higher performance.
 
 Based on this simple performance model, we next summarize the
-computational cost of the different approaches to high-oder multigrid
-discussed in Section~\ref{sec:approaches}. We denote by $s$ the number
-of smoothing steps on the finest multigrid level. Note that smoothers
-such as Jacobi, Gauss-Seidel or Chebyshev requsmoothers amount to
-matrix-vector products.
+computational cost of the approaches to high-oder multigrid discussed
+in Section~\ref{sec:approaches}. We denote by $s_\text{pre}$ and
+$s_\text{post}$ the number of pre- and post-smoothing steps on the
+finest multigrid level, respectively. Note that smoothers such as
+Jacobi, SSOR and Chebyshev internally use matrix-vector products, and
+we denote by $m$ the number of products per smoothing step.  Jacobi
+smoothing and Chebyshev-accelerated Jacobi require $m=1$ matrix-vector
+multiplication per smoothing step, while SSOR requires $m=2$
+matrix-vector operations.
 
 
 \begin{itemize}
-\item High-order $h$-multigrid: 
-\item p-multigrid
+\item {\em High-order $h$-multigrid:} On the finest grid level, the
+  residual and the smoothing steps are all based on the order $p$
+  discretization. Thus, the cost based on the matrix-vector products
+  on the finest multigrid level is
+  $g_p(1+m(s_\text{pre}+s_\text{post}))$.
+
+\item {\em $p$-multigrid:} As for high-order $h$-multigrid, an
+  estimate for the computational cost on the finest level is
+  $g_p(1+m(s_\text{pre}+s_\text{post}))$.
+
+\item {\em High-order defect correction with linear-order operator:}
+  High-order defect correction requires the computation of the
+  high-order residual, but uses smoothing based on the low-order
+  operator. Using linear elements, the computational cost on the
+  finest grid level is thus
+  $g_p+g_1m(s_\text{pre}+s_\text{post})$.
+
+
 \end{itemize}
 
 
