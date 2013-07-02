@@ -81,6 +81,50 @@ classdef grid < handle
       r = grid.K*u - rhs;
     end
 
+
+    function [u, rr, iter] = solve_lin_pcg(grid, num_vcyc, smoother, smooth_steps, rhs, u)
+      % disp('setting smoother');
+      grid.set_smoother(smoother);
+      
+      % disp('computing initial residual');
+      r = grid.residual(rhs, u);
+      rho = zeros(size(u));
+      % disp('outer v-cycle');
+      rho = grid.Coarse.vcycle(smooth_steps, smooth_steps, r, rho);
+      p = rho;
+      disp(['Initial residual is ' num2str(norm(r))]);
+      disp('------------------------------------------');
+      r0 = norm(r);
+      for i=1:num_vcyc
+        % disp(['inner v-cycle: ' num2str(i)]);
+        h = grid.K * p;
+        rho_res = dot (rho, r);
+        alpha = rho_res / dot ( p, h );
+        u = u + alpha*p;
+        r = r - alpha*h;
+
+        % rho_res_prev = rho_res;
+        
+        disp([num2str(i, '%03d\t') ': |res| = ' num2str(norm(r),'\t%8.4e')]);
+        if (norm(r)/r0 < 1e-8)
+          iter = i;
+          rr = norm(r)/r0;
+          return;
+        end
+        
+        % precondition ..
+        rho = zeros(size(u)); % needed ?
+        rho = grid.Coarse.vcycle(smooth_steps, smooth_steps, r, rho);
+        
+        beta = dot(rho, r) / rho_res ;
+        p = rho + beta*p;
+      end
+      disp('------------------------------------------');
+      iter = num_vcyc;
+      rr = norm(r)/r0;
+    end
+
+
     function [u, rr, iter] = solve_pcg(grid, num_vcyc, smoother, smooth_steps, rhs, u)
       % disp('setting smoother');
       grid.set_smoother(smoother);
