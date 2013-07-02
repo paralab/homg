@@ -363,8 +363,10 @@ classdef grid < handle
     end
 
     function u = smoother_hybrid (grid, v, rhs, u)
-      u = grid.smoother_gauss_seidel (v, rhs, u);
+      % u = grid.smoother_gauss_seidel (v, rhs, u);
       u = grid.smoother_chebyshev (v, rhs, u);
+      % u = grid.smoother_chebyshev (v, rhs, u);
+      u = grid.smoother_sym_sor(2, rhs, u);
     end
     
     function u = smoother_2sr (grid, v, rhs, u)
@@ -417,7 +419,7 @@ classdef grid < handle
       
       % adjust the eigenvalues to hit the upper spectrum
       l_max = grid.eig_max;
-      l_min =  (grid.eig_min + grid.eig_max)/2;
+      l_min =  0.3*grid.eig_max; % (grid.eig_min + grid.eig_max)/2;
       
       c = (l_min - l_max)/2;
       d = (l_min + l_max)/2;

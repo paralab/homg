@@ -1,4 +1,4 @@
-function test_smoother (dim, order, nelem, smoother) 
+function test_smoother (dim, geom, order, nelem, smoother) 
 % function test_smoother (dim, order, nelem, smoother) 
 % 
 % valid smoothers are,
@@ -8,7 +8,7 @@ function test_smoother (dim, order, nelem, smoother)
 %       '2sr'
 
 % generate matrix 
-m = homg.mesh(dim, nelem);
+m = homg.mesh(dim, geom, nelem, 1);
 m.set_rhs('0');
 % m.set_rhs('-8*pi^2*(sin(2*pi*x) * sin(2*pi*y))');
 g = homg.grid(m, order);
@@ -34,7 +34,7 @@ q = repmat(u0,size(u0'));
 b = dot (evec, q);
 plot(b, 'k'); hold on;
 
-for i=1:4
+for i=1
   u0 = evec*lam; % compare with sum(evec, 2);
   u = g.smooth(stps(i), g.L, u0);
   % compute projections ...

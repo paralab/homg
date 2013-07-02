@@ -35,18 +35,21 @@ for i=2:num_hgrids
   disp(['Creating h-grid: ' num2str(i) ' of ' num2str(num_grids) ', order = ' num2str(orders(1)) ', nelem = ' num2str(nelems(i))]);
   m = homg.mesh(dim, geom, nelems(i), sp);
   disp('---- created mesh')
-  grid = homg.grid(m, orders(1), coarse);
-  disp('---- created grid')
   % grid.debug = 1;
   % evc = grid.get_eigenvectors();
   if ( dim==2 )
-    m.set_rhs('(1 - 8*pi^2)*(sin(2*pi*x) * sin(2*pi*y))');
+    m.set_rhs('0');
+    % m.set_rhs('(1 - 8*pi^2)*(sin(2*pi*x) * sin(2*pi*y))');
     m.set_coeff('1');
     % m.set_coeff('1 + 1000000*((cos(2*pi*x))^2 + (cos(2*pi*y))^2 )');
   else
     m.set_rhs('(1 - 12*pi^2)*(sin(2*pi*x) * sin(2*pi*y) * sin(2*pi*z) )');
     m.set_coeff('1');
+    % m.set_coeff('1 + 1000000*((cos(2*pi*x))^2 + (cos(2*pi*y))^2 + (cos(2*pi*z))^2)');
   end
+  grid = homg.grid(m, orders(1), coarse);
+  disp('---- created grid')
+  
   coarse = grid;
 end
 
@@ -59,7 +62,7 @@ for i=2:num_pgrids
   grid = homg.grid(m, orders(i), coarse);
   if ( dim == 2 )
     m.set_rhs('(1 - 8*pi^2)*(sin(2*pi*x) * sin(2*pi*y))');
-    % m.set_coeff('1');
+    m.set_coeff('1');
   else
     m.set_rhs('(1 - 12*pi^2)*(sin(2*pi*x) * sin(2*pi*y) * sin(2*pi*z) )');
     m.set_coeff('1');
