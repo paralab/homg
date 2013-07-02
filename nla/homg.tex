@@ -44,33 +44,27 @@ T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 \input {homg_abstract.tex}
 \end{abstract}
 
-\keywords{geometric multigrid, high-order discretizations, p-multigrid}
+\keywords{geometric multigrid, high-order finite elements, p-multigrid}
 
 \maketitle
 
 
 \section{Introduction}
 
-%We are interested on asymptotically
-%optimal---$\mathcal{O}(N)$---complexity solvers for approximating the
-%solution of elliptic partial differential equations (PDEs), where $N$
-%is the number of unknowns.  Multigrid is such a solver. In practice
-%however, multigrid performs best for low-order uniform discretizations
-%with smooth coefficients. 
-
 This paper presents a systematic comparision of geometric multigrid
 algorithms for the solution of systems arising from high-order (we
 target polynomial orders up to 8) discretizations of elliptic partial
-differential equations. Our particular interest is in the efficiency
-of different approaches for high-order multigrid for large-scale,
-complex-geometry problems and the implementation of these methods on
-parallel high performance computing platforms. While we do not use
-large-scale test problems in this paper, we study our findings with
-these issues in mind. For instance, we discuss (1) matrix-free
-methods, i.e., methods that do not require assembled finite element
-matrices, (2) methods that can be parallelized on shared or
-distributed memory architectures, and (3) cache-efficient methods with
-dominantly local memory access.
+differential equations. Our particular interest is to compare the
+efficiency of different high-order multigrid methods for large-scale,
+complex-geometry problems with varying coefficients and the
+implementation of these methods on parallel high performance computing
+platforms. While we use moderate size model problems for the
+comparisons in this paper, we discuss our findings having large-scale
+parallel issues in mind. For instance,
+we discuss (1) matrix-free methods, i.e., methods that do not require
+assembled finite element matrices, (2) methods that can be
+parallelized on shared or distributed memory architectures, and (3)
+cache-efficient methods with dominantly local memory access.
 
 High order spatial discretizations can have significant advantages
 over low order methods, especially when the solution is smooth and
