@@ -2,9 +2,9 @@
 clear all; close all;
 
 % polynomial order
-N = 6;
+N = 4;
 % number of elements per space dimension
-no_elem = 4;
+no_elem = 8;
 
 % get GLL coordinates
 GLLcoords = getGLLcoords(N, no_elem);
@@ -68,11 +68,22 @@ Rinv = inv(R);
 
 % high-order stuff in GLL basis
 KK = Rinv' * K * Rinv;
-NN = N * Rinv;
 LL = Rinv' * L;
 
+rk = rank(full(N));
+[n1,n2] = size(N);
+NN = sparse(rk,n2);
+% find boundary points
+constr = find(coords(p,1)>0.9999 | coords(p,1)<0.00001 | ...
+    coords(p,2)>0.9999 | coords(p,2)<0.00001);
+for k=1:rk
+    NN(k,constr(k)) = 1;
+end
+
+MM = zeros(rk,1);
+
 % new basis
-[KC,LC,NULL,UD] = femlin('in', {'K', KK, 'L', LL, 'M', M, 'N', NN});
+[KC,LC,NULL,UD] = femlin('in', {'K', KK, 'L', LL, 'M', MM, 'N', NN});
 
 % old basis
 [K1C,L1C, NULL1, U1D] = femlin('in', {'K', K, 'L', L, 'M', M, 'N', N});
@@ -81,9 +92,9 @@ LL = Rinv' * L;
 [KCl,LCl, NULLl, UCl] = femlin('in', {'K', Kl, 'L', Ll, 'M', M_low, 'N', Nl});
 
 % check reordering of solution
-%sol = Rinv * (NULL * (KC\LC));
-%sol1 = NULL1 * (K1C\L1C);
-%norm(sol-sol1)/norm(sol)
+sol = Rinv * (NULL * (KC\LC));
+sol1 = NULL1 * (K1C\L1C);
+fprintf('Difference in solution due to reordering: %g\n', norm(sol-sol1)/norm(sol));
 
 soll = (NULLl * (KCl \ LCl));
 soll1(p,1) = soll;
