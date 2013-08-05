@@ -169,6 +169,8 @@ classdef mesh < handle
       % by imposing N*U = M
       [K,L] = assemble(mesh.fem,'Out',{'K','L'}, 'report', 'off');
       
+      %% DO Transform to GLL here ... 
+
       [~,~,Null,Ud] = femlin(mesh.fem,  'report', 'off');
       
       nodes = xmeshinfo(mesh.fem ,'out', 'nodes');

@@ -115,7 +115,7 @@ classdef grid < handle
         % precondition ..
         rho = zeros(size(u)); % needed ?
         rho = grid.Coarse.vcycle(smooth_steps, smooth_steps, r, rho);
-        
+
         beta = dot(rho, r) / rho_res ;
         p = rho + beta*p;
       end
