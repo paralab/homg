@@ -19,7 +19,7 @@ classdef tensor
         % 3D routines
         function y = IIAX (A, x)
             N = size (A, 1);
-            y = reshape(x, N*N, N) * A';
+            y = A * reshape(x, N, N*N);
             y = y(:);
         end
         
@@ -35,7 +35,7 @@ classdef tensor
         
         function y = AIIX (A, x)
             N = size (A, 1);
-            y = A * reshape(x, N, N*N);
+            y = reshape(x, N*N, N) * A';
             y = y(:);
         end
         

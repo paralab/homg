@@ -37,7 +37,7 @@ classdef refel < handle
                 elem.gradVr(i,:) = homg.GradJacobiP(elem.r, 0, 0, i-1);
             end
         
-            elem.Dr     = elem.Vr \ elem.gradVr;
+            elem.Dr     = transpose(elem.Vr \ elem.gradVr);
             
             iVr         = elem.Vr \ eye(order+1);
             elem.Mr     = iVr * iVr';

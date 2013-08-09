@@ -26,10 +26,10 @@ classdef hexmesh < handle
       
       % create coordinates ... 
       if ( mesh.dim == 2 )
-        [x,y] = meshgrid(0:1/nelems(1):1.0, 0:1/nelems(2):1.0);
+        [x,y] = ndgrid(0:1/nelems(1):1.0, 0:1/nelems(2):1.0);
         pts = [x(:) y(:)];
       else
-        [x,y,z] = meshgrid(0:1/nelems(1):1.0, 0:1/nelems(2):1.0,0:1/nelems(3):1.0);
+        [x,y,z] = ndgrid(0:1/nelems(1):1.0, 0:1/nelems(2):1.0,0:1/nelems(3):1.0);
         pts = [x(:) y(:) z(:)];
       end
       
@@ -39,14 +39,35 @@ classdef hexmesh < handle
     function plot(mesh)
         % display the mesh. Needs X.
         figure(1);
+        c = [31/256,171/256,226/256];   % default color of grid
+        lw = 1;                         % default line width of grid
+        
         if (mesh.dim == 2 )
-            plot(mesh.coords(:,1), mesh.coords(:,2), 'bo');
+            plot(mesh.coords(:,1), mesh.coords(:,2), 'ko');
+            hold on;
+            x = reshape(mesh.coords(:,1), mesh.nelems(1)+1, mesh.nelems(2)+1);
+            y = reshape(mesh.coords(:,2), mesh.nelems(1)+1, mesh.nelems(2)+1);
+            plot(x,y, 'Color',c,'LineWidth',lw);
+            plot(x',y', 'Color',c,'LineWidth',lw);
             axis square
         else
             plot3(mesh.coords(:,1), mesh.coords(:,2), mesh.coords(:,3), 'bo');
+            
             view(3); axis square
         end
         % title(['Hex Mesh ', num2str(numx,3),'x',num2str(numy,3),'x',num2str(numz,3)])
+    end
+    
+    function u = evaluate(mesh, fx)
+       % evaluate a function over the domain,
+       % fx = @(x,y) or @(x,y,z)
+       if (mesh.dim == 2)
+        u = arrayfun( fx, mesh.coords(:,1), mesh.coords(:,2) );
+       else
+        u = arrayfun( fx, mesh.coords(:,1), mesh.coords(:,2), mesh.coords(:,3) );   
+       end
+       
+       u = reshape(u, mesh.nelems + 1);
     end
     
     function set_coeff(mesh, coeff)
