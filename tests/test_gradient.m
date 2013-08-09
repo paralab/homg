@@ -19,6 +19,8 @@ dudy = arrayfun(g2y,  X(:), Y(:));
 dudx_t = homg.tensor.IAX(quad.Dr, u);
 dudy_t = homg.tensor.AIX(quad.Dr, u);
 
+% [dudx_t, dudy_t] = homg.tensor.grad2(quad.Dr, u);
+
 % error ...
 err_x = norm(dudx - dudx_t);
 err_y = norm(dudy - dudy_t);
@@ -43,6 +45,8 @@ dudz = arrayfun(g3z,  X(:), Y(:), Z(:));
 dudx_t = homg.tensor.IIAX(oct.Dr, u);
 dudy_t = homg.tensor.IAIX(oct.Dr, u);
 dudz_t = homg.tensor.AIIX(oct.Dr, u);
+
+% [dudx_t, dudy_t, dudz_t] = homg.tensor.grad3(oct.Dr, u);
 
 err_x = norm(dudx - dudx_t);
 err_y = norm(dudy - dudy_t);

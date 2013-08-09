@@ -132,8 +132,17 @@ classdef hexmesh < handle
         J   = zeros(Np,1);
         rst = zeros(Np,mesh.dim^2);
         
+        % compute x,y,z for element
         
+        [xrd, xsd, xtd] = homg.tensor.grad3 (elem.Dr, x);
+        [yrd, ysd, ytd] = homg.tensor.grad3 (elem.Dr, y);
+        [zrd, zsd, ztd] = homg.tensor.grad3 (elem.Dr, z);
         
+        % X component and Jacobi determinant
+        
+        % Y component
+        
+        % Z component
     end
     
   end % methods 

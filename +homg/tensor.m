@@ -39,6 +39,16 @@ classdef tensor
             y = y(:);
         end
         
+        function [dx, dy] = grad2(A, x)
+           dx = homg.tensor.IAX (A, x);
+           dy = homg.tensor.AIX (A, x);
+        end
+        
+        function [dx, dy, dz] = grad3(A, x)
+           dx = homg.tensor.IIAX (A, x);
+           dy = homg.tensor.IAIX (A, x);
+           dz = homg.tensor.AIIX (A, x);
+        end
     end
     
 end
