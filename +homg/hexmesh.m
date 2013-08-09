@@ -5,9 +5,11 @@ classdef hexmesh < handle
   properties (SetAccess = private)
     dim=2;
     nelems=[8 8];
-    coords
-    Xf
     
+    coords       % element vertices 
+    Xf           % transform 
+    
+    % problem specific
     coeff
     rhs
   end % properties
@@ -31,7 +33,7 @@ classdef hexmesh < handle
         pts = [x(:) y(:) z(:)];
       end
       
-      mesh.coords = X(pts); 
+      mesh.coords = X(pts);
     end
     
     function plot(mesh)
@@ -45,7 +47,6 @@ classdef hexmesh < handle
             view(3); axis square
         end
         % title(['Hex Mesh ', num2str(numx,3),'x',num2str(numy,3),'x',num2str(numz,3)])
-        
     end
     
     function set_coeff(mesh, coeff)
@@ -63,7 +64,7 @@ classdef hexmesh < handle
        dof = prod(mesh.nelems*order + 1);
        ne  = prod(mesh.nelems);
        
-       M = zeros(dof, dof);
+       M = zeros(dof, dof); % maybe sparse ?
        
        % loop over elements
        for e=1:ne
@@ -76,21 +77,42 @@ classdef hexmesh < handle
     
     function idx = get_node_indices ( mesh, elem, order )
        % determine global node indices for a given element
-       [i,j,k] = ind2sub (mesh.nelems, elem);
+       if ( mesh.dim == 2) 
+        [i,j] = ind2sub (mesh.nelems, elem);
+        
+        i_low   = (i-1)*order + 1;   i_high =  i*order + 1;
+        j_low   = (j-1)*order + 1;   j_high =  j*order + 1;
+        
+        [i,j] = ndgrid(i_low:i_high, j_low:j_high);
        
-       i_low   = (i-1)*order + 1;   i_high =  i*order + 1;
-       j_low   = (j-1)*order + 1;   j_high =  j*order + 1;
-       k_low   = (k-1)*order + 1;   k_high =  k*order + 1;
+        idx     = sub2ind (mesh.nelems*order + 1, i(:), j(:));
+       else
+        [i,j,k] = ind2sub (mesh.nelems, elem);
        
-       [i,j,k] = ndgrid(i_low:i_high, j_low:j_high, k_low:k_high);
+        i_low   = (i-1)*order + 1;   i_high =  i*order + 1;
+        j_low   = (j-1)*order + 1;   j_high =  j*order + 1;
+        k_low   = (k-1)*order + 1;   k_high =  k*order + 1;
        
-       idx     = sub2ind (mesh.nelems*order + 1, i(:), j(:), k(:) ); 
+        [i,j,k] = ndgrid(i_low:i_high, j_low:j_high, k_low:k_high);
+       
+        idx     = sub2ind (mesh.nelems*order + 1, i(:), j(:), k(:) );
+       end
     end
     
-    function Me = element_mass(mesh, order, refel)
+    function Me = element_mass(mesh, elem, refel)
        % element mass matrix 
-       Np =  (order+1)^mesh.dim;
+       Np =  refel.Nrp ^ mesh.dim;
        Me = zeros(Np);
+    end
+    
+    function [J, rst] = geometric_factors( mesh, elem, refel ) 
+        Np =  refel.Nrp ^ mesh.dim;
+        
+        J   = zeros(Np,1);
+        rst = zeros(Np,mesh.dim^2);
+        
+        
+        
     end
     
   end % methods 
