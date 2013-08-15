@@ -39,6 +39,18 @@ classdef tensor
             y = y(:);
         end
         
+        function du = grad(refel, u)
+            du = zeros(length(u), refel.dim);
+            if (refel.dim == 2)
+                du(:,1) = homg.tensor.IAX (refel.Dr, u);
+                du(:,2) = homg.tensor.AIX (refel.Dr, u);
+            else
+                du(:,1) = homg.tensor.IIAX (refel.Dr, u);
+                du(:,2) = homg.tensor.IAIX (refel.Dr, u);
+                du(:,3) = homg.tensor.AIIX (refel.Dr, u);
+            end
+        end
+        
         function [dx, dy] = grad2(A, x)
            dx = homg.tensor.IAX (A, x);
            dy = homg.tensor.AIX (A, x);
