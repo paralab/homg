@@ -145,12 +145,52 @@ classdef hexmesh < handle
       Me = refel.Q' * diag(Md) * refel.Q;
     end
     
-    function Ke = element_stiffness(self, eid, refel)
+    function Ke = element_stiffness(self, eid, r)
       % element mass matrix
-      [J, D] = self.geometric_factors(eid, refel);
+      [J, D] = self.geometric_factors(eid, r);
+      
+%             | Qx Qy Qz || rx ry rz |     | rx sx tx || Qx |
+%    Ke =                 | sx sy sz | J W | ry sy ty || Qy |
+%                         | tx ty tz |     | rz sz tz || Qz |
       
       
-      % Ke = refel.Q' * Kd * refel.Q;
+      factor = zeros(length(J), 6);
+
+      %             1  4  5
+      % factor      4  2  6
+      %             5  6  3
+      
+      
+      if (self.dim == 2 )
+        factor (:,1) = (D.rx.*D.rx + D.ry.*D.ry ) .* J .* r.W ; % d2u/dx^2
+        factor (:,2) = (D.sx.*D.sx + D.sy.*D.sy ) .* J .* r.W ; % d2u/dy^2
+        factor (:,3) = (D.rx.*D.sx + D.ry.*D.sy ) .* J .* r.W ; % d2u/dxdy
+        
+        Ke =   r.Qx' * diag(factor(:,1)) * r.Qx ...
+             + r.Qy' * diag(factor(:,2)) * r.Qy ...
+             + r.Qx' * diag(factor(:,3)) * r.Qy ...
+             + r.Qy' * diag(factor(:,3)) * r.Qx ;
+      else
+        
+        % first compute dj.w.J.J'
+        factor (:,1) = (D.rx.*D.rx + D.ry.*D.ry + D.rz.*D.rz ) .* J .* r.W ; % d2u/dx^2
+        factor (:,2) = (D.sx.*D.sx + D.sy.*D.sy + D.sz.*D.sz ) .* J .* r.W ; % d2u/dy^2
+        factor (:,3) = (D.tx.*D.tx + D.ty.*D.ty + D.tz.*D.tz ) .* J .* r.W ; % d2u/dz^2
+        factor (:,4) = (D.rx.*D.sx + D.ry.*D.sy + D.rz.*D.sz ) .* J .* r.W ; % d2u/dxdy
+        factor (:,5) = (D.rx.*D.tx + D.ry.*D.ty + D.rz.*D.tz ) .* J .* r.W ; % d2u/dxdz
+        factor (:,6) = (D.sx.*D.tx + D.sy.*D.ty + D.sz.*D.tz ) .* J .* r.W ; % d2u/dydz
+        
+        Ke =   r.Qx' * diag(factor(:,1)) * r.Qx ...
+             + r.Qy' * diag(factor(:,2)) * r.Qy ...
+             + r.Qz' * diag(factor(:,3)) * r.Qz ...
+             + r.Qx' * diag(factor(:,4)) * r.Qy ...
+             + r.Qy' * diag(factor(:,4)) * r.Qx ...
+             + r.Qx' * diag(factor(:,5)) * r.Qz ...
+             + r.Qz' * diag(factor(:,5)) * r.Qx ...
+             + r.Qz' * diag(factor(:,6)) * r.Qy ...
+             + r.Qy' * diag(factor(:,6)) * r.Qz ;
+      end
+      
     end
     
     
