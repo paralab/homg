@@ -36,79 +36,96 @@ classdef hexmesh < handle
       mesh.coords = X(pts);
     end
     
-    function plot(mesh)
+    function plot(self)
       % display the mesh. Needs X.
       figure(1);
       c = [31/256,171/256,226/256];   % default color of grid
       lw = 1;                         % default line width of grid
       
-      if (mesh.dim == 2 )
-        plot(mesh.coords(:,1), mesh.coords(:,2), 'ko');
+      if (self.dim == 2 )
+        plot(self.coords(:,1), self.coords(:,2), 'ko');
         hold on;
-        x = reshape(mesh.coords(:,1), mesh.nelems(1)+1, mesh.nelems(2)+1);
-        y = reshape(mesh.coords(:,2), mesh.nelems(1)+1, mesh.nelems(2)+1);
+        x = reshape(self.coords(:,1), self.nelems(1)+1, self.nelems(2)+1);
+        y = reshape(self.coords(:,2), self.nelems(1)+1, self.nelems(2)+1);
         plot(x,y, 'Color',c,'LineWidth',lw);
         plot(x',y', 'Color',c,'LineWidth',lw);
         axis square
       else
-        plot3(mesh.coords(:,1), mesh.coords(:,2), mesh.coords(:,3), 'bo');
+        plot3(self.coords(:,1), self.coords(:,2), self.coords(:,3), 'bo');
         
         view(3); axis square
       end
       % title(['Hex Mesh ', num2str(numx,3),'x',num2str(numy,3),'x',num2str(numz,3)])
     end
     
-    function u = evaluate(mesh, fx)
+    function u = evaluate(self, fx)
       % evaluate a function over the domain,
       % fx = @(x,y) or @(x,y,z)
-      if (mesh.dim == 2)
-        u = arrayfun( fx, mesh.coords(:,1), mesh.coords(:,2) );
+      if (self.dim == 2)
+        u = arrayfun( fx, self.coords(:,1), self.coords(:,2) );
       else
-        u = arrayfun( fx, mesh.coords(:,1), mesh.coords(:,2), mesh.coords(:,3) );
+        u = arrayfun( fx, self.coords(:,1), self.coords(:,2), self.coords(:,3) );
       end
       
-      u = reshape(u, mesh.nelems + 1);
+      u = reshape(u, self.nelems + 1);
     end
     
-    function set_coeff(mesh, coeff)
-      mesh.coeff = coeff;
+    function set_coeff(self, coeff)
+      self.coeff = coeff;
     end
     
     function set_rhs(mesh, rhs)
       mesh.rhs = rhs;
     end
     
-    function M = assemble_mass(mesh, order)
+    function M = assemble_mass(self, order)
       % assemble the mass matrix
-      refel = homg.refel ( mesh.dim, order );
+      refel = homg.refel ( self.dim, order );
       
-      dof = prod(mesh.nelems*order + 1);
-      ne  = prod(mesh.nelems);
+      dof = prod(self.nelems*order + 1);
+      ne  = prod(self.nelems);
       
       M = zeros(dof, dof); % maybe sparse ?
       
       % loop over elements
       for e=1:ne
-        idx = mesh.get_node_indices (e, order);
+        idx = self.get_node_indices (e, order);
         
-        M(idx, idx) = mesh.element_mass(order, refel);
+        M(idx, idx) = M(idx, idx) + self.element_mass(e, refel);
+      end
+      M = sparse(M);
+    end
+    
+    function K = assemble_stiffness(self, order)
+      % assemble the mass matrix
+      refel = homg.refel ( self.dim, order );
+      
+      dof = prod(self.nelems*order + 1);
+      ne  = prod(self.nelems);
+      
+      K = zeros(dof, dof); % maybe sparse ?
+      
+      % loop over elements
+      for e=1:ne
+        idx = self.get_node_indices (e, order);
+        
+        K(idx, idx) = K(idx, idx) + self.element_stiffness(e, refel);
       end
     end
     
-    
-    function idx = get_node_indices ( mesh, elem, order )
+    function idx = get_node_indices ( self, eid, order )
       % determine global node indices for a given element
-      if ( mesh.dim == 2)
-        [i,j] = ind2sub (mesh.nelems, elem);
+      if ( self.dim == 2)
+        [i,j] = ind2sub (self.nelems, eid);
         
         i_low   = (i-1)*order + 1;   i_high =  i*order + 1;
         j_low   = (j-1)*order + 1;   j_high =  j*order + 1;
         
         [i,j] = ndgrid(i_low:i_high, j_low:j_high);
         
-        idx     = sub2ind (mesh.nelems*order + 1, i(:), j(:));
+        idx     = sub2ind (self.nelems*order + 1, i(:), j(:));
       else
-        [i,j,k] = ind2sub (mesh.nelems, elem);
+        [i,j,k] = ind2sub (self.nelems, eid);
         
         i_low   = (i-1)*order + 1;   i_high =  i*order + 1;
         j_low   = (j-1)*order + 1;   j_high =  j*order + 1;
@@ -116,85 +133,77 @@ classdef hexmesh < handle
         
         [i,j,k] = ndgrid(i_low:i_high, j_low:j_high, k_low:k_high);
         
-        idx     = sub2ind (mesh.nelems*order + 1, i(:), j(:), k(:) );
+        idx     = sub2ind (self.nelems*order + 1, i(:), j(:), k(:) );
       end
     end
     
-    function Me = element_mass(mesh, elem, refel)
+    function Me = element_mass(self, eid, refel)
       % element mass matrix
-      Np =  refel.Nrp ^ mesh.dim;
-      Me = zeros(Np);
+      J = self.geometric_factors(eid, refel);
+      Md = refel.W .* J ; 
+      
+      Me = refel.Q' * diag(Md) * refel.Q;
     end
     
-    function [J, D] = geometric_factors( mesh, elem, refel )
+    function Ke = element_stiffness(self, eid, refel)
+      % element mass matrix
+      [J, D] = self.geometric_factors(eid, refel);
+      
+      
+      % Ke = refel.Q' * Kd * refel.Q;
+    end
+    
+    
+    function [J, D] = geometric_factors( self, elem, refel )
       % Np =  refel.Nrp ^ mesh.dim;
       
       % compute x,y,z for element
-      pts = mesh.element_nodes(elem, refel);
+      pts = self.element_nodes(elem, refel);
+        
+      if (refel.dim == 2)
+        [xr, xs] = homg.tensor.grad2 (refel.Dr, pts(:,1));
+        [yr, ys] = homg.tensor.grad2 (refel.Dr, pts(:,2));
       
-      % gradients ...
-      xd = homg.tensor.grad(refel, pts(:,1));
-      yd = homg.tensor.grad(refel, pts(:,2));
-      zd = homg.tensor.grad(refel, pts(:,3));
+        J = -xs.*yr + xr.*ys;
+      else
+        [xr, xs, xt] = homg.tensor.grad3 (refel.Dr, pts(:,1));
+        [yr, ys, yt] = homg.tensor.grad3 (refel.Dr, pts(:,2));
+        [zr, zs, zt] = homg.tensor.grad3 (refel.Dr, pts(:,3));
+        
+        J = xr.*(ys.*zt-zs.*yt) - yr.*(xs.*zt-zs.*xt) + zr.*(xs.*yt-ys.*xt);
+      end
       
-      % X component and Jacobi determinant
-      ad = diag(pts(:,2))*zd - diag(pts(:,3))*yd;
-      
-      arsd = homg.tensor.IAIX (refel.Dr, ad(:,1) );
-      artd = homg.tensor.AIIX (refel.Dr, ad(:,1) );
-      asrd = homg.tensor.IIAX (refel.Dr, ad(:,2) );
-      astd = homg.tensor.AIIX (refel.Dr, ad(:,2) );
-      atrd = homg.tensor.IIAX (refel.Dr, ad(:,3) );
-      atsd = homg.tensor.IAIX (refel.Dr, ad(:,3) );
-      
-      % J = det([xd yd zd]);
-      J = xd(:,1).*(yd(:,2).*zd(:,3) - zd(:,2).*yd(:,3)) + ...
-          yd(:,1).*(zd(:,2).*xd(:,3) - xd(:,2).*zd(:,3)) + ...
-          zd(:,1).*(xd(:,2).*yd(:,3) - yd(:,2).*xd(:,3)) ;
-      
-      i2J = 0.5./J;
-      
-      D.rx = (atsd - astd) .* i2J;
-      D.sx = (artd - atrd) .* i2J;
-      D.tx = (asrd - arsd) .* i2J;
-      
-      % Y component
-      ad = diag(pts(:,3))*xd - diag(pts(:,1))*zd;
-      
-      arsd = homg.tensor.IAIX (refel.Dr, ad(:,1) );
-      artd = homg.tensor.AIIX (refel.Dr, ad(:,1) );
-      asrd = homg.tensor.IIAX (refel.Dr, ad(:,2) );
-      astd = homg.tensor.AIIX (refel.Dr, ad(:,2) );
-      atrd = homg.tensor.IIAX (refel.Dr, ad(:,3) );
-      atsd = homg.tensor.IAIX (refel.Dr, ad(:,3) );
-      
-      D.ry = (atsd - astd) .* i2J;
-      D.sy = (artd - atrd) .* i2J;
-      D.ty = (asrd - arsd) .* i2J;
-      
-      % Z component
-      ad = diag(pts(:,1))*yd - diag(pts(:,2))*xd;
-      
-      arsd = homg.tensor.IAIX (refel.Dr, ad(:,1) );
-      artd = homg.tensor.AIIX (refel.Dr, ad(:,1) );
-      asrd = homg.tensor.IIAX (refel.Dr, ad(:,2) );
-      astd = homg.tensor.AIIX (refel.Dr, ad(:,2) );
-      atrd = homg.tensor.IIAX (refel.Dr, ad(:,3) );
-      atsd = homg.tensor.IAIX (refel.Dr, ad(:,3) );
-      
-      D.rz = (atsd - astd) .* i2J;
-      D.sz = (artd - atrd) .* i2J;
-      D.tz = (asrd - arsd) .* i2J;
+      if (nargout > 1)
+        if (refel.dim == 2)
+          D.rx =  ys./J;
+          D.sx = -yr./J;
+          D.ry = -xs./J;
+          D.sy =  xr./J;
+        else
+          D.rx =  (ys.*zt - zs.*yt)./J;
+          D.ry = -(xs.*zt - zs.*xt)./J;
+          D.rz =  (xs.*yt - ys.*xt)./J;
+          
+          D.sx = -(yr.*zt - zr.*yt)./J;
+          D.sy =  (xr.*zt - zr.*xt)./J;
+          D.sz = -(xr.*yt - yr.*xt)./J;
+          
+          D.tx =  (yr.*zs - zr.*ys)./J;
+          D.ty = -(xr.*zs - zr.*xs)./J;
+          D.tz =  (xr.*ys - yr.*xs)./J;
+        end
+        
+      end
     end
     
-    function coords = element_nodes(mesh,  elem, refel)
-      h = 1./mesh.nelems;
+    function coords = element_nodes(self,  elem, refel)
+      h = 1./self.nelems;
       
-      if ( mesh.dim == 2)
-        [i,j] = ind2sub (mesh.nelems, elem);
+      if ( self.dim == 2)
+        [i,j] = ind2sub (self.nelems, elem);
         idx = [i j];
       else
-        [i,j,k] = ind2sub (mesh.nelems, elem);
+        [i,j,k] = ind2sub (self.nelems, elem);
         idx = [i j k];
       end
       
@@ -202,15 +211,15 @@ classdef hexmesh < handle
       p_gll = refel.r * 0.5 * h;
       nodes = bsxfun(@plus, p_mid, p_gll) ;
       
-      if ( mesh.dim == 2)
-        [x y] = ndgrid(nodes(:,1), nodes(:,2));
+      if ( self.dim == 2)
+        [x, y] = ndgrid(nodes(:,1), nodes(:,2));
         pts = [x(:) y(:)];
       else
-        [x y z] = ndgrid(nodes(:,1), nodes(:,2), nodes(:,3));
+        [x, y, z] = ndgrid(nodes(:,1), nodes(:,2), nodes(:,3));
         pts = [x(:) y(:) z(:)];
       end
       
-      coords = mesh.Xf(pts);
+      coords = self.Xf(pts);
     end
     
   end % methods

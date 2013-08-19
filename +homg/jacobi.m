@@ -73,7 +73,7 @@ classdef jacobi
             end
             
             % Form symmetric matrix from recurrence.
-            J = zeros(N+1);
+            % J = zeros(N+1);
             h1 = 2*(0:N)+alpha+beta;
             J = diag(-1/2*(alpha^2-beta^2)./(h1+2)./h1) + ...
                 diag(2./(h1(1:N)+2).*sqrt((1:N).*((1:N)+alpha+beta).*...
