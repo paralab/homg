@@ -75,8 +75,9 @@ classdef refel < handle
             if (d == 2)
               elem.Q  = kron(q1d, q1d) ;
               
-              elem.Qx = kron(elem.Dg, q1d);
-              elem.Qy = kron(q1d, elem.Dg);
+              elem.Qx = kron(q1d, elem.Dg);
+              elem.Qy = kron(elem.Dg, q1d);
+              
               sk = 1;
               for i=1:elem.Nrp
                 for j=1:elem.Nrp
@@ -88,9 +89,9 @@ classdef refel < handle
             else
               elem.Q  = kron(kron(q1d, q1d), q1d);
               
-              elem.Qx = kron(kron(elem.Dg, q1d), q1d);
+              elem.Qx = kron(kron(q1d, q1d), elem.Dg);
               elem.Qy = kron(kron(q1d, elem.Dg), q1d);
-              elem.Qz = kron(kron(q1d, q1d), elem.Dg);
+              elem.Qz = kron(kron(elem.Dg, q1d), q1d);
               
               sk = 1;
               for i=1:elem.Nrp

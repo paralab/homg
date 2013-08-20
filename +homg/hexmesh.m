@@ -137,6 +137,10 @@ classdef hexmesh < handle
       end
     end
     
+		function idx = get_boundary_node_indices(self, order)
+			
+		end
+		
     function Me = element_mass(self, eid, refel)
       % element mass matrix
       J = self.geometric_factors(eid, refel);
@@ -261,14 +265,30 @@ classdef hexmesh < handle
       
       coords = self.Xf(pts);
     end
-    
+		
   end % methods
   
   methods(Static)
     function Xout = identity (Xin)
       Xout = Xin;
     end
+ 
+    function Xout = twoX (Xin)
+      Xout = Xin;
+      Xout(:,1) = 2*Xout(:,1);
+    end
     
+    function Xout = twoY (Xin)
+      Xout = Xin;
+      Xout(:,2) = 2*Xout(:,2);
+    end
+
+		function Xout = twoSix (Xin)
+			% currently only 2D 
+      Xout = 2*Xin;
+      Xout(:,2) = 3*Xout(:,2);
+		end
+
     function Xout = shell (Xin)
       d = size(Xin, 2);
       R1 = 1.0; % hard coded for now.
