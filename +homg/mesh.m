@@ -1,5 +1,5 @@
 classdef mesh < handle
-  %MESH A container class for homg Meshes
+  %MESH A container class for homg Meshes using ComSol (depricated)
   %   Mesh class for homg meshes. Is a wrapper around comsol
   
   properties (SetAccess = private)
@@ -323,7 +323,7 @@ classdef mesh < handle
 	    %   disp(['Assembling P ' num2str(i/prog_step) ' %']);
 	    % end
 	    Xi(:) = 0;
-	    %% Xi = zeros(no_dofs,1);
+	    % Xi = zeros(no_dofs,1);
 	    Xi(mesh.perm_full(i)) = 1;
 	    P(ind,mesh.perm_full(i)) = postinterp(mesh.fem, 'u', pts(ind,:)', 'U', Xi)';
 	   % plot(pts(ind,1),pts(ind,2)','ro'); hold on;
