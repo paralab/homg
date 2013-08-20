@@ -50,7 +50,7 @@ classdef grid < handle
       % end
 
       grid.Mesh = mesh;
-      [grid.K, grid.L, grid.Null, grid.Ud] = mesh.assemble_poisson(order);
+      [grid.K, grid.L, grid.Null, grid.Ud] = mesh.assemble_poisson(order, 'gll');
       grid.M = mesh.assemble_mass(order);
       grid.ZeroBoundary = grid.Null * grid.Null';
       grid.smoother = 'sor';
@@ -58,7 +58,7 @@ classdef grid < handle
       grid.sor_omega = 1;
       if (~ isempty(grid.Coarse) )
          ts1 = tic;
-         grid.P = grid.Coarse.Mesh.assemble_interpolation(mesh.coords);
+         grid.P = grid.Coarse.Mesh.assemble_interpolation(mesh.coords, 'gll');
          toc(ts1);
          % grid.R = inv(grid.Coarse.M) * grid.P' * grid.M ; 
          grid.R = grid.P';

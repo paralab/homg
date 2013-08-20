@@ -121,7 +121,7 @@ classdef mesh < handle
     function M = assemble_mass(mesh, order)
       % Assembles the mass matrix
       % Check that the Stiffness matrix is assembled first
-      mesh.fem.dim = {'u'};s
+      mesh.fem.dim = {'u'};
       mesh.fem.shape = order;
       
       mesh.fem.equ.weak = '(-u*u_test)';
