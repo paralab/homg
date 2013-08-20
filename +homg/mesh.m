@@ -11,6 +11,8 @@ classdef mesh < handle
     % permutations
     perm_full
     perm_rest
+		% Uniform2GLL
+		GLL2Uniform
     coords
     geom_shape
   end % properties
@@ -119,7 +121,7 @@ classdef mesh < handle
     function M = assemble_mass(mesh, order)
       % Assembles the mass matrix
       % Check that the Stiffness matrix is assembled first
-      mesh.fem.dim = {'u'};
+      mesh.fem.dim = {'u'};s
       mesh.fem.shape = order;
       
       mesh.fem.equ.weak = '(-u*u_test)';
@@ -149,7 +151,7 @@ classdef mesh < handle
       M = M(mesh.perm_full, mesh.perm_full);
     end
     
-    function [K,L,Null,Ud] = assemble_poisson(mesh, order)
+    function [K,L,Null,Ud] = assemble_poisson(mesh, order, basis)
       % Assembles the Stiffness matrix and RHS for the poisson equation
       mesh.fem.dim   = {'u'};
       mesh.fem.shape = order;
@@ -167,11 +169,8 @@ classdef mesh < handle
       
       % K system matrix, L rhs, boundary conditions are to be incorporated
       % by imposing N*U = M
-      [K,L] = assemble(mesh.fem,'Out',{'K','L'}, 'report', 'off');
-      
-      %% DO Transform to GLL here ... 
-
-      [~,~,Null,Ud] = femlin(mesh.fem,  'report', 'off');
+      % [K,L, M,N] = assemble(mesh.fem,'Out',{'K','L'}, 'report', 'off');
+      [K,L, M,N] = assemble(mesh.fem, 'report', 'off');
       
       nodes = xmeshinfo(mesh.fem ,'out', 'nodes');
       dofs = nodes.dofs;
@@ -182,7 +181,7 @@ classdef mesh < handle
       [~,idof] = sort(dofs);
       
       mesh.coords = crds(idof,:);
-      fac = 10*mesh.nelem;
+      fac = 10000*mesh.nelem;
       
       if (mesh.dim == 2)
         sortval = mesh.coords(:,2)*fac + mesh.coords(:,1);
@@ -191,8 +190,61 @@ classdef mesh < handle
       end
       
       [~, p] = sort(sortval);
+
+      % [~,~,Null,Ud] = femlin(mesh.fem,  'report', 'off');      
       mesh.perm_full = p;
+
+			%%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       
+      if ( strcmp(basis, 'gll') & (order > 2) )
+			  qq = getGLLcoords(order, mesh.nelem);
+        if (mesh.dim == 2)
+          [xx, yy] = meshgrid(qq, qq);
+          pts = [yy(:) xx(:)];
+        else
+          [xx, yy, zz] = meshgrid(qq, qq, qq);
+          pts = [zz(:) yy(:) xx(:)];
+        end
+				no_pts = size(pts, 1);
+				X = zeros(no_pts, 1);
+				no_dofs = length(X);
+				
+				% coordinate transformation matrix uniform->GLL
+				Uniform2GLL = zeros(no_pts, no_dofs);
+				for i = 1:no_dofs
+				    X(:) = 0;
+				    X(i) = 1;
+				    Uniform2GLL(:,i) = postinterp(mesh.fem, 'u', pts', 'U', X)';
+				end
+				% Rinv transforms from GLL to uniform Lagrange basis
+				mesh.GLL2Uniform = inv(Uniform2GLL);
+				
+        clear Uniform2GLL;
+				% high-order stuff in GLL basis
+				K = mesh.GLL2Uniform' * K * mesh.GLL2Uniform;
+				L = mesh.GLL2Uniform' * L;
+
+        rk = rank(full(N));
+        [n1,n2] = size(N);
+        NN = sparse(rk,n2);
+        % find boundary points
+        if (mesh.dim == 2)
+          constr = find(pts(:,1)>0.9999 | pts(:,1)<0.00001 | pts(:,2)>0.9999 | pts(:,2)<0.00001);
+        else 
+          constr = find(pts(:,1)>0.9999 | pts(:,1)<0.00001 | pts(:,2)>0.9999 | pts(:,2)<0.00001 | pts(:,3)>0.9999 | pts(:,3)<0.00001 ) ;
+        end
+        for k=1:rk
+          NN(k,constr(k)) = 1;
+        end
+
+        M = zeros(rk,1);
+        N = NN;
+      end
+      
+			%%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      
+      [K,L,Null,Ud] = femlin('in', {'K', K, 'L', L, 'M', M, 'N', N}, 'report', 'off' );
+			
       crds2 = Null' * mesh.coords;
       if (mesh.dim == 2)
         sortval = crds2(:,2)*fac + crds2(:,1);
@@ -213,7 +265,7 @@ classdef mesh < handle
       
     end
     
-    function P = assemble_interpolation(mesh, pts)
+    function P = assemble_interpolation(mesh, pts, basis)
       % todo: check if matrices assembled before this ...
       % vector of FEM coefficients and its length
 
