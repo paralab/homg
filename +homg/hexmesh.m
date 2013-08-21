@@ -6,12 +6,12 @@ classdef hexmesh < handle
     dim=2;
     nelems=[8 8];
     
-    coords       % element vertices
+    % coords       % element vertices
     Xf           % transform
     
     % problem specific
-    coeff
-    rhs
+    % coeff
+    % rhs
   end % properties
   
   methods
@@ -23,35 +23,34 @@ classdef hexmesh < handle
       mesh.dim    = length(nelems);
       mesh.nelems  = nelems;
       mesh.Xf = X;
-      
-      % create coordinates ...
-      if ( mesh.dim == 2 )
-        [x,y] = ndgrid(0:1/nelems(1):1.0, 0:1/nelems(2):1.0);
-        pts = [x(:) y(:)];
-      else
-        [x,y,z] = ndgrid(0:1/nelems(1):1.0, 0:1/nelems(2):1.0,0:1/nelems(3):1.0);
-        pts = [x(:) y(:) z(:)];
-      end
-      
-      mesh.coords = X(pts);
     end
     
     function plot(self)
+      % create coordinates ...
+      if ( self.dim == 2 )
+        [x,y] = ndgrid(0:1/self.nelems(1):1.0, 0:1/self.nelems(2):1.0);
+        pts = [x(:) y(:)];
+      else
+        [x,y,z] = ndgrid(0:1/self.nelems(1):1.0, 0:1/self.nelems(2):1.0,0:1/self.nelems(3):1.0);
+        pts = [x(:) y(:) z(:)];
+      end
+      
+      coords = self.Xf(pts);
       % display the mesh. Needs X.
       figure(1);
       c = [31/256,171/256,226/256];   % default color of grid
       lw = 1;                         % default line width of grid
       
       if (self.dim == 2 )
-        plot(self.coords(:,1), self.coords(:,2), 'ko');
+        plot(coords(:,1), coords(:,2), 'ko');
         hold on;
-        x = reshape(self.coords(:,1), self.nelems(1)+1, self.nelems(2)+1);
-        y = reshape(self.coords(:,2), self.nelems(1)+1, self.nelems(2)+1);
+        x = reshape(coords(:,1), self.nelems(1)+1, self.nelems(2)+1);
+        y = reshape(coords(:,2), self.nelems(1)+1, self.nelems(2)+1);
         plot(x,y, 'Color',c,'LineWidth',lw);
         plot(x',y', 'Color',c,'LineWidth',lw);
         axis square
       else
-        plot3(self.coords(:,1), self.coords(:,2), self.coords(:,3), 'bo');
+        plot3(coords(:,1), coords(:,2), coords(:,3), 'bo');
         
         view(3); axis square
       end
@@ -85,7 +84,9 @@ classdef hexmesh < handle
       dof = prod(self.nelems*order + 1);
       ne  = prod(self.nelems);
       
-      M = zeros(dof, dof); % maybe sparse ?
+      num_nz = dof * ( min(dof, (order+2)^self.dim) ); 
+      
+      M = spalloc(dof, dof, num_nz); 
       
       % loop over elements
       for e=1:ne
@@ -93,7 +94,7 @@ classdef hexmesh < handle
         
         M(idx, idx) = M(idx, idx) + self.element_mass(e, refel);
       end
-      M = sparse(M);
+      % M = sparse(M);
     end
     
     function K = assemble_stiffness(self, order)
@@ -103,7 +104,9 @@ classdef hexmesh < handle
       dof = prod(self.nelems*order + 1);
       ne  = prod(self.nelems);
       
-      K = zeros(dof, dof); % maybe sparse ?
+      num_nz = dof * ( min(dof, (order+2)^self.dim) ); 
+      
+      K = spalloc(dof, dof, num_nz); 
       
       % loop over elements
       for e=1:ne
@@ -316,6 +319,27 @@ classdef hexmesh < handle
         Xout(:,1) =   q.* y;
         Xout(:,2) =   q;
       end
+    end
+    
+    function C = stats(nelems, order)
+      % function Ch = stats(nelems, order)
+      %   given number of elements and the order,
+      %   this function calculates different node 
+      %   stats for the mesh
+      d               = length(nelems);
+      C.num_nodes     = prod(nelems*order + 1);
+      C.num_elements  = prod(nelems);
+      C.num_bdy_nodes = C.num_nodes - prod(nelems*order - 1);
+      
+      C.num_int_elements = prod(nelems - 1);
+      C.num_bdy_elements = C.num_elements - C.num_int_elements;
+      
+      C.nnz = (order+2)^d*C.num_nodes;
+%       if (d == 2)
+%         
+%       else
+%         
+%       end
     end
   end  % static methods
   
