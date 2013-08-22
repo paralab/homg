@@ -32,6 +32,9 @@ classdef refel < handle
         Qy
         Qz
         
+        % Prolongation 
+        P      % interpolation from this element to its 4/8 children
+        
         Mr     % exact 1D Mass matrix (Nrp x Nrp)
         invMr  % and its inverse
     end
@@ -44,9 +47,11 @@ classdef refel < handle
             elem.N      = order;
             elem.Nrp    = order + 1;
             
-            elem.r      = homg.jacobi.gll (0, 0, elem.N);
+            elem.r      = homg.basis.gll (0, 0, elem.N);
             
-            [elem.g, elem.w] = homg.jacobi.gauss(0, 0, elem.N);
+            rp          = [0.5*(elem.r - 1); 0.5*(elem.r(2:end) + 1)];
+            
+            [elem.g, elem.w] = homg.basis.gauss(0, 0, elem.N);
             
             elem.Vr     = zeros (order+1, order+1);
             elem.gradVr = zeros (order+1, order+1);
@@ -54,12 +59,16 @@ classdef refel < handle
             elem.Vg     = zeros (order+1, order+1);
             elem.gradVg = zeros (order+1, order+1);
             
+            Vp     = zeros (order+1, 2*order+1);
+            
             for i=1:elem.Nrp
-                elem.Vr(i,:)     = homg.jacobi.polynomial (elem.r, 0, 0, i-1);
-                elem.gradVr(i,:) = homg.jacobi.gradient (elem.r, 0, 0, i-1);
+                elem.Vr(i,:)     = homg.basis.polynomial (elem.r, 0, 0, i-1);
+                elem.gradVr(i,:) = homg.basis.gradient (elem.r, 0, 0, i-1);
                 
-                elem.Vg(i,:)     = homg.jacobi.polynomial (elem.g, 0, 0, i-1);
-                elem.gradVg(i,:) = homg.jacobi.gradient (elem.g, 0, 0, i-1);
+                elem.Vg(i,:)     = homg.basis.polynomial (elem.g, 0, 0, i-1);
+                elem.gradVg(i,:) = homg.basis.gradient (elem.g, 0, 0, i-1);
+                
+                Vp(i,:)          = homg.basis.polynomial (rp, 0, 0, i-1);
             end
         
             elem.Dr     = transpose(elem.Vr \ elem.gradVr);
@@ -69,11 +78,13 @@ classdef refel < handle
             iVr         = elem.Vr \ eye(order+1);
             
             q1d         = transpose (elem.Vr \ elem.Vg);  
+            p1d         = transpose (elem.Vr \ Vp);  
             
-            elem.W           = zeros(elem.Nrp^elem.dim, 1);
+            elem.W      = zeros(elem.Nrp^elem.dim, 1);
             
             if (d == 2)
               elem.Q  = kron(q1d, q1d) ;
+              elem.P  = kron(p1d, p1d) ;
               
               elem.Qx = kron(q1d, elem.Dg);
               elem.Qy = kron(elem.Dg, q1d);
@@ -88,6 +99,7 @@ classdef refel < handle
               
             else
               elem.Q  = kron(kron(q1d, q1d), q1d);
+              elem.P  = kron(kron(p1d, p1d), p1d);
               
               elem.Qx = kron(kron(q1d, q1d), elem.Dg);
               elem.Qy = kron(kron(q1d, elem.Dg), q1d);

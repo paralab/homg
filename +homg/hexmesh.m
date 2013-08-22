@@ -48,25 +48,31 @@ classdef hexmesh < handle
         y = reshape(coords(:,2), self.nelems(1)+1, self.nelems(2)+1);
         plot(x,y, 'Color',c,'LineWidth',lw);
         plot(x',y', 'Color',c,'LineWidth',lw);
+        % boundary test
+        idx = self.get_boundary_node_indices(1);
+        plot(coords(idx,1), coords(idx,2), 'ro');
         axis square
       else
         plot3(coords(:,1), coords(:,2), coords(:,3), 'bo');
-        
+        hold on;
+        idx = self.get_boundary_node_indices(1);
+        plot3(coords(idx,1), coords(idx,2), coords(idx,3), 'ro');
         view(3); axis square
       end
       % title(['Hex Mesh ', num2str(numx,3),'x',num2str(numy,3),'x',num2str(numz,3)])
     end
     
-    function u = evaluate(self, fx)
+    function u = evaluate(self, fx, order)
       % evaluate a function over the domain,
+      coords = zeros(100);
       % fx = @(x,y) or @(x,y,z)
       if (self.dim == 2)
-        u = arrayfun( fx, self.coords(:,1), self.coords(:,2) );
+        u = arrayfun( fx, coords(:,1), coords(:,2) );
       else
-        u = arrayfun( fx, self.coords(:,1), self.coords(:,2), self.coords(:,3) );
+        u = arrayfun( fx, coords(:,1), coords(:,2), coords(:,3) );
       end
       
-      u = reshape(u, self.nelems + 1);
+      % u = reshape(u, self.nelems + 1);
     end
     
     function set_coeff(self, coeff)
@@ -87,7 +93,6 @@ classdef hexmesh < handle
       num_nz = dof * ( min(dof, (order+2)^self.dim) ); 
       
       M = spalloc(dof, dof, num_nz); 
-      
       % loop over elements
       for e=1:ne
         idx = self.get_node_indices (e, order);
@@ -98,7 +103,7 @@ classdef hexmesh < handle
     end
     
     function K = assemble_stiffness(self, order)
-      % assemble the mass matrix
+      % assemble the stiffness matrix
       refel = homg.refel ( self.dim, order );
       
       dof = prod(self.nelems*order + 1);
@@ -114,6 +119,30 @@ classdef hexmesh < handle
         
         K(idx, idx) = K(idx, idx) + self.element_stiffness(e, refel);
       end
+    end
+    
+    function P = assemble_interpolation(self, order)
+      % assemble prolongation operator from coarse (self) to fine mesh
+      refel = homg.refel ( self.dim, order );
+      
+      dof_coarse = prod(self.nelems*order + 1);
+      dof_fine   = prod(2*self.nelems*order + 1);
+      
+      ne  = prod(self.nelems);
+      
+      num_nz = dof_coarse *  (3*order)^self.dim ;
+      
+      % P = sparse(dof_fine, dof_coarse);
+      P = spalloc(dof_fine, dof_coarse, num_nz); 
+      
+      % loop over elements
+      for e=1:ne
+        [idx_coarse, idx_fine] = self.get_interpolation_indices (e, order);
+        
+        P(idx_fine, idx_coarse) = refel.P;
+      end
+      
+      % disp(['factor = ' num2str(nnz(P)/dof_coarse)]); 
     end
     
     function idx = get_node_indices ( self, eid, order )
@@ -140,8 +169,52 @@ classdef hexmesh < handle
       end
     end
     
+    function [idx_coarse, idx_fine] = get_interpolation_indices ( self, eid, order )
+      % determine global node indices for a given element
+      if ( self.dim == 2)
+        [i,j] = ind2sub (self.nelems, eid);
+        
+        i_low       = (i-1)*order + 1;   i_high =  i*order + 1;
+        j_low       = (j-1)*order + 1;   j_high =  j*order + 1;
+        [i,j]       = ndgrid(i_low:i_high, j_low:j_high);
+        idx_coarse  = sub2ind (self.nelems*order + 1, i(:), j(:));
+        
+        [i,j]       = ndgrid(2*i_low-1:2*i_high-1, 2*j_low-1:2*j_high-1);
+        idx_fine    = sub2ind (2*self.nelems*order + 1, i(:), j(:));
+      else
+        [i,j,k] = ind2sub (self.nelems, eid);
+        
+        i_low       = (i-1)*order + 1;   i_high =  i*order + 1;
+        j_low       = (j-1)*order + 1;   j_high =  j*order + 1;
+        k_low       = (k-1)*order + 1;   k_high =  k*order + 1;
+        [i,j,k]     = ndgrid(i_low:i_high, j_low:j_high, k_low:k_high);
+        idx_coarse  = sub2ind (self.nelems*order + 1, i(:), j(:), k(:) );
+      
+        [i,j,k]     = ndgrid(2*i_low-1:2*i_high-1, 2*j_low-1:2*j_high-1, 2*k_low-1:2*k_high-1);
+        idx_fine    = sub2ind (2*self.nelems*order + 1, i(:), j(:), k(:) );
+      end
+    end
+    
 		function idx = get_boundary_node_indices(self, order)
-			
+			% function idx = get_boundary_node_indices(self, order)
+      %    returns indices of boundary nodes, for setting 
+      %    boundary conditions       
+      if (self.dim == 2)
+        [x,y] = ndgrid(1:self.nelems(1)*order+1,1:self.nelems(2)*order+1);
+        
+        idx = [ find(x == 1);     find(x == (self.nelems(1)*order+1));
+                find(y == 1);     find(y == (self.nelems(2)*order+1))  ];
+        
+        idx = unique(idx);
+      else 
+         [x,y,z] = ndgrid(1:self.nelems(1)*order+1,1:self.nelems(2)*order+1,1:self.nelems(3)*order+1);
+         
+         idx = [ find(x == 1);     find(x == (self.nelems(1)*order+1));
+                 find(y == 1);     find(y == (self.nelems(2)*order+1));
+                 find(z == 1);     find(z == (self.nelems(3)*order+1))  ];
+        
+        idx = unique(idx);
+      end
 		end
 		
     function Me = element_mass(self, eid, refel)
@@ -207,6 +280,7 @@ classdef hexmesh < handle
       % compute x,y,z for element
       pts = self.element_nodes(elem, refel);
         
+      % change to using Qx etc ?
       if (refel.dim == 2)
         [xr, xs] = homg.tensor.grad2 (refel.Dr, pts(:,1));
         [yr, ys] = homg.tensor.grad2 (refel.Dr, pts(:,2));
@@ -271,56 +345,7 @@ classdef hexmesh < handle
 		
   end % methods
   
-  methods(Static)
-    function Xout = identity (Xin)
-      Xout = Xin;
-    end
- 
-    function Xout = twoX (Xin)
-      Xout = Xin;
-      Xout(:,1) = 2*Xout(:,1);
-    end
-    
-    function Xout = twoY (Xin)
-      Xout = Xin;
-      Xout(:,2) = 2*Xout(:,2);
-    end
-
-		function Xout = twoSix (Xin)
-			% currently only 2D 
-      Xout = 2*Xin;
-      Xout(:,2) = 3*Xout(:,2);
-		end
-
-    function Xout = shell (Xin)
-      d = size(Xin, 2);
-      R1 = 1.0; % hard coded for now.
-      R2 = 0.55; % hard coded for now.
-      R2byR1 = R2 / R1;
-      R1sqrbyR2 = R1 * R1 / R2;
-      
-      if (d == 2)
-        x = zeros( size(Xin(:,1)) );
-        y = tan ( Xin(:,2)  * pi/4 );
-        R = R1sqrbyR2 * ( R2byR1.^(Xin(:,1) + 1) ) ;
-      else
-        x = tan ( Xin(:,1)  * pi/4 );
-        y = tan ( Xin(:,2)  * pi/4 );
-        R = R1sqrbyR2 * ( R2byR1.^(Xin(:,3) + 1) );
-      end
-      
-      q = R ./ sqrt (x.*x + y.*y + 1);
-      
-      if (d == 3)
-        Xout(:,1) =  q.* y;
-        Xout(:,2) = -q.* x;
-        Xout(:,3) = q;
-      else
-        Xout(:,1) =   q.* y;
-        Xout(:,2) =   q;
-      end
-    end
-    
+  methods(Static) 
     function C = stats(nelems, order)
       % function Ch = stats(nelems, order)
       %   given number of elements and the order,
