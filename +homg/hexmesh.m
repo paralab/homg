@@ -64,7 +64,23 @@ classdef hexmesh < handle
     
     function u = evaluate(self, fx, order)
       % evaluate a function over the domain,
-      coords = zeros(100);
+      
+      % create coordinates ...
+      if ( self.dim == 2 )
+        xp = homg.hexmesh.getGLLcoords(order, self.nelems(1));
+        yp = homg.hexmesh.getGLLcoords(order, self.nelems(2));
+        [x,y] = ndgrid(xp, yp);
+        pts = [x(:) y(:)];
+      else
+        xp = homg.hexmesh.getGLLcoords(order, self.nelems(1));
+        yp = homg.hexmesh.getGLLcoords(order, self.nelems(2));
+        zp = homg.hexmesh.getGLLcoords(order, self.nelems(3));
+        [x,y,z] = ndgrid(xp, yp, zp);
+        pts = [x(:) y(:) z(:)];
+      end
+      
+      coords = self.Xf(pts);
+      
       % fx = @(x,y) or @(x,y,z)
       if (self.dim == 2)
         u = arrayfun( fx, coords(:,1), coords(:,2) );
@@ -119,6 +135,29 @@ classdef hexmesh < handle
         
         K(idx, idx) = K(idx, idx) + self.element_stiffness(e, refel);
       end
+    end
+    
+    function f = assemble_rhs(self, fx, order)
+      % assemble the mass matrix
+      refel = homg.refel ( self.dim, order );
+      
+      dof = prod(self.nelems*order + 1);
+      ne  = prod(self.nelems);
+      
+      f = zeros(dof,1);
+      fval = self.evaluate(fx, order);
+      % num_nz = dof * ( min(dof, (order+2)^self.dim) ); 
+      
+      % M = spalloc(dof, dof, num_nz); 
+      % loop over elements
+      for e=1:ne
+        idx = self.get_node_indices (e, order);
+        J = self.geometric_factors(e, refel);
+        fd = refel.W .* J .*  fval(idx); 
+      
+        f(idx) = f(idx) + refel.Q*fd;;
+      end
+      % M = sparse(M);
     end
     
     function P = assemble_interpolation(self, order)
@@ -317,7 +356,7 @@ classdef hexmesh < handle
       end
     end
     
-    function coords = element_nodes(self,  elem, refel)
+    function coords = element_nodes(self, elem, refel)
       h = 1./self.nelems;
       
       if ( self.dim == 2)
@@ -346,6 +385,28 @@ classdef hexmesh < handle
   end % methods
   
   methods(Static) 
+    function coords = getGLLcoords(order, elems)
+      % function coords=getGLLcoords(order, elems)
+      % returns location of gll coordinates of order
+      % for elements in [0,1]
+      
+      fac = 1.0/(2*elems);
+      
+      % gll coordinates in [-1,1]
+      x = homg.basis.gll (0,0,order)';
+      
+      x = (x + 1)*fac;
+      
+      
+      coords = [];
+      for i=1:elems
+        y = x + (i-1)/elems;
+        coords = [coords y(1:end-1)];
+      end
+      
+      coords = [coords 1.0];
+    end
+      
     function C = stats(nelems, order)
       % function Ch = stats(nelems, order)
       %   given number of elements and the order,
