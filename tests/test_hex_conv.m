@@ -36,7 +36,7 @@ for i=1:length(nelem)
   K((N+1)*(bdy-1)+1) = 1;
   
   % rhs(bdy) = 0;
-  disp(['Solving: ' num2str(i)])
+  % disp(['Solving: ' num2str(i)])
   U = K \ rhs;
   
   % check error
