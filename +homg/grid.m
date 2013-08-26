@@ -227,7 +227,7 @@ classdef grid < handle
         % Kc = grid.Null' * grid.K * grid.Null;
         % Lc = grid.Null' * rhs;
         % u = grid.Null * (Kc \ Lc) + grid.Ud;
-        u = grid.K \ grid.L;
+        u = grid.K \ rhs;
         return;
       end
       
