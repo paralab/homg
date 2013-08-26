@@ -20,8 +20,9 @@ classdef grid < handle
     smoother
     K
     L
-    Null
-    ZeroBoundary
+    % Null
+    % Zero
+    Boundary
     Ud
     M
     R
@@ -50,15 +51,36 @@ classdef grid < handle
       % end
 
       grid.Mesh = mesh;
-      [grid.K, grid.L, grid.Null, grid.Ud] = mesh.assemble_poisson(order, 'gll');
-      grid.M = mesh.assemble_mass(order);
-      grid.ZeroBoundary = grid.Null * grid.Null';
+      % [grid.K, grid.L, grid.Null, grid.Ud] = mesh.assemble_poisson(order, 'gll');
+      grid.K = mesh.assemble_stiffness (order);
+      grid.M = mesh.assemble_mass (order);
+      %%
+       N = size(grid.K,1);
+       
+       % zero-Dirichlet boundary conditions
+       bdy = mesh.get_boundary_node_indices(order);
+       grid.K(bdy,:)    = 0;
+       grid.K(:,bdy)    = 0;
+       grid.K((N+1)*(bdy-1)+1) = 1;
+        syms x y z
+        if ( mesh.dim==2 )
+          fx = matlabFunction(-8*pi^2*(sin(2*pi*x) * sin(2*pi*y)));
+        else
+          fx =matlabFunction(-12*pi^2*(sin(2*pi*x) * sin(2*pi*y) * sin(2*pi*z) ));
+        end
+         f   = mesh.evaluate(fx, order);
+        
+        f(bdy) = 0;
+        grid.L = zeros(N,1); % - grid.M * f;
+        grid.Boundary = bdy;
+      %%
+      % grid.ZeroBoundary = grid.Null * grid.Null';
       grid.smoother = 'sor';
       grid.jacobi_omega = 2/3;
       grid.sor_omega = 1;
       if (~ isempty(grid.Coarse) )
          ts1 = tic;
-         grid.P = grid.Coarse.Mesh.assemble_interpolation(mesh.coords, 'gll');
+         grid.P = grid.Coarse.Mesh.assemble_interpolation(order);
          toc(ts1);
          % grid.R = inv(grid.Coarse.M) * grid.P' * grid.M ; 
          grid.R = grid.P';
@@ -202,9 +224,10 @@ classdef grid < handle
       if ( isempty( grid.Coarse ) )
         % disp('------- coarse solve -------');
         % disp( [' grid level is ' num2str(grid.level)]);
-        Kc = grid.Null' * grid.K * grid.Null;
-        Lc = grid.Null' * rhs;
-        u = grid.Null * (Kc \ Lc) + grid.Ud;
+        % Kc = grid.Null' * grid.K * grid.Null;
+        % Lc = grid.Null' * rhs;
+        % u = grid.Null * (Kc \ Lc) + grid.Ud;
+        u = grid.K \ grid.L;
         return;
       end
       
@@ -280,8 +303,8 @@ classdef grid < handle
     function u = smoother_jacobi (grid, v, rhs, u)
       % standard jacobi smoother
       if ( isempty(grid.jacobi_invdiag) )
-        Kc = (eye(size(grid.K)) - grid.ZeroBoundary) + grid.ZeroBoundary * grid.K * grid.ZeroBoundary;
-        D = diag(Kc);
+        % Kc = (eye(size(grid.K)) - grid.ZeroBoundary) + grid.ZeroBoundary * grid.K * grid.ZeroBoundary;
+        D = diag(grid.K);
         grid.jacobi_invdiag = 1./D;
       end
       
@@ -297,8 +320,8 @@ classdef grid < handle
     
     function u = smoother_sor (grid, v, rhs, u)
       if ( isempty ( grid.sor_G ) )
-        Kc = (eye(size(grid.K)) - grid.ZeroBoundary) + grid.ZeroBoundary * grid.K * grid.ZeroBoundary;
-        kL = tril(Kc, -1);
+        % Kc = (eye(size(grid.K)) - grid.ZeroBoundary) + grid.ZeroBoundary * grid.K * grid.ZeroBoundary;
+        kL = tril(grid.K, -1);
         kD = diag(diag(Kc));
         kU = triu(Kc, 1);
         grid.sor_G = - (kD + grid.sor_omega*kL) \ (grid.sor_omega*kU + (grid.sor_omega - 1.0)*kD );
