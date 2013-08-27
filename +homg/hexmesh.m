@@ -102,11 +102,27 @@ classdef hexmesh < handle
     function M = assemble_mass(self, order)
       % assemble the mass matrix
       refel = homg.refel ( self.dim, order );
-      
       dof = prod(self.nelems*order + 1);
       ne  = prod(self.nelems);
-      
-      num_nz = dof * ( min(dof, (order+2)^self.dim) ); 
+tic;
+if (0)
+      % storage for indices and values
+      NP = (order+1)^self.dim;
+      NPNP = NP * NP;
+      eM = zeros(NP, NP);
+      stor = zeros(ne * NP, 3);
+
+      % loop over elements
+      for e=1:ne
+	  idx = self.get_node_indices (e, order);
+	  eM = self.element_mass(e, refel);
+	  ind1 = repmat(idx,NP,1);
+	  ind2 = reshape(repmat(idx',NP,1),NPNP,1);
+	  stor((e-1)*NPNP+1:e*NPNP,:) = [ind1,ind2,eM(:)];
+      end
+      M = sparse(stor(:,1),stor(:,2),stor(:,3),dof,dof);
+else
+      num_nz =  dof * ( min(dof, (order+2)^self.dim) );
       
       M = spalloc(dof, dof, num_nz); 
       % loop over elements
@@ -115,6 +131,9 @@ classdef hexmesh < handle
         
         M(idx, idx) = M(idx, idx) + self.element_mass(e, refel);
       end
+end
+      tspent = toc;
+      fprintf('Assembly time: %g\n', tspent);
       % M = sparse(M);
     end
     
