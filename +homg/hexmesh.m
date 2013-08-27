@@ -213,11 +213,11 @@ end
       M = sparse(I,J,mass_val,dof,dof);
       % zero dirichlet bdy conditions
       bdy = self.get_boundary_node_indices(order);
+
+      ii = ismember(I,bdy);
+      jj = ismember(J,bdy);
       
-      [~,ii,~] = intersect(I,bdy);
-      [~,jj,~] = intersect(J,bdy);
-      
-      stiff_val([ii; jj]) = 0;
+      stiff_val = stiff_val.*(~ii).*(~jj);
       I = [I; bdy];
       J = [J; bdy];
       stiff_val = [stiff_val; ones(length(bdy), 1)];
