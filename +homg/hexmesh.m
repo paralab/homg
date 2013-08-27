@@ -113,18 +113,19 @@ if (1)
       I = zeros(ne * NP, 1);
       J = zeros(ne * NP, 1);
       val = zeros(ne * NP, 1);
-
+      
       % loop over elements
       for e=1:ne
-	  idx = self.get_node_indices (e, order);
-	  eM = self.element_mass(e, refel);
-	  ind1 = repmat(idx,NP,1);
-	  ind2 = reshape(repmat(idx',NP,1),NPNP,1);
-	  st = (e-1)*NPNP+1;
-	  en = e*NPNP;
-	  I(st:en) = ind1;
-	  J(st:en) = ind2;
-	  val(st:en) = eM(:);
+        detJac = self.geometric_factors(e, refel);
+        idx = self.get_node_indices (e, order);
+        eM = self.element_mass(e, refel, detJac);
+        ind1 = repmat(idx,NP,1);
+        ind2 = reshape(repmat(idx',NP,1),NPNP,1);
+        st = (e-1)*NPNP+1;
+        en = e*NPNP;
+        I(st:en) = ind1;
+        J(st:en) = ind2;
+        val(st:en) = eM(:);
       end
       M = sparse(I,J,val,dof,dof);
 else
@@ -135,11 +136,12 @@ else
       for e=1:ne
         idx = self.get_node_indices (e, order);
         
-        M(idx, idx) = M(idx, idx) + self.element_mass(e, refel);
+        detJac = self.geometric_factors(e, refel);
+        M(idx, idx) = M(idx, idx) + self.element_mass(e, refel, detJac);
       end
 end
       tspent = toc;
-      fprintf('Assembly time: %g\n', tspent);
+      fprintf('Mass: Assembly time: %g\n', tspent);
       % M = sparse(M);
     end
     
@@ -157,11 +159,85 @@ end
       % loop over elements
       for e=1:ne
         idx = self.get_node_indices (e, order);
+        [detJac, Jac] = self.geometric_factors(e, refel);
         
-        K(idx, idx) = K(idx, idx) + self.element_stiffness(e, refel);
+        K(idx, idx) = K(idx, idx) + self.element_stiffness(e, refel, detJac, Jac);
       end
     end
     
+    function [K, M] = assemble_poisson(self, order)
+      % assemble the mass matrix
+      refel = homg.refel ( self.dim, order );
+      dof = prod(self.nelems*order + 1);
+      ne  = prod(self.nelems);
+      tic;
+      
+      % storage for indices and values
+      NP = (order+1)^self.dim;
+      NPNP = NP * NP;
+      eMat = zeros(NP, NP);
+      
+      I = zeros(ne * NP, 1);
+      J = zeros(ne * NP, 1);
+      mass_val = zeros(ne * NP, 1);
+      stiff_val = zeros(ne * NP, 1);
+      
+      % loop over elements
+      for e=1:ne
+        idx = self.get_node_indices (e, order);
+        
+        ind1 = repmat(idx,NP,1);
+        ind2 = reshape(repmat(idx',NP,1),NPNP,1);
+        st = (e-1)*NPNP+1;
+        en = e*NPNP;
+        I(st:en) = ind1;
+        J(st:en) = ind2;
+        
+        [detJac, Jac] = self.geometric_factors(e, refel);
+        
+        eMat = self.element_mass(e, refel, detJac);
+        mass_val(st:en) = eMat(:);
+        
+        eMat = self.element_stiffness(e, refel, detJac, Jac);
+        stiff_val(st:en) = eMat(:);
+      end
+      M = sparse(I,J,mass_val,dof,dof);
+      % zero dirichlet bdy conditions
+      bdy = self.get_boundary_node_indices(order);
+      
+      [C,ii,~] = intersect(I,bdy);
+      [C,jj,~] = intersect(J,bdy);
+      
+      stiff_val([ii; jj]) = 0;
+      I = [I; bdy];
+      J = [J; bdy];
+      stiff_val = [stiff_val; ones(length(bdy), 1)];
+      
+      K = sparse(I,J,stiff_val,dof,dof);
+    end
+
+% 
+%     function [K, M] = assemble_poisson(self, order)
+%       % assemble the mass matrix
+%       refel = homg.refel ( self.dim, order );
+%       dof = prod(self.nelems*order + 1);
+%       ne  = prod(self.nelems);
+%       
+%       num_nz = dof * ( min(dof, (order+2)^self.dim) ); 
+%       
+%       M = spalloc(dof, dof, num_nz); 
+%       K = spalloc(dof, dof, num_nz); 
+%       
+%       % loop over elements
+%       for e=1:ne
+%         idx = self.get_node_indices (e, order);
+%         [detJac, Jac] = self.geometric_factors(e, refel);
+%         
+%         M(idx, idx) = M(idx, idx) + self.element_mass(e, refel, detJac);
+%         K(idx, idx) = K(idx, idx) + self.element_stiffness(e, refel, detJac, Jac);
+%       end
+%     end
+
     function f = assemble_rhs(self, fx, order)
       % assemble the mass matrix
       refel = homg.refel ( self.dim, order );
@@ -281,17 +357,17 @@ end
       end
 		end
 		
-    function Me = element_mass(self, eid, refel)
+    function Me = element_mass(self, eid, refel, J)
       % element mass matrix
-      J = self.geometric_factors(eid, refel);
+      % J = self.geometric_factors(eid, refel);
       Md = refel.W .* J ; 
       
       Me = refel.Q' * diag(Md) * refel.Q;
     end
     
-    function Ke = element_stiffness(self, eid, r)
+    function Ke = element_stiffness(self, eid, r, J, D)
       % element mass matrix
-      [J, D] = self.geometric_factors(eid, r);
+      % [J, D] = self.geometric_factors(eid, r);
       
 %             | Qx Qy Qz || rx ry rz |     | rx sx tx || Qx |
 %    Ke =                 | sx sy sz | J W | ry sy ty || Qy |

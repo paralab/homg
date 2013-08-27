@@ -29,11 +29,12 @@ disp(['Creating h-grid: ' num2str(1) ' of ' num2str(num_grids) ', order = ' num2
 
 m = homg.hexmesh(repmat(nelems(1), 1, dim), xform);
 coarse = homg.grid(m, orders(1) );
+disp('---- created grid ----')
 
 for i=2:num_hgrids
   disp(['Creating h-grid: ' num2str(i) ' of ' num2str(num_grids) ', order = ' num2str(orders(1)) ', nelem = ' num2str(nelems(i))]);
   m = homg.hexmesh(repmat(nelems(i), 1, dim), xform);
-  disp('---- created mesh')
+  %%% disp('---- created mesh')
   % grid.debug = 1;
   % evc = grid.get_eigenvectors();
   %if ( dim==2 )
@@ -47,7 +48,7 @@ for i=2:num_hgrids
     % m.set_coeff('1 + 1000000*((cos(2*pi*x))^2 + (cos(2*pi*y))^2 + (cos(2*pi*z))^2)');
   %end
   grid = homg.grid(m, orders(1), coarse);
-  disp('---- created grid')
+  disp('---- created grid ----')
   
   coarse = grid;
 end

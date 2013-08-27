@@ -52,16 +52,28 @@ classdef grid < handle
 
       grid.Mesh = mesh;
       % [grid.K, grid.L, grid.Null, grid.Ud] = mesh.assemble_poisson(order, 'gll');
-      grid.K = mesh.assemble_stiffness (order);
-      grid.M = mesh.assemble_mass (order);
+      [grid.K, grid.M] = mesh.assemble_poisson(order);
+      % grid.K = mesh.assemble_stiffness (order);
+      % grid.M = mesh.assemble_mass (order);
       %%
-       N = size(grid.K,1);
+        N = size(grid.K,1); 
+        % zero-Dirichlet boundary conditions
+        bdy = mesh.get_boundary_node_indices(order);
+%        
+%        grid.K((N+1)*(bdy-1)+1) = 1;
+%        for i=bdy'
+%         % grid.K(i,i) = 1;
+%         grid.K(1:i-1,i)    = 0; % col
+%         grid.K(i+1:end,i)  = 0; % col
+%         grid.K(i,1:i-1)    = 0; % row
+%         grid.K(i,i+1:end)  = 0; % row
+%        end
+%        % grid.K((N+1)*(bdy-1)+1) = 1;
        
-       % zero-Dirichlet boundary conditions
-       bdy = mesh.get_boundary_node_indices(order);
-       grid.K(bdy,:)    = 0;
-       grid.K(:,bdy)    = 0;
-       grid.K((N+1)*(bdy-1)+1) = 1;
+       %grid.K(bdy,:)    = 0; % row
+       %grid.K(:,bdy)    = 0; % col
+       
+        
         syms x y z
         if ( mesh.dim==2 )
           fx = matlabFunction(-8*pi^2*(sin(2*pi*x) * sin(2*pi*y)));
@@ -79,9 +91,9 @@ classdef grid < handle
       grid.jacobi_omega = 2/3;
       grid.sor_omega = 1;
       if (~ isempty(grid.Coarse) )
-         ts1 = tic;
+         % ts1 = tic;
          grid.P = grid.Coarse.Mesh.assemble_interpolation(order);
-         toc(ts1);
+         % toc(ts1);
          % grid.R = inv(grid.Coarse.M) * grid.P' * grid.M ; 
          grid.R = grid.P';
       end
