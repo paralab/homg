@@ -104,13 +104,15 @@ classdef hexmesh < handle
       refel = homg.refel ( self.dim, order );
       dof = prod(self.nelems*order + 1);
       ne  = prod(self.nelems);
-tic;
-if (0)
+      tic;
+if (1)
       % storage for indices and values
       NP = (order+1)^self.dim;
       NPNP = NP * NP;
       eM = zeros(NP, NP);
-      stor = zeros(ne * NP, 3);
+      I = zeros(ne * NP, 1);
+      J = zeros(ne * NP, 1);
+      val = zeros(ne * NP, 1);
 
       % loop over elements
       for e=1:ne
@@ -118,12 +120,16 @@ if (0)
 	  eM = self.element_mass(e, refel);
 	  ind1 = repmat(idx,NP,1);
 	  ind2 = reshape(repmat(idx',NP,1),NPNP,1);
-	  stor((e-1)*NPNP+1:e*NPNP,:) = [ind1,ind2,eM(:)];
+	  st = (e-1)*NPNP+1;
+	  en = e*NPNP;
+	  I(st:en) = ind1;
+	  J(st:en) = ind2;
+	  val(st:en) = eM(:);
       end
-      M = sparse(stor(:,1),stor(:,2),stor(:,3),dof,dof);
+      M = sparse(I,J,val,dof,dof);
 else
+
       num_nz =  dof * ( min(dof, (order+2)^self.dim) );
-      
       M = spalloc(dof, dof, num_nz); 
       % loop over elements
       for e=1:ne
