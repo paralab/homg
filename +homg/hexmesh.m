@@ -64,12 +64,10 @@ classdef hexmesh < handle
     
     function u = evaluate(self, fx, order, where)
       % evaluate a function over the domain,
-      % where is a string, 'gll', 'gauss' or 'uniform'
+      % where is a string, 'gll' or 'uniform'
       
       if strcmp(where, 'gll')
         pfx = @homg.hexmesh.getGLLcoords;
-      elseif strcmp(where, 'gauss')
-        pfx = @homg.hexmesh.getGaussCoords;
       else
         pfx = @homg.hexmesh.getUniformCoords;
       end
@@ -96,8 +94,7 @@ classdef hexmesh < handle
       else
         u = arrayfun( fx, coords(:,1), coords(:,2), coords(:,3) );
       end
-      
-      % u = reshape(u, self.nelems + 1);
+  
     end
     
     function set_coeff(self, coeff)
@@ -255,16 +252,23 @@ end
       ne  = prod(self.nelems);
       
       f = zeros(dof,1);
-      fval = self.evaluate(fx, order, 'gauss');
+      % fval = self.evaluate(fx, order, 'gauss');
       
       % loop over elements
       for e=1:ne
         idx = self.get_node_indices (e, order);
         J = self.geometric_factors(e, refel);
-        Jd = refel.W .* J; 
-        fd =  fval(idx); 
-      
-        f(idx) = f(idx) + refel.Q' * diag(Jd) * fd;
+        gpts =  self.element_gauss(e, refel);
+        
+        if (self.dim == 2)
+          fd = arrayfun( fx, gpts(:,1), gpts(:,2) );
+        else
+          fd = arrayfun( fx, gpts(:,1), gpts(:,2), gpts(:,3) );
+        end
+        
+        Jd = refel.W .* J .* fd; 
+        
+        f(idx) = f(idx) + refel.Q' * Jd;
       end
       % M = sparse(M);
     end
@@ -476,7 +480,7 @@ end
         idx = [i j k];
       end
       
-      p_mid = (idx + 0.5) .* h;
+      p_mid = (idx - 0.5) .* h;
       p_gll = refel.r * 0.5 * h;
       nodes = bsxfun(@plus, p_mid, p_gll) ;
       
@@ -491,6 +495,36 @@ end
       coords = self.Xf(pts);
     end
 		
+    function coords = element_gauss(self, elem, refel)
+      % function pts = element_gauss(self, elem, refel)
+      % returns location of gauss coordinates of order
+      % for element 
+      
+      h = 1./self.nelems;
+      
+      if ( self.dim == 2)
+        [i,j] = ind2sub (self.nelems, elem);
+        idx = [i j];
+      else
+        [i,j,k] = ind2sub (self.nelems, elem);
+        idx = [i j k];
+      end
+      
+      p_mid = (idx - 0.5) .* h;
+      p_gau = refel.g * 0.5 * h;
+      nodes = bsxfun(@plus, p_mid, p_gau) ;
+      
+      if ( self.dim == 2)
+        [x, y] = ndgrid(nodes(:,1), nodes(:,2));
+        pts = [x(:) y(:)];
+      else
+        [x, y, z] = ndgrid(nodes(:,1), nodes(:,2), nodes(:,3));
+        pts = [x(:) y(:) z(:)];
+      end
+      
+      coords = self.Xf(pts);
+    end
+    
   end % methods
   
   methods(Static) 
@@ -503,28 +537,6 @@ end
       
       % gll coordinates in [-1,1]
       x = homg.basis.gll (0,0,order)';
-      
-      x = (x + 1)*fac;
-      
-      
-      coords = [];
-      for i=1:elems
-        y = x + (i-1)/elems;
-        coords = [coords y(1:end-1)];
-      end
-      
-      coords = [coords 1.0];
-    end
-    
-    function coords = getGaussCoords(order, elems)
-      % function coords=getGaussCoords(order, elems)
-      % returns location of gauss coordinates of order
-      % for elements in [0,1]
-      
-      fac = 1.0/(2*elems);
-      
-      % gll coordinates in [-1,1]
-      x = homg.basis.gauss (0,0,order)';
       
       x = (x + 1)*fac;
       

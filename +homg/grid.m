@@ -80,10 +80,11 @@ classdef grid < handle
         else
           fx =matlabFunction(-12*pi^2*(sin(2*pi*x) * sin(2*pi*y) * sin(2*pi*z) ));
         end
-         f   = mesh.evaluate(fx, order);
         
-        f(bdy) = 0;
-        grid.L = zeros(N,1); % - grid.M * f;
+        % f   = mesh.evaluate(fx, order);
+        % f(bdy) = 0;
+        grid.L = mesh.assemble_rhs(fx, order);
+        % grid.L = zeros(N,1); % - grid.M * f;
         grid.Boundary = bdy;
       %%
       % grid.ZeroBoundary = grid.Null * grid.Null';
