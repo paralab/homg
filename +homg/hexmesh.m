@@ -205,10 +205,10 @@ end
       % zero dirichlet bdy conditions
       bdy = self.get_boundary_node_indices(order);
       
-      [C,ii,~] = intersect(I,bdy);
-      [C,jj,~] = intersect(J,bdy);
+      ii = ismember(I,bdy);
+      jj = ismember(J,bdy);
       
-      stiff_val([ii; jj]) = 0;
+      stiff_val = stiff_val.*(~ii).*(~jj);
       I = [I; bdy];
       J = [J; bdy];
       stiff_val = [stiff_val; ones(length(bdy), 1)];
