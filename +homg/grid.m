@@ -59,21 +59,7 @@ classdef grid < handle
         N = size(grid.K,1); 
         % zero-Dirichlet boundary conditions
         bdy = mesh.get_boundary_node_indices(order);
-%        
-%        grid.K((N+1)*(bdy-1)+1) = 1;
-%        for i=bdy'
-%         % grid.K(i,i) = 1;
-%         grid.K(1:i-1,i)    = 0; % col
-%         grid.K(i+1:end,i)  = 0; % col
-%         grid.K(i,1:i-1)    = 0; % row
-%         grid.K(i,i+1:end)  = 0; % row
-%        end
-%        % grid.K((N+1)*(bdy-1)+1) = 1;
-       
-       %grid.K(bdy,:)    = 0; % row
-       %grid.K(:,bdy)    = 0; % col
-       
-        
+
         syms x y z
         if ( mesh.dim==2 )
           fx = matlabFunction(-8*pi^2*(sin(2*pi*x) * sin(2*pi*y)));
@@ -85,6 +71,7 @@ classdef grid < handle
         % f(bdy) = 0;
         grid.L = mesh.assemble_rhs(fx, order);
         % grid.L = zeros(N,1); % - grid.M * f;
+        grid.L(bdy) = 0;
         grid.Boundary = bdy;
       %%
       % grid.ZeroBoundary = grid.Null * grid.Null';

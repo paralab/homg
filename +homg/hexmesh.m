@@ -10,8 +10,8 @@ classdef hexmesh < handle
     Xf           % transform
     
     % problem specific
-    % coeff
-    % rhs
+    coeff
+    rhs
   end % properties
   
   methods
@@ -98,11 +98,25 @@ classdef hexmesh < handle
     end
     
     function set_coeff(self, coeff)
-      self.coeff = coeff;
+      if ( ischar(coeff) )
+        % is a string, so convert into a function
+        syms x y z;
+        expr = ['matlabFunction(' coeff ')'];
+        self.coeff = eval(expr);
+      else
+        self.coeff = coeff;
+      end
     end
     
-    function set_rhs(mesh, rhs)
-      mesh.rhs = rhs;
+    function set_rhs(self, rhs)
+      if ( ischar(rhs) )
+        % is a string, so convert into a function
+        syms x y z;
+        expr = ['matlabFunction(' rhs ')'];
+        self.rhs = eval(expr);
+      else
+        self.rhs = rhs;
+      end
     end
     
     function M = assemble_mass(self, order)
