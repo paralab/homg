@@ -62,19 +62,28 @@ classdef hexmesh < handle
       % title(['Hex Mesh ', num2str(numx,3),'x',num2str(numy,3),'x',num2str(numz,3)])
     end
     
-    function u = evaluate(self, fx, order)
+    function u = evaluate(self, fx, order, where)
       % evaluate a function over the domain,
+      % where is a string, 'gll', 'gauss' or 'uniform'
+      
+      if strcmp(where, 'gll')
+        pfx = @homg.hexmesh.getGLLcoords;
+      elseif strcmp(where, 'gauss')
+        pfx = @homg.hexmesh.getGaussCoords;
+      else
+        pfx = @homg.hexmesh.getUniformCoords;
+      end
       
       % create coordinates ...
       if ( self.dim == 2 )
-        xp = homg.hexmesh.getGLLcoords(order, self.nelems(1));
-        yp = homg.hexmesh.getGLLcoords(order, self.nelems(2));
+        xp = pfx (order, self.nelems(1));
+        yp = pfx (order, self.nelems(2));
         [x,y] = ndgrid(xp, yp);
         pts = [x(:) y(:)];
       else
-        xp = homg.hexmesh.getGLLcoords(order, self.nelems(1));
-        yp = homg.hexmesh.getGLLcoords(order, self.nelems(2));
-        zp = homg.hexmesh.getGLLcoords(order, self.nelems(3));
+        xp = pfx (order, self.nelems(1));
+        yp = pfx (order, self.nelems(2));
+        zp = pfx (order, self.nelems(3));
         [x,y,z] = ndgrid(xp, yp, zp);
         pts = [x(:) y(:) z(:)];
       end
@@ -205,8 +214,8 @@ end
       % zero dirichlet bdy conditions
       bdy = self.get_boundary_node_indices(order);
       
-      [C,ii,~] = intersect(I,bdy);
-      [C,jj,~] = intersect(J,bdy);
+      [~,ii,~] = intersect(I,bdy);
+      [~,jj,~] = intersect(J,bdy);
       
       stiff_val([ii; jj]) = 0;
       I = [I; bdy];
@@ -246,17 +255,16 @@ end
       ne  = prod(self.nelems);
       
       f = zeros(dof,1);
-      fval = self.evaluate(fx, order);
-      % num_nz = dof * ( min(dof, (order+2)^self.dim) ); 
+      fval = self.evaluate(fx, order, 'gauss');
       
-      % M = spalloc(dof, dof, num_nz); 
       % loop over elements
       for e=1:ne
         idx = self.get_node_indices (e, order);
         J = self.geometric_factors(e, refel);
-        fd = refel.W .* J .*  fval(idx); 
+        Jd = refel.W .* J; 
+        fd =  fval(idx); 
       
-        f(idx) = f(idx) + refel.Q*fd;;
+        f(idx) = f(idx) + refel.Q' * diag(Jd) * fd;
       end
       % M = sparse(M);
     end
@@ -506,6 +514,32 @@ end
       end
       
       coords = [coords 1.0];
+    end
+    
+    function coords = getGaussCoords(order, elems)
+      % function coords=getGaussCoords(order, elems)
+      % returns location of gauss coordinates of order
+      % for elements in [0,1]
+      
+      fac = 1.0/(2*elems);
+      
+      % gll coordinates in [-1,1]
+      x = homg.basis.gauss (0,0,order)';
+      
+      x = (x + 1)*fac;
+      
+      
+      coords = [];
+      for i=1:elems
+        y = x + (i-1)/elems;
+        coords = [coords y(1:end-1)];
+      end
+      
+      coords = [coords 1.0];
+    end
+      
+    function coords = getUniformCoords(order, elems)
+      coords = linspace(0, 1, order*elems+1);
     end
       
     function C = stats(nelems, order)
