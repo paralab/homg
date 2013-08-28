@@ -1,9 +1,17 @@
+% Example usage: low_order_precon([16 16], @homg.xform.identity, 3)
+
 function low_order_precon(nelems, xform, order)
 
 mesh = homg.hexmesh(nelems, xform); 
 
 [K, M]          =  mesh.assemble_poisson (order);
 [K_lin, M_lin]  =  mesh.assemble_poisson_linearized (order);
+
+% permutation to reduce fill in when computing factorization
+per = symamd(K_lin);
+
+K_lin_chol = chol(K_lin(per,per));
+
 
 bdy = mesh.get_boundary_node_indices(order);
 
@@ -26,8 +34,6 @@ rhs (bdy) = 0;
 maxit = 200;
 
 
-
-
 tic
 [x0,fl0,rr0,it0,rv0] = gmres(K, rhs, [], 1e-8, maxit);
 toc
@@ -39,8 +45,12 @@ ylabel('Relative residual'); hold on;
 
 
 tic
-[x1,fl1,rr1,it1,rv1] = gmres(K, rhs, [], 1e-8, maxit, K_lin);
+% solve reordered system and revert ordering in solution
+[x1,fl1,rr1,it1,rv1] = gmres(K(per,per), rhs(per), [], 1e-8, maxit, K_lin_chol', K_lin_chol);
+x1(per) = x1;
 toc
+
+fprintf('Difference between solutions: %g\n', norm(x1-x0,'fro')/norm(x0,'fro'));
 
 semilogy(rv1/norm(rhs),'r-o');
 
