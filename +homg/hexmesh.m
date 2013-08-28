@@ -300,27 +300,60 @@ end
       % M = sparse(M);
     end
     
-    function P = assemble_interpolation(self, order)
+    function P = assemble_interpolation(self, order, isP)
       % assemble prolongation operator from coarse (self) to fine mesh
       refel = homg.refel ( self.dim, order );
-      
-      dof_coarse = prod(self.nelems*order + 1);
-      dof_fine   = prod(2*self.nelems*order + 1);
-      
-      ne  = prod(self.nelems);
 			
-			num_nz = dof_coarse *  (3*order)^self.dim ;
+			if ( nargin > 2  && isP )
+				Pe = refel.Pp;
+			else
+				Pe = refel.Ph; 
+			end
+			
+			dof_coarse = prod(self.nelems*order + 1);
+			dof_fine   = prod(2*self.nelems*order + 1);
+			ne  = prod(self.nelems);
+			
+			if (0)
+				num_nz = dof_coarse *  (3*order)^self.dim ;
+				P = spalloc(dof_fine, dof_coarse, num_nz); 
+				% loop over elements
+				for e=1:ne
+					[idx_coarse, idx_fine] = self.get_interpolation_indices (e, order);
+					P(idx_fine, idx_coarse) = Pe;
+				end
+			else
+	      % storage for indices and values
+	      NP_c = (order+1)^self.dim;
+				NP_f = (2*order+1)^self.dim;
+	      NPNP = NP_c * NP_f;
+	      % eMat = zeros(NP, NP);
       
-      % P = sparse(dof_fine, dof_coarse);
-      P = spalloc(dof_fine, dof_coarse, num_nz); 
-      
-      % loop over elements
-      for e=1:ne
-        [idx_coarse, idx_fine] = self.get_interpolation_indices (e, order);
+	      I = zeros(ne * NPNP, 1);
+	      J = zeros(ne * NPNP, 1);
+	      val = zeros(ne * NPNP, 1);
+				
+				for e=1:ne
+	        [idx_c, idx_f] = self.get_interpolation_indices (e, order);
         
-        P(idx_fine, idx_coarse) = refel.P;
-      end
-      
+	        ind1 = repmat(idx_f,NP_c,1);
+	        ind2 = reshape(repmat(idx_c',NP_f,1),NPNP,1);
+	        st = (e-1)*NPNP+1;
+	        en = e*NPNP;
+	        I(st:en) = ind1;
+	        J(st:en) = ind2;
+        
+	        val(st:en) = Pe(:);
+				end
+				
+				[u_ij,q] = unique([I,J],'rows','first');
+				 u_val   = val(q);
+         I = u_ij(:,1);
+         J = u_ij(:,2);
+         
+				 P = sparse (I,J,u_val,dof_fine,dof_coarse);
+			end
+			
       % disp(['factor = ' num2str(nnz(P)/dof_coarse)]); 
     end
     
