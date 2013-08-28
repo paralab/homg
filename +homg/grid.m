@@ -52,7 +52,10 @@ classdef grid < handle
 
       grid.Mesh = mesh;
       % [grid.K, grid.L, grid.Null, grid.Ud] = mesh.assemble_poisson(order, 'gll');
+      tic;
       [grid.K, grid.M] = mesh.assemble_poisson(order);
+      tt = toc;
+      disp(['---- assembled mass and stiffness : ' num2str(tt)])
       % grid.K = mesh.assemble_stiffness (order);
       % grid.M = mesh.assemble_mass (order);
       %%
@@ -69,7 +72,11 @@ classdef grid < handle
         
         % f   = mesh.evaluate(fx, order);
         % f(bdy) = 0;
+        tic;
         grid.L = mesh.assemble_rhs(fx, order);
+        tt = toc;
+        
+        disp(['---- assembled rhs : ' num2str(tt)])
         % grid.L = zeros(N,1); % - grid.M * f;
         grid.L(bdy) = 0;
         grid.Boundary = bdy;
@@ -80,7 +87,10 @@ classdef grid < handle
       grid.sor_omega = 1;
       if (~ isempty(grid.Coarse) )
          % ts1 = tic;
+         tic;
          grid.P = grid.Coarse.Mesh.assemble_interpolation(order);
+         tt = toc;
+         disp(['---- assembled prolongation: ' num2str(tt)])
          % toc(ts1);
          % grid.R = inv(grid.Coarse.M) * grid.P' * grid.M ; 
          grid.R = grid.P';
