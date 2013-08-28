@@ -26,7 +26,7 @@ rhs = K*x_gt;
 rhs (bdy) = 0;
 
 % now solve and test 
-maxit = 200;
+maxit = 100;
 
 
 tic
@@ -50,6 +50,9 @@ toc
 
 fprintf('Difference between solutions: %g\n', norm(x1-x0,'fro')/norm(x0,'fro'));
 
+disp(['iter: ' num2str(it1)]);
+
 semilogy(rv1/norm(rhs),'r-o');
 hold off;
+
 end
