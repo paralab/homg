@@ -130,9 +130,9 @@ if (1)
       NP = (order+1)^self.dim;
       NPNP = NP * NP;
       eM = zeros(NP, NP);
-      I = zeros(ne * NP, 1);
-      J = zeros(ne * NP, 1);
-      val = zeros(ne * NP, 1);
+      I = zeros(ne * NPNP, 1);
+      J = zeros(ne * NPNP, 1);
+      val = zeros(ne * NPNP, 1);
       
       % loop over elements
       for e=1:ne
@@ -168,20 +168,34 @@ end
     function K = assemble_stiffness(self, order)
       % assemble the stiffness matrix
       refel = homg.refel ( self.dim, order );
-      
       dof = prod(self.nelems*order + 1);
       ne  = prod(self.nelems);
       
-      num_nz = dof * ( min(dof, (order+2)^self.dim) ); 
+      % storage for indices and values
+      NP = (order+1)^self.dim;
+      NPNP = NP * NP;
+      eMat = zeros(NP, NP);
       
-      K = spalloc(dof, dof, num_nz); 
-      
+      I = zeros(ne * NPNP, 1);
+      J = zeros(ne * NPNP, 1);
+      stiff_val = zeros(ne * NPNP, 1);
+			
       % loop over elements
       for e=1:ne
         idx = self.get_node_indices (e, order);
+        
+        ind1 = repmat(idx,NP,1);
+        ind2 = reshape(repmat(idx',NP,1),NPNP,1);
+        st = (e-1)*NPNP+1;
+        en = e*NPNP;
+        I(st:en) = ind1;
+        J(st:en) = ind2;
+				
         [detJac, Jac] = self.geometric_factors(e, refel);
         
-        K(idx, idx) = K(idx, idx) + self.element_stiffness(e, refel, detJac, Jac);
+				eMat = self.element_stiffness(e, refel, detJac, Jac);
+				stiff_val(st:en) = eMat(:);
+        %K(idx, idx) = K(idx, idx) + self.element_stiffness(e, refel, detJac, Jac);
       end
     end
     
@@ -190,17 +204,16 @@ end
       refel = homg.refel ( self.dim, order );
       dof = prod(self.nelems*order + 1);
       ne  = prod(self.nelems);
-      tic;
       
       % storage for indices and values
       NP = (order+1)^self.dim;
       NPNP = NP * NP;
-      eMat = zeros(NP, NP);
+      % eMat = zeros(NP, NP);
       
-      I = zeros(ne * NP, 1);
-      J = zeros(ne * NP, 1);
-      mass_val = zeros(ne * NP, 1);
-      stiff_val = zeros(ne * NP, 1);
+      I = zeros(ne * NPNP, 1);
+      J = zeros(ne * NPNP, 1);
+      mass_val = zeros(ne * NPNP, 1);
+      stiff_val = zeros(ne * NPNP, 1);
       
       % loop over elements
       for e=1:ne
@@ -295,8 +308,8 @@ end
       dof_fine   = prod(2*self.nelems*order + 1);
       
       ne  = prod(self.nelems);
-      
-      num_nz = dof_coarse *  (3*order)^self.dim ;
+			
+			num_nz = dof_coarse *  (3*order)^self.dim ;
       
       % P = sparse(dof_fine, dof_coarse);
       P = spalloc(dof_fine, dof_coarse, num_nz); 
