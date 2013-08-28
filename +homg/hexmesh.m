@@ -148,7 +148,10 @@ if (1)
       
       % loop over elements
       for e=1:ne
-        detJac = self.geometric_factors(e, refel);
+        pts = self.element_nodes(e, refel);
+        detJac = self.geometric_factors(refel, pts);
+        % detJac = self.geometric_factors(e, refel);
+        
         idx = self.get_node_indices (e, order);
         eM = self.element_mass(e, refel, detJac);
         ind1 = repmat(idx,NP,1);
@@ -167,8 +170,9 @@ else
       % loop over elements
       for e=1:ne
         idx = self.get_node_indices (e, order);
-        
-        detJac = self.geometric_factors(e, refel);
+        pts = self.element_nodes(e, refel);
+        detJac = self.geometric_factors(refel, pts);
+        % detJac = self.geometric_factors(e, refel);
         M(idx, idx) = M(idx, idx) + self.element_mass(e, refel, detJac);
       end
 end
@@ -204,7 +208,9 @@ end
         I(st:en) = ind1;
         J(st:en) = ind2;
 				
-        [detJac, Jac] = self.geometric_factors(e, refel);
+        % [detJac, Jac] = self.geometric_factors(e, refel);
+        pts = self.element_nodes(e, refel);
+        [detJac, Jac] = self.geometric_factors(refel, pts);
         
 				eMat = self.element_stiffness(e, refel, detJac, Jac);
 				stiff_val(st:en) = eMat(:);
@@ -240,7 +246,8 @@ end
         I(st:en) = ind1;
         J(st:en) = ind2;
         
-        [detJac, Jac] = self.geometric_factors(e, refel);
+        pts = self.element_nodes(e, refel);
+        [detJac, Jac] = self.geometric_factors(refel, pts);
         
         eMat = self.element_mass(e, refel, detJac);
         mass_val(st:en) = eMat(:);
@@ -299,7 +306,10 @@ end
       % loop over elements
       for e=1:ne
         idx = self.get_node_indices (e, order);
-        J = self.geometric_factors(e, refel);
+        
+        pts = self.element_nodes(e, refel);
+        J = self.geometric_factors(refel, pts);
+        
         gpts =  self.element_gauss(e, refel);
         
         if (self.dim == 2)
@@ -395,6 +405,30 @@ end
         k_low   = (k-1)*order + 1;   k_high =  k*order + 1;
         
         [i,j,k] = ndgrid(i_low:i_high, j_low:j_high, k_low:k_high);
+        
+        idx     = sub2ind (self.nelems*order + 1, i(:), j(:), k(:) );
+      end
+    end
+    
+    function idx = get_linear_node_indices ( self, eid, order )
+      % determine global node indices for a given element
+      if ( self.dim == 2)
+        [i,j] = ind2sub (self.nelems*order, eid);
+        
+        i_high =  i + 1;
+        j_high =  j + 1;
+        
+        [i,j] = ndgrid(i:i_high, j:j_high);
+        
+        idx     = sub2ind (self.nelems*order + 1, i(:), j(:));
+      else
+        [i,j,k] = ind2sub (self.nelems*order, eid);
+        
+        i_high =  i + 1;
+        j_high =  j + 1;
+        k_high =  k + 1;
+        
+        [i,j,k] = ndgrid(i:i_high, j:j_high, k:k_high);
         
         idx     = sub2ind (self.nelems*order + 1, i(:), j(:), k(:) );
       end
@@ -505,11 +539,11 @@ end
     end
     
     
-    function [J, D] = geometric_factors( self, elem, refel )
+    function [J, D] = geometric_factors( self, refel, pts )
       % Np =  refel.Nrp ^ mesh.dim;
       
       % compute x,y,z for element
-      pts = self.element_nodes(elem, refel);
+      % pts = self.element_nodes(elem, refel);
         
       % change to using Qx etc ?
       if (refel.dim == 2)
@@ -546,6 +580,30 @@ end
         end
         
       end
+    end
+    
+    function coords = linear_element_nodes(self, elem, order) 
+      
+      if (self.dim == 2)
+        [i,j] = ind2sub (self.nelems*order, elem);
+        
+        x1d = homg.hexmesh.getGLLcoords(order, self.nelems(1));
+        y1d = homg.hexmesh.getGLLcoords(order, self.nelems(2));
+        
+        [x, y] = ndgrid(x1d(i:i+1), y1d(j:j+1));
+        pts = [x(:) y(:)];
+      else
+        [i,j,k] = ind2sub (self.nelems*order, elem);
+        
+        x1d = homg.hexmesh.getGLLcoords(order, self.nelems(1));
+        y1d = homg.hexmesh.getGLLcoords(order, self.nelems(2));
+        z1d = homg.hexmesh.getGLLcoords(order, self.nelems(3));
+        
+        [x, y, z] = ndgrid(x1d(i:i+1), y1d(j:j+1), z1d(k:k+1));
+        pts = [x(:) y(:) z(:)];
+      end
+      
+      coords = self.Xf(pts);
     end
     
     function coords = element_nodes(self, elem, refel)
@@ -602,6 +660,59 @@ end
       end
       
       coords = self.Xf(pts);
+    end
+    
+    function [K, M] = assemble_poisson_linearized (self, order)
+      self.set_order(order);
+      
+      refel = homg.refel ( self.dim, 1 );
+      
+      dof = prod ( self.nelems*order + 1);
+      ne  = prod ( self.nelems*order ) ;
+      
+      % storage for indices and values
+      NP = (1+1)^self.dim; % linear elements
+      NPNP = NP * NP;
+      % eMat = zeros(NP, NP);
+      
+      I = zeros(ne * NPNP, 1);
+      J = zeros(ne * NPNP, 1);
+      mass_val = zeros(ne * NPNP, 1);
+      stiff_val = zeros(ne * NPNP, 1);
+      
+      % loop over elements
+      for e=1:ne
+        idx = self.get_linear_node_indices (e, order);
+        
+        ind1 = repmat(idx,NP,1);
+        ind2 = reshape(repmat(idx',NP,1),NPNP,1);
+        st = (e-1)*NPNP+1;
+        en = e*NPNP;
+        I(st:en) = ind1;
+        J(st:en) = ind2;
+        
+        pts = self.linear_element_nodes(e, order);
+        [detJac, Jac] = self.geometric_factors(refel, pts);
+        
+        eMat = self.element_mass(e, refel, detJac);
+        mass_val(st:en) = eMat(:);
+        
+        eMat = self.element_stiffness(e, refel, detJac, Jac);
+        stiff_val(st:en) = eMat(:);
+      end
+      M = sparse(I,J,mass_val,dof,dof);
+      % zero dirichlet bdy conditions
+      bdy = self.get_boundary_node_indices(order);
+
+      ii = ismember(I,bdy);
+      jj = ismember(J,bdy);
+      
+      stiff_val = stiff_val.*(~ii).*(~jj);
+      I = [I; bdy];
+      J = [J; bdy];
+      stiff_val = [stiff_val; ones(length(bdy), 1)];
+      
+      K = sparse(I,J,stiff_val,dof,dof);
     end
     
   end % methods

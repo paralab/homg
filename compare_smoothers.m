@@ -1,4 +1,4 @@
-function [res, evec] = compare_smoothers (dim, geom, order, nelem) 
+function [res, evec] = compare_smoothers (dim, xform, order, nelem) 
 % function compare_smoothers (dim, geom, order, nelem) 
 % 
 % valid smoothers are,
@@ -13,7 +13,8 @@ function [res, evec] = compare_smoothers (dim, geom, order, nelem)
 % m.set_rhs('-8*pi^2*(sin(2*pi*x) * sin(2*pi*y))');
 % g = homg.grid(m, order);
 
-g = create_grid_hierarchy(dim, geom, order, [nelem/4 nelem/2 nelem], 1);
+% g = create_grid_hierarchy(dim, geom, order, [nelem/4 nelem/2 nelem], 1);
+g = create_hexmesh_grids(dim, xform, order,  [nelem/4 nelem/2 nelem]);
 
 nun = nelem*order + 1;
 
@@ -65,7 +66,7 @@ u = g.smooth(3, g.L, u1);
 % r = g.residual(g.L, u);
 b = u' * evec; % abs(dot (evec, q));
 % plot eigenvalues
-% semilogy(abs(b), 'b'); %, 'MarkerSize', 5); hold on;
+semilogy(abs(b), 'b'); %, 'MarkerSize', 5); hold on;
 
 res(:,:,2) = reshape(u, nun, nun);
 
@@ -104,7 +105,7 @@ grid on;
 % ylim([0.001, 10]);
 
 print ('-depsc2', ['smoothers-order' num2str(order) '.eps']);
-matlab2tikz (['smoothers-order' num2str(order) '.tikz']);
+% matlab2tikz (['smoothers-order' num2str(order) '.tikz']);
 
 % Now for one v-cycle ...
 close all;
@@ -125,7 +126,7 @@ u1 = u0; %evec*lam;
 r = g.residual(g.L, u);
 b = u' * evec; % abs(dot (evec, q));
 % plot eigenvalues
-% semilogy(abs(b), 'b'); %, 'LineWidth', 3); hold on;
+semilogy(abs(b), 'b'); %, 'LineWidth', 3); hold on;
 
 % chebyshev 
 u1 = u0; % evec*lam;
@@ -154,7 +155,7 @@ grid on;
 % ylim([0.00001, 1.2]);
 
 print ('-depsc2', ['vcycle-order' num2str(order) '.eps']);
-matlab2tikz (['vcycle-order' num2str(order) '.tikz']);
+% matlab2tikz (['vcycle-order' num2str(order) '.tikz']);
 
 % close all;
 % hFig = figure(1);
