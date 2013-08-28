@@ -5,9 +5,12 @@ classdef hexmesh < handle
   properties (SetAccess = private)
     dim=2;
     nelems=[8 8];
+    order
     
     % coords       % element vertices
     Xf           % transform
+    
+    
     
     % problem specific
     coeff
@@ -97,6 +100,14 @@ classdef hexmesh < handle
   
     end
     
+    function set_order(self, order)
+      if isempty(self.order)
+        self.order = order;
+      else
+        assert (order == self.order);
+      end
+    end
+    
     function set_coeff(self, coeff)
       if ( ischar(coeff) )
         % is a string, so convert into a function
@@ -120,6 +131,7 @@ classdef hexmesh < handle
     end
     
     function M = assemble_mass(self, order)
+      self.set_order(order);
       % assemble the mass matrix
       refel = homg.refel ( self.dim, order );
       dof = prod(self.nelems*order + 1);
@@ -166,6 +178,7 @@ end
     end
     
     function K = assemble_stiffness(self, order)
+      self.set_order(order);
       % assemble the stiffness matrix
       refel = homg.refel ( self.dim, order );
       dof = prod(self.nelems*order + 1);
@@ -200,6 +213,7 @@ end
     end
     
     function [K, M] = assemble_poisson(self, order)
+      self.set_order(order);
       % assemble the mass matrix
       refel = homg.refel ( self.dim, order );
       dof = prod(self.nelems*order + 1);
@@ -272,6 +286,7 @@ end
 %     end
 
     function f = assemble_rhs(self, fx, order)
+      self.set_order(order);
       % assemble the mass matrix
       refel = homg.refel ( self.dim, order );
       
@@ -300,18 +315,25 @@ end
       % M = sparse(M);
     end
     
-    function P = assemble_interpolation(self, order, isP)
+    function P = assemble_interpolation(self, order)
       % assemble prolongation operator from coarse (self) to fine mesh
-      refel = homg.refel ( self.dim, order );
-			
-			if ( nargin > 2  && isP )
-				Pe = refel.Pp;
-			else
-				Pe = refel.Ph; 
+			refel = homg.refel ( self.dim, self.order );
+      
+      if ( order == self.order )
+				dof_coarse = prod(  self.nelems * self.order + 1);
+        dof_fine   = prod(2*self.nelems * self.order + 1);
+        NP_c = (self.order+1)^self.dim;
+				NP_f = (2*self.order+1)^self.dim;
+        Pe = refel.Ph;
+      else
+        assert (order == 2*self.order);
+        NP_c = (self.order+1)^self.dim;
+				NP_f = (order+1)^self.dim;
+        dof_coarse = prod(self.nelems * self.order + 1);
+        dof_fine   = prod(self.nelems * order + 1);
+				Pe = refel.Pp; 
 			end
 			
-			dof_coarse = prod(self.nelems*order + 1);
-			dof_fine   = prod(2*self.nelems*order + 1);
 			ne  = prod(self.nelems);
 			
 			if (0)
@@ -319,22 +341,19 @@ end
 				P = spalloc(dof_fine, dof_coarse, num_nz); 
 				% loop over elements
 				for e=1:ne
-					[idx_coarse, idx_fine] = self.get_interpolation_indices (e, order);
+					[idx_coarse, idx_fine] = self.get_interpolation_indices (e);
 					P(idx_fine, idx_coarse) = Pe;
 				end
 			else
 	      % storage for indices and values
-	      NP_c = (order+1)^self.dim;
-				NP_f = (2*order+1)^self.dim;
 	      NPNP = NP_c * NP_f;
-	      % eMat = zeros(NP, NP);
-      
+	      
 	      I = zeros(ne * NPNP, 1);
 	      J = zeros(ne * NPNP, 1);
 	      val = zeros(ne * NPNP, 1);
 				
 				for e=1:ne
-	        [idx_c, idx_f] = self.get_interpolation_indices (e, order);
+	        [idx_c, idx_f] = self.get_interpolation_indices (e);
         
 	        ind1 = repmat(idx_f,NP_c,1);
 	        ind2 = reshape(repmat(idx_c',NP_f,1),NPNP,1);
@@ -381,29 +400,29 @@ end
       end
     end
     
-    function [idx_coarse, idx_fine] = get_interpolation_indices ( self, eid, order )
+    function [idx_coarse, idx_fine] = get_interpolation_indices ( self, eid )
       % determine global node indices for a given element
       if ( self.dim == 2)
         [i,j] = ind2sub (self.nelems, eid);
         
-        i_low       = (i-1)*order + 1;   i_high =  i*order + 1;
-        j_low       = (j-1)*order + 1;   j_high =  j*order + 1;
+        i_low       = (i-1)*self.order + 1;   i_high =  i*self.order + 1;
+        j_low       = (j-1)*self.order + 1;   j_high =  j*self.order + 1;
         [i,j]       = ndgrid(i_low:i_high, j_low:j_high);
-        idx_coarse  = sub2ind (self.nelems*order + 1, i(:), j(:));
+        idx_coarse  = sub2ind (self.nelems*self.order + 1, i(:), j(:));
         
         [i,j]       = ndgrid(2*i_low-1:2*i_high-1, 2*j_low-1:2*j_high-1);
-        idx_fine    = sub2ind (2*self.nelems*order + 1, i(:), j(:));
+        idx_fine    = sub2ind (2*self.nelems*self.order + 1, i(:), j(:));
       else
         [i,j,k] = ind2sub (self.nelems, eid);
         
-        i_low       = (i-1)*order + 1;   i_high =  i*order + 1;
-        j_low       = (j-1)*order + 1;   j_high =  j*order + 1;
-        k_low       = (k-1)*order + 1;   k_high =  k*order + 1;
+        i_low       = (i-1)*self.order + 1;   i_high =  i*self.order + 1;
+        j_low       = (j-1)*self.order + 1;   j_high =  j*self.order + 1;
+        k_low       = (k-1)*self.order + 1;   k_high =  k*self.order + 1;
         [i,j,k]     = ndgrid(i_low:i_high, j_low:j_high, k_low:k_high);
-        idx_coarse  = sub2ind (self.nelems*order + 1, i(:), j(:), k(:) );
+        idx_coarse  = sub2ind (self.nelems*self.order + 1, i(:), j(:), k(:) );
       
         [i,j,k]     = ndgrid(2*i_low-1:2*i_high-1, 2*j_low-1:2*j_high-1, 2*k_low-1:2*k_high-1);
-        idx_fine    = sub2ind (2*self.nelems*order + 1, i(:), j(:), k(:) );
+        idx_fine    = sub2ind (2*self.nelems*self.order + 1, i(:), j(:), k(:) );
       end
     end
     
