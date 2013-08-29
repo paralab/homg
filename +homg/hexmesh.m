@@ -417,20 +417,13 @@ end
       if ( self.dim == 2)
         [i,j] = ind2sub (self.nelems*order, eid);
         
-        i_high =  i + 1;
-        j_high =  j + 1;
-        
-        [i,j] = ndgrid(i:i_high, j:j_high);
+        [i,j] = ndgrid(i:i+1, j:j+1);
         
         idx     = sub2ind (self.nelems*order + 1, i(:), j(:));
       else
         [i,j,k] = ind2sub (self.nelems*order, eid);
         
-        i_high =  i + 1;
-        j_high =  j + 1;
-        k_high =  k + 1;
-        
-        [i,j,k] = ndgrid(i:i_high, j:j_high, k:k_high);
+        [i,j,k] = ndgrid(i:i+1, j:j+1, k:k+1);
         
         idx     = sub2ind (self.nelems*order + 1, i(:), j(:), k(:) );
       end

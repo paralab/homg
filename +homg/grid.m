@@ -503,7 +503,7 @@ classdef grid < handle
       
       % adjust the eigenvalues to hit the upper spectrum
       l_max = grid.eig_max;
-      l_min =  0.3*grid.eig_max; % (grid.eig_min + grid.eig_max)/2;
+      l_min = (grid.eig_min + grid.eig_max)/2;
       
       c = (l_min - l_max)/2;
       d = (l_min + l_max)/2;
