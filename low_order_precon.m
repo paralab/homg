@@ -4,6 +4,14 @@ function low_order_precon(nelems, xform, order)
 
 mesh = homg.hexmesh(nelems, xform); 
 
+if (mesh.dim == 2)
+  mu = @(x,y)(1 + 1000000*( (cos(2*pi*x))^2 + (cos(2*pi*y))^2 ));
+else
+  mu = @(x,y,z)(1 + 1000000*( (cos(2*pi*x))^2 + (cos(2*pi*y))^2 + (cos(2*pi*z))^2 ));
+end
+
+mesh.set_coeff(mu);
+
 [K, M]          =  mesh.assemble_poisson (order);
 [K_lin, M_lin]  =  mesh.assemble_poisson_linearized (order);
 
@@ -14,7 +22,7 @@ syms x y z
 if ( mesh.dim==2 )
   fx = matlabFunction(-8*pi^2*(sin(2*pi*x) * sin(2*pi*y)));
 else
-  fx =matlabFunction(-12*pi^2*(sin(2*pi*x) * sin(2*pi*y) * sin(2*pi*z) ));
+  fx = matlabFunction(-12*pi^2*(sin(2*pi*x) * sin(2*pi*y) * sin(2*pi*z) ));
 end
 
 rhs       = mesh.assemble_rhs(fx, order);
@@ -34,9 +42,9 @@ tic
 toc
 
 %figure;
-semilogy(rv0/norm(rhs),'-o');
-xlabel('Iteration number');
-ylabel('Relative residual'); hold on;
+%semilogy(rv0/norm(rhs),'-o');
+%xlabel('Iteration number');
+%ylabel('Relative residual'); hold on;
 
 
 tic
@@ -50,9 +58,9 @@ toc
 
 fprintf('Difference between solutions: %g\n', norm(x1-x0,'fro')/norm(x0,'fro'));
 
-disp(['iter: ' num2str(it1)]);
+disp(['order: ' num2str(order) ' -- iterations: ' num2str(it1(2))]);
 
-semilogy(rv1/norm(rhs),'r-o');
-hold off;
+%semilogy(rv1/norm(rhs),'r-o');
+%hold off;
 
 end

@@ -303,6 +303,13 @@ classdef grid < handle
       end
     end
 
+    function set_coeff(grid, mu)
+      grid.Mesh.set_coeff (mu) ;
+      if (~ isempty(grid.Coarse) )
+        grid.Coarse.Mesh.set_coeff (mu) ;
+      end
+    end
+    
     function set_smoother(grid, sm)
       grid.smoother = sm;
       if (~ isempty(grid.Coarse) )
