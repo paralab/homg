@@ -10,7 +10,7 @@ else
   mu = @(x,y,z)(1 + 1000000*( (cos(2*pi*x))^2 + (cos(2*pi*y))^2 + (cos(2*pi*z))^2 ));
 end
 
-% mesh.set_coeff(mu);
+mesh.set_coeff(mu);
 
 [K, M]          =  mesh.assemble_poisson (order);
 [K_lin, M_lin]  =  mesh.assemble_poisson_linearized (order);

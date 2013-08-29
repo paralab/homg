@@ -636,26 +636,57 @@ end
       % returns location of gauss coordinates of order
       % for element 
       
-      h = 1./self.nelems;
+      if (self.order == refel.N) 
+        h = 1./self.nelems;
       
-      if ( self.dim == 2)
-        [i,j] = ind2sub (self.nelems, elem);
-        idx = [i j];
+        if ( self.dim == 2)
+          [i,j] = ind2sub (self.nelems, elem);
+          idx = [i j];
+        else
+          [i,j,k] = ind2sub (self.nelems, elem);
+          idx = [i j k];
+        end
+      
+        p_mid = (idx - 0.5) .* h;
+        p_gau = refel.g * 0.5 * h;
+        nodes = bsxfun(@plus, p_mid, p_gau) ;
+        
+        if ( self.dim == 2)
+          [x, y] = ndgrid(nodes(:,1), nodes(:,2));
+          pts = [x(:) y(:)];
+        else
+          [x, y, z] = ndgrid(nodes(:,1), nodes(:,2), nodes(:,3));
+          pts = [x(:) y(:) z(:)];
+        end
       else
-        [i,j,k] = ind2sub (self.nelems, elem);
-        idx = [i j k];
-      end
-      
-      p_mid = (idx - 0.5) .* h;
-      p_gau = refel.g * 0.5 * h;
-      nodes = bsxfun(@plus, p_mid, p_gau) ;
-      
-      if ( self.dim == 2)
-        [x, y] = ndgrid(nodes(:,1), nodes(:,2));
-        pts = [x(:) y(:)];
-      else
-        [x, y, z] = ndgrid(nodes(:,1), nodes(:,2), nodes(:,3));
-        pts = [x(:) y(:) z(:)];
+        assert(refel.N == 1);
+        % ... get gll points ...
+        if (self.dim == 2)
+          [i,j] = ind2sub (self.nelems*self.order, elem);
+
+          x1d = homg.hexmesh.getGLLcoords(self.order, self.nelems(1));
+          y1d = homg.hexmesh.getGLLcoords(self.order, self.nelems(2));
+
+          [x, y] = ndgrid(x1d(i:i+1), y1d(j:j+1));
+          
+          x = x(:) + (x(2) - x(1))*(refel.g + 1)*0.5;
+          y = y(:) + (y(2) - y(1))*(refel.g + 1)*0.5;
+          pts = [x y];
+        else
+          [i,j,k] = ind2sub (self.nelems*self.order, elem);
+
+          x1d = homg.hexmesh.getGLLcoords(self.order, self.nelems(1));
+          y1d = homg.hexmesh.getGLLcoords(self.order, self.nelems(2));
+          z1d = homg.hexmesh.getGLLcoords(self.order, self.nelems(3));
+
+          [x, y, z] = ndgrid(x1d(i:i+1), y1d(j:j+1), z1d(k:k+1));
+          
+          x = x(:) + (x(2) - x(1))*(refel.g + 1)*0.5;
+          y = y(:) + (y(2) - y(1))*(refel.g + 1)*0.5;
+          z = z(:) + (z(2) - z(1))*(refel.g + 1)*0.5;
+
+          pts = [x y z];
+        end
       end
       
       coords = self.Xf(pts);
