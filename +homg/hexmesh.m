@@ -493,7 +493,7 @@ end
 %    Ke =                 | sx sy sz | J W | ry sy ty || Qy |
 %                         | tx ty tz |     | rz sz tz || Qz |
 
-      gpts =  self.element_gauss(eid, r);
+      gpts = self.element_gauss(eid, r);
 
       factor = zeros(length(J), 6);
 
@@ -659,7 +659,7 @@ end
           pts = [x(:) y(:) z(:)];
         end
       else
-        assert(refel.N == 1);
+        assert(refel.N == 1); 
         % ... get gll points ...
         if (self.dim == 2)
           [i,j] = ind2sub (self.nelems*self.order, elem);
@@ -667,25 +667,26 @@ end
           x1d = homg.hexmesh.getGLLcoords(self.order, self.nelems(1));
           y1d = homg.hexmesh.getGLLcoords(self.order, self.nelems(2));
 
-          [x, y] = ndgrid(x1d(i:i+1), y1d(j:j+1));
+          xg = x1d(i) + (x1d(i+1) - x1d(i))*(refel.g + 1)*0.5;
+          yg = y1d(j) + (y1d(j+1) - y1d(j))*(refel.g + 1)*0.5;
           
-          x = x(:) + (x(2) - x(1))*(refel.g + 1)*0.5;
-          y = y(:) + (y(2) - y(1))*(refel.g + 1)*0.5;
-          pts = [x y];
+          [x, y] = ndgrid(xg, yg);
+          
+          pts = [x(:) y(:)];
         else
           [i,j,k] = ind2sub (self.nelems*self.order, elem);
 
           x1d = homg.hexmesh.getGLLcoords(self.order, self.nelems(1));
           y1d = homg.hexmesh.getGLLcoords(self.order, self.nelems(2));
           z1d = homg.hexmesh.getGLLcoords(self.order, self.nelems(3));
-
-          [x, y, z] = ndgrid(x1d(i:i+1), y1d(j:j+1), z1d(k:k+1));
+  
+          xg = x1d(i) + (x1d(i+1) - x1d(i))*(refel.g + 1)*0.5;
+          yg = y1d(j) + (y1d(j+1) - y1d(j))*(refel.g + 1)*0.5;
+          zg = z1d(k) + (z1d(k+1) - z1d(k))*(refel.g + 1)*0.5;
           
-          x = x(:) + (x(2) - x(1))*(refel.g + 1)*0.5;
-          y = y(:) + (y(2) - y(1))*(refel.g + 1)*0.5;
-          z = z(:) + (z(2) - z(1))*(refel.g + 1)*0.5;
-
-          pts = [x y z];
+          [x, y, z] = ndgrid(xg, yg, zg);
+          
+          pts = [x(:) y(:) z(:)];
         end
       end
       
@@ -722,6 +723,7 @@ end
         J(st:en) = ind2;
         
         pts = self.linear_element_nodes(e, order);
+        
         [detJac, Jac] = self.geometric_factors(refel, pts);
         
         eMat = self.element_mass(e, refel, detJac);
