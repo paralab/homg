@@ -279,8 +279,8 @@ classdef grid < handle
         case 'chebssor'
           u = grid.smoother_chebyshev_ssor (v, rhs, u);
           return;
-        case 'chebjac'
-          u = grid.smoother_chebyshev_jacobi (v, rhs, u);
+        case 'chebyshev2'
+          u = grid.smoother_chebyshev2 (v, rhs, u);
           return;
         case 'chebyshev', 
           u = grid.smoother_chebyshev(v, rhs, u); 
@@ -489,14 +489,14 @@ classdef grid < handle
       
     end % 2sr
     
-    function u = smoother_chebyshev (grid, v, rhs, u)
+    function u = smoother_chebyshev2 (grid, v, rhs, u)
       if ( isempty ( grid.eig_max ) )
         disp('computing eigenvalues');
         tic;
         % Kc = grid.Null' * grid.K * grid.Null;
         Kc = grid.K; %(eye(size(grid.K)) - grid.ZeroBoundary) + grid.ZeroBoundary * grid.K * grid.ZeroBoundary;
         % d = eigs(Kc, 2, 'be');
-        grid.eig_max = eigs(Kc, 1, 'lm');  
+	grid.eig_max = eigs(Kc, 1, 'lm');  
         grid.eig_min = eigs(Kc, 1, 'sm');  
         toc;
       end
@@ -512,7 +512,7 @@ classdef grid < handle
 
       for iter = 1:v
         res = grid.residual ( rhs, u ); 
-        r = norm(res);
+        %r = norm(res)
         % disp([grid.dbg_spaces 'residual: ' num2str(r)]); 
         if ( iter == 1 )
           alpha = 1.0/d;
@@ -528,6 +528,48 @@ classdef grid < handle
         u = u + p;  
       end
     end % chebyshev
+
+    function u = smoother_chebyshev (grid, v, rhs, u)
+      if ( isempty ( grid.eig_max ) )
+        disp('computing eigenvalues');
+        tic;
+        % Kc = grid.Null' * grid.K * grid.Null;
+	D = diag(grid.K);
+	grid.jacobi_invdiag = 1./D;
+	Kc = diag(grid.jacobi_invdiag)*grid.K;
+        % d = eigs(Kc, 2, 'be');
+        grid.eig_max = eigs(Kc, 1, 'lm');  
+        grid.eig_min = eigs(Kc, 1, 'sm');  
+      end
+
+      % adjust the eigenvalues to hit the upper spectrum
+      beta = grid.eig_max;
+      alpha = 0.25*grid.eig_max;% (grid.eig_min + grid.eig_max)/2;
+
+      delta = (beta - alpha)/2;
+      theta = (beta + alpha)/2;
+      s1 = theta/delta;
+      rhok = 1./s1;
+
+      d = zeros(size(u));
+
+      % first loop
+      res = -grid.residual ( rhs, u );
+      d = res/theta.* grid.jacobi_invdiag;
+      u = u + d;
+
+      for iter = 2:v
+	  rhokp1 = 1/ (2*s1 - rhok);
+	  d1 = rhokp1 * rhok;
+	  d2 = 2*rhokp1 / delta;
+	  rhok = rhokp1;
+	  res = -grid.residual ( rhs, u ); 
+	  %norm(res)
+	  d = d1 * d + d2 * res.*grid.jacobi_invdiag;
+	  u = u + d;
+      end
+    end % chebyshev
+
 
     function evec = get_eigenvectors(grid)
       % generate the correct matrix 
@@ -567,6 +609,7 @@ classdef grid < handle
         u0 = grid.k_evec*lam;
       else
         u0 = rand(size(grid.L()));
+	u0(grid.Boundary) = 0;
       end
     end
   end %methods
