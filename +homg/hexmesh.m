@@ -417,20 +417,13 @@ end
       if ( self.dim == 2)
         [i,j] = ind2sub (self.nelems*order, eid);
         
-        i_high =  i + 1;
-        j_high =  j + 1;
-        
-        [i,j] = ndgrid(i:i_high, j:j_high);
+        [i,j] = ndgrid(i:i+1, j:j+1);
         
         idx     = sub2ind (self.nelems*order + 1, i(:), j(:));
       else
         [i,j,k] = ind2sub (self.nelems*order, eid);
         
-        i_high =  i + 1;
-        j_high =  j + 1;
-        k_high =  k + 1;
-        
-        [i,j,k] = ndgrid(i:i_high, j:j_high, k:k_high);
+        [i,j,k] = ndgrid(i:i+1, j:j+1, k:k+1);
         
         idx     = sub2ind (self.nelems*order + 1, i(:), j(:), k(:) );
       end
@@ -500,7 +493,7 @@ end
 %    Ke =                 | sx sy sz | J W | ry sy ty || Qy |
 %                         | tx ty tz |     | rz sz tz || Qz |
 
-      gpts =  self.element_gauss(eid, r);
+      gpts = self.element_gauss(eid, r);
 
       factor = zeros(length(J), 6);
 
@@ -643,26 +636,58 @@ end
       % returns location of gauss coordinates of order
       % for element 
       
-      h = 1./self.nelems;
+      if (self.order == refel.N) 
+        h = 1./self.nelems;
       
-      if ( self.dim == 2)
-        [i,j] = ind2sub (self.nelems, elem);
-        idx = [i j];
+        if ( self.dim == 2)
+          [i,j] = ind2sub (self.nelems, elem);
+          idx = [i j];
+        else
+          [i,j,k] = ind2sub (self.nelems, elem);
+          idx = [i j k];
+        end
+      
+        p_mid = (idx - 0.5) .* h;
+        p_gau = refel.g * 0.5 * h;
+        nodes = bsxfun(@plus, p_mid, p_gau) ;
+        
+        if ( self.dim == 2)
+          [x, y] = ndgrid(nodes(:,1), nodes(:,2));
+          pts = [x(:) y(:)];
+        else
+          [x, y, z] = ndgrid(nodes(:,1), nodes(:,2), nodes(:,3));
+          pts = [x(:) y(:) z(:)];
+        end
       else
-        [i,j,k] = ind2sub (self.nelems, elem);
-        idx = [i j k];
-      end
-      
-      p_mid = (idx - 0.5) .* h;
-      p_gau = refel.g * 0.5 * h;
-      nodes = bsxfun(@plus, p_mid, p_gau) ;
-      
-      if ( self.dim == 2)
-        [x, y] = ndgrid(nodes(:,1), nodes(:,2));
-        pts = [x(:) y(:)];
-      else
-        [x, y, z] = ndgrid(nodes(:,1), nodes(:,2), nodes(:,3));
-        pts = [x(:) y(:) z(:)];
+        assert(refel.N == 1); 
+        % ... get gll points ...
+        if (self.dim == 2)
+          [i,j] = ind2sub (self.nelems*self.order, elem);
+
+          x1d = homg.hexmesh.getGLLcoords(self.order, self.nelems(1));
+          y1d = homg.hexmesh.getGLLcoords(self.order, self.nelems(2));
+
+          xg = x1d(i) + (x1d(i+1) - x1d(i))*(refel.g + 1)*0.5;
+          yg = y1d(j) + (y1d(j+1) - y1d(j))*(refel.g + 1)*0.5;
+          
+          [x, y] = ndgrid(xg, yg);
+          
+          pts = [x(:) y(:)];
+        else
+          [i,j,k] = ind2sub (self.nelems*self.order, elem);
+
+          x1d = homg.hexmesh.getGLLcoords(self.order, self.nelems(1));
+          y1d = homg.hexmesh.getGLLcoords(self.order, self.nelems(2));
+          z1d = homg.hexmesh.getGLLcoords(self.order, self.nelems(3));
+  
+          xg = x1d(i) + (x1d(i+1) - x1d(i))*(refel.g + 1)*0.5;
+          yg = y1d(j) + (y1d(j+1) - y1d(j))*(refel.g + 1)*0.5;
+          zg = z1d(k) + (z1d(k+1) - z1d(k))*(refel.g + 1)*0.5;
+          
+          [x, y, z] = ndgrid(xg, yg, zg);
+          
+          pts = [x(:) y(:) z(:)];
+        end
       end
       
       coords = self.Xf(pts);
@@ -698,6 +723,7 @@ end
         J(st:en) = ind2;
         
         pts = self.linear_element_nodes(e, order);
+        
         [detJac, Jac] = self.geometric_factors(refel, pts);
         
         eMat = self.element_mass(e, refel, detJac);

@@ -25,7 +25,7 @@ else
   fx = matlabFunction(-12*pi^2*(sin(2*pi*x) * sin(2*pi*y) * sin(2*pi*z) ));
 end
 
-rhs       = mesh.assemble_rhs(fx, order);
+% rhs       = mesh.assemble_rhs(fx, order);
 
 n = size(K, 1);
 x_gt = rand(n,1);
@@ -37,9 +37,9 @@ rhs (bdy) = 0;
 maxit = 100;
 
 
-tic
-[x0,fl0,rr0,it0,rv0] = gmres(K, rhs, [], 1e-8, maxit);
-toc
+%tic
+%[x0,fl0,rr0,it0,rv0] = gmres(K, rhs, [], 1e-8, maxit);
+%toc
 
 %figure;
 %semilogy(rv0/norm(rhs),'-o');
@@ -56,7 +56,7 @@ K_lin_chol = chol(K_lin(per,per));
 x1(per) = x1;
 toc
 
-fprintf('Difference between solutions: %g\n', norm(x1-x0,'fro')/norm(x0,'fro'));
+%fprintf('Difference between solutions: %g\n', norm(x1-x0,'fro')/norm(x0,'fro'));
 
 disp(['order: ' num2str(order) ' -- iterations: ' num2str(it1(2))]);
 
