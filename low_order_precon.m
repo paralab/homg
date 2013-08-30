@@ -1,6 +1,6 @@
 % Example usage: low_order_precon([16 16], @homg.xform.identity, 3)
 
-function low_order_precon(nelems, xform, order)
+function [it_gll, it_uni] = low_order_precon(nelems, xform, order)
 
 mesh = homg.hexmesh(nelems, xform); 
 
@@ -39,7 +39,7 @@ rhs = K*x_gt;
 rhs (bdy) = 0;
 
 % now solve and test 
-maxit = 100;
+maxit = min(350, size(K,1));
 
 
 %tic
@@ -52,7 +52,7 @@ maxit = 100;
 %ylabel('Relative residual'); hold on;
 
 
-tic
+%tic
 % permutation to reduce fill in when computing factorization
 per = symamd(K_lin);
 K_lin_chol = chol(K_lin(per,per));
@@ -60,18 +60,21 @@ K_lin_chol = chol(K_lin(per,per));
 % solve reordered system and revert ordering in solution
 [x1,fl1,rr1,it1,rv1] = gmres(K(per,per), rhs(per), [], 1e-8, maxit, K_lin_chol', K_lin_chol);
 x1(per) = x1;
-toc
+%toc
 
-tic
+%tic
 per_uni = symamd(K_uni);
 K_uni_chol = chol(K_uni(per_uni,per_uni));
 [x2,fl2,rr2,it2,rv2] = gmres(K(per_uni,per_uni), rhs(per_uni), [], 1e-8, maxit, K_uni_chol', K_uni_chol);
 x2(per_uni) = x2;
-toc
+%toc
 
 %fprintf('Difference between solutions: %g\n', norm(x1-x0,'fro')/norm(x0,'fro'));
 
-disp(['order: ' num2str(order) ' -- iterations: ' num2str(it1(2)) ' --- uniform : ' num2str(it2(2))]);
+% disp(['order: ' num2str(order) ' -- iterations: ' num2str(it1(2)) ' --- uniform : ' num2str(it2(2))]);
+
+it_gll = it1(2);
+it_uni = it2(2);
 
 %semilogy(rv1/norm(rhs),'r-o');
 %hold off;

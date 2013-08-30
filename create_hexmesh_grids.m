@@ -1,5 +1,5 @@
-function grid = create_hexmesh_grids(dim, xform, orders, nelems)
-% function grid = create_hexmesh_grids(dim, xform, orders, nelems)
+function grid = create_hexmesh_grids(dim, mu, xform, orders, nelems)
+% function grid = create_hexmesh_grids(dim, mu, xform, orders, nelems)
 %
 %   dim  is the dimension of the mesh, either 2 or 3
 %   geom is the domain geometry, currently 'box', 'fan'
@@ -25,14 +25,14 @@ num_grids = num_hgrids + num_pgrids - 1;
 
 % disp('Creating linear h-grids first');
 
-disp(['Creating h-grid: ' num2str(1) ' of ' num2str(num_grids) ', order = ' num2str(orders(1)) ', nelem = ' num2str(nelems(1))]);
+%disp(['Creating h-grid: ' num2str(1) ' of ' num2str(num_grids) ', order = ' num2str(orders(1)) ', nelem = ' num2str(nelems(1))]);
 
 m = homg.hexmesh(repmat(nelems(1), 1, dim), xform);
-coarse = homg.grid(m, orders(1) );
-disp('---- created grid ----')
+coarse = homg.grid(m, orders(1), mu );
+%disp('---- created grid ----')
 
 for i=2:num_hgrids
-  disp(['Creating h-grid: ' num2str(i) ' of ' num2str(num_grids) ', order = ' num2str(orders(1)) ', nelem = ' num2str(nelems(i))]);
+  %disp(['Creating h-grid: ' num2str(i) ' of ' num2str(num_grids) ', order = ' num2str(orders(1)) ', nelem = ' num2str(nelems(i))]);
   m = homg.hexmesh(repmat(nelems(i), 1, dim), xform);
   %%% disp('---- created mesh')
   % grid.debug = 1;
@@ -47,8 +47,8 @@ for i=2:num_hgrids
     % m.set_coeff('1');
     % m.set_coeff('1 + 1000000*((cos(2*pi*x))^2 + (cos(2*pi*y))^2 + (cos(2*pi*z))^2)');
   %end
-  grid = homg.grid(m, orders(1), coarse);
-  disp('---- created grid ----')
+  grid = homg.grid(m, orders(1), mu, coarse);
+  %disp('---- created grid ----')
   
   coarse = grid;
 end
@@ -57,10 +57,10 @@ hfine = nelems(num_hgrids);
 
 % disp('Creating p-grids now');
 for i=2:num_pgrids
-  disp(['Creating p-grid: ' num2str(i+num_hgrids-1) ' of ' num2str(num_grids) ', order = ' num2str(orders(i)) ', nelem = ' num2str(hfine)]);
+  %disp(['Creating p-grid: ' num2str(i+num_hgrids-1) ' of ' num2str(num_grids) ', order = ' num2str(orders(i)) ', nelem = ' num2str(hfine)]);
   % m = homg.mesh(dim, geom, hfine, sp);
   m = homg.hexmesh(repmat(hfine, 1, dim), xform);
-  grid = homg.grid(m, orders(i), coarse);
+  grid = homg.grid(m, orders(i), mu, coarse);
 %   if ( dim == 2 )
 %     m.set_rhs('(1 - 8*pi^2)*(sin(2*pi*x) * sin(2*pi*y))');
 %     m.set_coeff('1');

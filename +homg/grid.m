@@ -34,8 +34,8 @@ classdef grid < handle
   end % properties
   
   methods
-    function grid = grid(mesh, order, coarse)
-      if ((nargin < 3) || isempty(coarse))
+    function grid = grid(mesh, order, coeff, coarse)
+      if ((nargin < 4) || isempty(coarse))
         grid.level = 0;
         grid.Coarse = [];
       else
@@ -52,10 +52,11 @@ classdef grid < handle
 
       grid.Mesh = mesh;
       % [grid.K, grid.L, grid.Null, grid.Ud] = mesh.assemble_poisson(order, 'gll');
-      tic;
+      %tic;
+      mesh.set_coeff( coeff );
       [grid.K, grid.M] = mesh.assemble_poisson(order);
-      tt = toc;
-      disp(['---- assembled mass and stiffness : ' num2str(tt)])
+      %tt = toc;
+      %disp(['---- assembled mass and stiffness : ' num2str(tt)])
       % grid.K = mesh.assemble_stiffness (order);
       % grid.M = mesh.assemble_mass (order);
       %%
@@ -72,25 +73,30 @@ classdef grid < handle
         
         % f   = mesh.evaluate(fx, order);
         % f(bdy) = 0;
-        tic;
+        %tic;
         grid.L = mesh.assemble_rhs(fx, order);
-        tt = toc;
+        %tt = toc;
         
-        disp(['---- assembled rhs : ' num2str(tt)])
+        %disp(['---- assembled rhs : ' num2str(tt)])
         % grid.L = zeros(N,1); % - grid.M * f;
         grid.L(bdy) = 0;
         grid.Boundary = bdy;
       %%
       % grid.ZeroBoundary = grid.Null * grid.Null';
       grid.smoother = 'sor';
-      grid.jacobi_omega = 2/3;
+      if (mesh.dim == 2)
+        grid.jacobi_omega = 2/3;
+      else
+        grid.jacobi_omega = 6/7;
+      end
+
       grid.sor_omega = 1;
       if (~ isempty(grid.Coarse) )
          % ts1 = tic;
-         tic;
+         % tic;
          grid.P = grid.Coarse.Mesh.assemble_interpolation(order);
-         tt = toc;
-         disp(['---- assembled prolongation: ' num2str(tt)])
+         % tt = toc;
+         %disp(['---- assembled prolongation: ' num2str(tt)])
          % toc(ts1);
          % grid.R = inv(grid.Coarse.M) * grid.P' * grid.M ; 
          grid.R = grid.P';
@@ -110,7 +116,9 @@ classdef grid < handle
 
       % r = Au - f
       % r = grid.ZeroBoundary * (grid.K*(grid.ZeroBoundary*u+grid.Ud) - rhs) + (u - grid.ZeroBoundary*u - grid.Ud);
+      % u(grid.Boundary) = 0;
       r = grid.K*u - rhs;
+      % r(grid.Boundary) = 0;
     end
 
 
@@ -167,8 +175,8 @@ classdef grid < handle
       % disp('outer v-cycle');
       rho = grid.vcycle(smooth_steps, smooth_steps, r, rho);
       p = rho;
-      disp(['Initial residual is ' num2str(norm(r))]);
-      disp('------------------------------------------');
+      %# disp(['Initial residual is ' num2str(norm(r))]);
+      %# disp('------------------------------------------');
       r0 = norm(r);
       for i=1:num_vcyc
         % disp(['inner v-cycle: ' num2str(i)]);
@@ -180,7 +188,7 @@ classdef grid < handle
 
         % rho_res_prev = rho_res;
         
-        disp([num2str(i, '%03d\t') ': |res| = ' num2str(norm(r),'\t%8.4e')]);
+        %# disp([num2str(i, '%03d\t') ': |res| = ' num2str(norm(r),'\t%8.4e')]);
         if (norm(r)/r0 < 1e-8)
           iter = i;
           rr = norm(r)/r0;
@@ -194,7 +202,7 @@ classdef grid < handle
         beta = dot(rho, r) / rho_res ;
         p = rho + beta*p;
       end
-      disp('------------------------------------------');
+      %# disp('------------------------------------------');
       iter = num_vcyc;
       rr = norm(r)/r0;
     end
@@ -205,20 +213,20 @@ classdef grid < handle
       % u = grid.ZeroBoundary*u;
       
       r = grid.residual(rhs, u);
-      disp(['Initial residual is ' num2str(norm(r))]);
-      disp('------------------------------------------');
+      %# disp(['Initial residual is ' num2str(norm(r))]);
+      %# disp('------------------------------------------');
       r0 = norm(r);
       for i=1:num_vcyc
         u = grid.vcycle(smooth_steps, smooth_steps, rhs, u);
         r = grid.residual(rhs, u);
-        disp([num2str(i) ': |res| = ' num2str(norm(r))]);
+        %# disp([num2str(i) ': |res| = ' num2str(norm(r))]);
         if (norm(r)/r0 < 1e-8)
           iter = i;
           rr = norm(r)/r0;
           return;
         end
       end
-      disp('------------------------------------------');
+      %# disp('------------------------------------------');
       iter = num_vcyc;
       rr = norm(r)/r0;
     end
@@ -531,15 +539,15 @@ classdef grid < handle
 
     function u = smoother_chebyshev (grid, v, rhs, u)
       if ( isempty ( grid.eig_max ) )
-        disp('computing eigenvalues');
-        tic;
+        % disp('computing eigenvalues');
         % Kc = grid.Null' * grid.K * grid.Null;
-	D = diag(grid.K);
-	grid.jacobi_invdiag = 1./D;
-	Kc = diag(grid.jacobi_invdiag)*grid.K;
+        D = diag(grid.K);
+        grid.jacobi_invdiag = 1./D;
+        Kc = diag(grid.jacobi_invdiag)*grid.K;
         % d = eigs(Kc, 2, 'be');
-        grid.eig_max = eigs(Kc, 1, 'lm');  
-        grid.eig_min = eigs(Kc, 1, 'sm');  
+        opts.tol = 0.01;
+        grid.eig_max = eigs(Kc, 1, 'lm', opts);  
+        % grid.eig_min = eigs(Kc, 1, 'sm');  
       end
 
       % adjust the eigenvalues to hit the upper spectrum
@@ -609,7 +617,7 @@ classdef grid < handle
         u0 = grid.k_evec*lam;
       else
         u0 = rand(size(grid.L()));
-	u0(grid.Boundary) = 0;
+        u0(grid.Boundary) = 0;
       end
     end
   end %methods
