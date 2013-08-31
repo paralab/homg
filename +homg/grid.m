@@ -543,7 +543,7 @@ classdef grid < handle
         % Kc = grid.Null' * grid.K * grid.Null;
         D = diag(grid.K);
         grid.jacobi_invdiag = 1./D;
-        Kc = diag(grid.jacobi_invdiag)*grid.K;
+        Kc = spdiags(grid.jacobi_invdiag,0,length(D), length(D)) * grid.K;
         % d = eigs(Kc, 2, 'be');
         opts.tol = 0.01;
         grid.eig_max = eigs(Kc, 1, 'lm', opts);  
