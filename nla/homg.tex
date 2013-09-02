@@ -1,6 +1,7 @@
 % nladoc.tex V2.0, 13 May 2010
 
-\documentclass[times]{nlaauth}
+\RequirePackage{fix-cm}
+\documentclass[smallcondensed,draft]{svjour3}     % onecolumn (ditto)
 
 \usepackage{moreverb}
 
@@ -11,6 +12,7 @@
 \usepackage{pgfplots}
 \usepackage{subcaption}
 % \usetkzobj{all} 
+\usepackage{amsmath}
 
 \definecolor{utorange}{RGB}{203,96,21}
 \definecolor{utblack}{RGB}{99,102,106}
@@ -27,19 +29,21 @@
 \newcommand\BibTeX{{\rmfamily B\kern-.05em \textsc{i\kern-.025em b}\kern-.08em
 T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 
-\def\volumeyear{2013}
+%\def\volumeyear{2013}
 
 \begin{document}
 
-\runningheads{Sundar~et~al.}{High-order Geometric Multigrid}
+\titlerunning{Sundar~et~al.}{High-order Geometric Multigrid}
 
 \title{Comparison of Geometric Multigrid Algorithms for High-order Finite Element Discretizations}
 
-\author{Hari Sundar\corrauth, Georg Stadler, Omar Ghattas and George Biros}
+\author{Hari Sundar, Georg Stadler, Omar Ghattas and George Biros}
 
-\address{Institute for Computational Engineering \& Sciences, University of Texas, Austin, TX 78712}
+\institute{Institute for Computational Engineering \& Sciences, The
+  University of Texas at Austin, Austin, TX}
 
-\corraddr{\texttt{hari@ices.utexas.edu}}
+%\corraddr{\texttt{hari@ices.utexas.edu}}
+\maketitle
 
 \begin{abstract}
 \input {homg_abstract.tex}
@@ -47,7 +51,6 @@ T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 
 \keywords{geometric multigrid, high-order finite elements, p-multigrid}
 
-\maketitle
 
 
 \section{Introduction}
@@ -155,7 +158,7 @@ as solvers, or as preconditioners within Krylov methods.
 
 \begin{figure}
 		% illustration for p-multigrid
-		\begin{tikzpicture}
+		\begin{tikzpicture}[scale=0.85]
 		% homg
 		\draw (-5,4) grid +(4,1);
 		\foreach \e in {-5,...,-2}
