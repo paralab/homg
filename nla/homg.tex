@@ -54,18 +54,19 @@ T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 
 This paper presents a systematic comparision of geometric multigrid
 algorithms for the solution of systems arising from high-order (we
-target polynomial orders up to 8) discretizations of elliptic partial
+target polynomial orders up to XX) discretizations of elliptic partial
 differential equations. Our particular interest is to compare the
-efficiency of different high-order multigrid methods for large-scale,
-complex-geometry problems with varying coefficients and the
-implementation of these methods on parallel high performance computing
-platforms. While we use moderate size model problems for the
-comparisons in this paper, we discuss our findings having large-scale
-parallel issues in mind. For instance,
-we discuss (1) matrix-free methods, i.e., methods that do not require
-assembled finite element matrices, (2) methods that can be
-parallelized on shared or distributed memory architectures, and (3)
-cache-efficient methods with dominantly local memory access.
+efficiency of different high-order multigrid methods for problems with
+varying coefficients and complex geometry.
+
+While we use moderate size model problems for the comparisons in this
+paper, we also discuss our findings with regard to parallel
+implementations on high performance computing platforms.  In
+particular, we discuss (1) matrix-free methods, i.e., methods that do
+not require assembled finite element matrices, and (2) their
+parallelization on shared or distributed memory architectures.
+% and (3)
+% cache-efficient methods with dominantly local memory access.
 
 High order spatial discretizations can have significant advantages
 over low order methods, especially when the solution is smooth and
@@ -77,14 +78,15 @@ true if matrix-free methods are used, i.e., system matrices are never
 assembled, but their application on vectors is implemented through
 elemental loops.  Besides the loss of sparsity, another challenge in
 high-order discretizations is due to the fact that the discretization
-matrices loose structural properties such as the M-matrix property
-that allows to prove convergence of iterative solvers such as the
+matrices loose structural properties such as the M-matrix property,
+which allows to prove convergence of iterative solvers such as the
 Jacobi or Gauss-Seidel method.
 
 \noindent
 \gsnote{Needs a literature review.}\\
 \gsnote{Unify notion of mesh/grid etc}\\
 \gsnote{Unify use of high order vs.\ higher order}\\
+
 Although there are examples of using Algebraic Multigrid directly on
 operators resulting from higher-order discretizations, limited work
 has been done on using geometric multigrid with higher-order
@@ -163,6 +165,7 @@ compared to their low order counterparts; For instance, higher-order
 discretizations of scalar elliptic operators are usually not
 M-matrices, which is a useful property to prove the convergence of
 smoothers such as Jacobi of Gauss-Seidel.
+
 
 \begin{figure}
 		% illustration for p-multigrid
