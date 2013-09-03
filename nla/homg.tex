@@ -46,7 +46,26 @@ T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 \maketitle
 
 \begin{abstract}
-\input {homg_abstract.tex}
+We are interested in asymptotically
+optimal---$\mathcal{O}(N)$---complexity solvers for approximating the
+solution of elliptic partial differential equations (PDEs), where $N$
+is the number of unknowns.  Multigrid is such a solver. In practice
+however, multigrid performs best for low-order uniform discretizations
+with smooth coefficients.
+%
+Our goal is to compare different geometric multigrid approaches for
+solving systems arising from higher-order discretizations of
+variable-coefficient elliptic partial differential equations on
+arbitrary geometries. High-order discretizations offer several
+advantages over low-order discretizations. Besides the faster
+convergence per unknown for sufficiently smooth problems, high-order
+discretizations can often make better use of modern hardware due to
+their locality, resulting in improved efficiency of the calculations.
+%  According to standard isoparametric polynomial
+%approximation theory, by using a finite element basis of at least
+%degree $p$, we can achieve very fast $\mathcal{O}(N^{-(p+1)})$
+%convergence for sufficiently smooth problems while improving the
+%locality and thus the CPU efficiency of the calculations.
 \end{abstract}
 
 \keywords{geometric multigrid, high-order finite elements, p-multigrid}
@@ -57,7 +76,7 @@ T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 
 This paper presents a systematic comparision of geometric multigrid
 algorithms for the solution of systems arising from high-order (we
-target polynomial orders up to XX) discretizations of elliptic partial
+target polynomial orders up to 16) discretizations of elliptic partial
 differential equations. Our particular interest is to compare the
 efficiency of different high-order multigrid methods for problems with
 varying coefficients and complex geometry.
@@ -89,6 +108,18 @@ Jacobi or Gauss-Seidel method.
 \gsnote{Needs a literature review.}\\
 \gsnote{Unify notion of mesh/grid etc}\\
 \gsnote{Unify use of high order vs.\ higher order}\\
+\gsnote{We use hexas, motivated from spectral methods. Main
+  advantage is tensorized basis functions (and, potential octree adaptivity)}\\
+\gsnote{ High-order maps better to current architectures}
+
+
+For three-dimensional hexahedral mesh finite element discretizations
+with polynomial degree $p$, element matrices are of size
+$n=(p+1)^3$. The naive assembly and application of these elemental
+matrices requires $\mathcal O(p^9)$ operatrions, but exploiting the
+tensor structure of the basis functions allows to reduce this to
+$\mathcal O(p^7)$ operations.
+
 
 Although there are examples of using Algebraic Multigrid directly on
 operators resulting from higher-order discretizations, limited work
@@ -116,14 +147,6 @@ discretizations on arbitrary geometries using highly adapted meshes.
 
 %\section{Meshing, High-order FEM}
 
-\gsnote{Section should contain:
-\begin{itemize}
-\item We prefer hexahedra, motivated from spectral methods. Main
-  advantage is tensorized basis functions (and, octree adaptivity)
-\item High-order maps better to current architectures (could go into
-  intro as well)
-\end{itemize}
-}
 
 %Our method is designed for meshes that are built from an unstructured
 %hexahedral macro mesh, in which each macro element is adaptively
@@ -138,13 +161,6 @@ discretizations on arbitrary geometries using highly adapted meshes.
 %demonstrate high parallel scalability. Here we explore various
 %approaches for extending our geometric multigrid solver to support
 %higher-order discretizations.
-
-For three-dimensional hexahedral mesh finite element discretizations
-with polynomial degree $p$, element matrices are of size
-$n=(p+1)^3$. The naive assembly and application of these elemental
-matrices requires $\mathcal O(p^9)$ operatrions, but exploiting the
-tensor structure of the basis functions allows to reduce this to
-$\mathcal O(p^7)$ operations.
 
 
 \section{Approaches for High-order Multigrid}
