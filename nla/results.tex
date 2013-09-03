@@ -1,7 +1,19 @@
 
-\subsection{Meshes}
+\subsection{Test problems}
 
-Describe meshes and material properties used for testing.
+In this section we present results for the Poisson problem with
+spatially varying coefficient $\mu$ on two and three-dimensional
+domains $\Omega$ with boundary $\partial \Omega$, on which the
+solution satisfies a homogeneous Dirichlet boundary condition:
+\begin{equation}\label{eq:Laplace}
+  \begin{aligned}
+    -\nabla\cdot\left(\mu(x)\nabla u(x)\right) &= f(x) \quad { for } x\in \Omega,\\
+    \quad u(x)& = 0  \mbox{ for } x\in \partial\Omega.
+  \end{aligned}
+\end{equation}
+
+
+%Describe meshes and material properties used for testing.
 
 \begin{figure}
 	\includegraphics[width=0.48\textwidth]{figs/box}
@@ -16,8 +28,6 @@ Describe meshes and material properties used for testing.
 \end{figure}
 
 
-\subsection{Smoothers}
-
 % \begin{figure}
 % 	\includegraphics[width=0.45\textwidth]{figs/smoothers-order4}
 % 	\includegraphics[width=0.45\textwidth]{figs/vcycle-order4}
@@ -26,7 +36,6 @@ Describe meshes and material properties used for testing.
 
 \begin{figure}
 	\centering
-	
 	\begin{subfigure}[b]{0.45\textwidth}
 		\input{tikz/smoothers-order1.tikz}
 		\caption{$p=1$, smoothing}
@@ -56,7 +65,14 @@ Describe meshes and material properties used for testing.
 	\caption{\label{fig:smoothers2} The smoothing properties of the smoothers.}
 \end{figure}
 
-\subsection{Comparisons}
+\subsection{Results for test problems}
+
+The SSOR smoother is based on a
+lexicographic order of the unknowns.  \gsnote{Hari, do you think it is
+  worth trying SSOR with a different node ordering to make it more
+  red-black-like? We could simple reorder the matrix as we do for the
+  low-order preconditioner.}
+
 
 \begin{table}
   \caption{\label{tab:box} Number of CG iterations/v-cycles for

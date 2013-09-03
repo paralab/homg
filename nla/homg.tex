@@ -12,7 +12,7 @@
 \usepackage{pgfplots}
 \usepackage{caption,subcaption}
 % \usetkzobj{all} 
-\usepackage{amsmath}
+\usepackage{amsmath,amsfonts,amssymb}
 
 \definecolor{utorange}{RGB}{203,96,21}
 \definecolor{utblack}{RGB}{99,102,106}
@@ -24,6 +24,7 @@
 
 \newcommand{\todo}[1]{\textcolor{red}{\bf #1}}
 \newcommand{\gsnote}[1]{\textcolor{blue}{GS: #1}}
+\newcommand{\bs}[1]{\ensuremath{\boldsymbol #1}}
 
 
 \newcommand\BibTeX{{\rmfamily B\kern-.05em \textsc{i\kern-.025em b}\kern-.08em
@@ -33,7 +34,7 @@ T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 
 \begin{document}
 
-\titlerunning{High-order Geometric Multigrid Methods}
+\titlerunning{Comparison of high-order geometric multigrid methods}
 
 \title{Comparison of Geometric Multigrid Algorithms for High-order Finite Element Discretizations}
 
@@ -382,7 +383,7 @@ at nonconforming faces.
 %via discretizations on unstructured meshes.
 
 
-
+% **********************************************************
 \section{Smoothers}
 Here, we summarize the smoothers used in our numerical experiments, in
 which we restrict ourselves to the point smoothers summarized in
@@ -409,7 +410,36 @@ implement~\cite{AdamsBrezinaHuEtAl03}. However, the acceleration of
 Jacobi smoothing with Chebyshev polynomials requires estimation of the
 maximum eigenvalues of the system matrix, which has to be done in a
 setup step using, for instance, a power method.
-
+\begin{figure}
+	\centering
+	\begin{subfigure}[b]{0.49\textwidth}
+		\input{tikz/smoothers-order1.tikz}
+		\caption{$p=1$, smoothing}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.49\textwidth}
+		\input{tikz/vcycle-order1.tikz}
+		\caption{$p=1$, single v-cycle}
+	\end{subfigure}
+	\\
+	\begin{subfigure}[b]{0.49\textwidth}
+		\input{tikz/smoothers-order2.tikz}
+		\caption{$p=2$, smoothing}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.49\textwidth}
+		\input{tikz/vcycle-order2.tikz}
+		\caption{$p=2$, single v-cycle}
+	\end{subfigure}
+	\\
+	\begin{subfigure}[b]{0.49\textwidth}
+		\input{tikz/smoothers-order4.tikz}
+		\caption{$p=4$, smoothing}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.49\textwidth}
+		\input{tikz/vcycle-order4.tikz}
+		\caption{$p=4$, single v-cycle}
+	\end{subfigure}
+	\caption{\label{fig:smoothers2} The smoothing properties of the smoothers.}
+\end{figure}
 
 
 
@@ -480,9 +510,53 @@ matrix-vector operations.
 \end{itemize}
 
 
+% **************************************************
+% **************************************************
+\section{Numerical results}
+We first introduce our test problems (Section~\ref{subsec:tests}), and
+then, in Section~\ref{subsec:results}, present a comprehensive
+comparison of the performance of the multigrid variants discussed
+in this paper for these test problems.
 
-\section{Evaluation}
+\subsection{Description of test problems}\label{subsec:tests}
 
+Our numerical tests are for the solution of the Poisson problem with
+homogeneous Dirichlet boundary conditions on a domain
+$\Omega\subset\mathbb R^d$ ($d=2$ or $d=3$), with boundary $\partial
+\Omega$, i.e., for the solution $u(\bs x)$ of:
+\begin{equation}\label{eq:Poisson}
+  \begin{aligned}
+    -\nabla\cdot\left(\mu(\bs x)\nabla u(\bs x)\right) &= f(\bs x) \quad &&\text{ for } \bs x\in \Omega,\\
+    \quad u(\bs x)& = 0  \quad &&\text{ for } \bs x\in \partial\Omega.
+  \end{aligned}
+\end{equation}
+Here, $\mu(\bs x)\ge \mu_0>0$ is a spatially varying coefficient that
+is bounded away from zero, and $f(x)$ is a given right hand side. We
+discretize \eqref{eq:Poisson} with hexahedral finite elements with
+different polynomial orders, and solve the resulting discrete system
+using the multigrid variants discussed in this paper. The two and
+three dimensional domains $\Omega$ used in our experiments can be seen
+in Figures~\ref{fig:mesh2d} and \ref{fig:mesh3d}, respectively.
+
+\begin{figure}
+	\includegraphics[width=0.48\textwidth]{figs/box}
+	\includegraphics[width=0.48\textwidth]{figs/fan}
+	\caption{\label{fig:mesh2d} The two dimensional meshes used in
+          our tests. The color corresponds to the value of the
+          coefficient $\mu(\bs x)$.}
+\end{figure}
+\begin{figure}
+	\includegraphics[width=0.48\textwidth]{figs/box3a}
+	\includegraphics[width=0.48\textwidth]{figs/fan3a}
+	\caption{\label{fig:mesh3d} The three dimensional meshes used
+          in our tests. The color corresponds to the value of the
+          coefficient $\mu(\bs x)$.}
+\end{figure}
+
+
+
+
+\subsection{Results for test problems}\label{subsec:results}
 
 The SSOR smoother is based on a
 lexicographic order of the unknowns.  \gsnote{Hari, do you think it is
@@ -491,20 +565,153 @@ lexicographic order of the unknowns.  \gsnote{Hari, do you think it is
   low-order preconditioner.}
 
 
+\begin{table}
+  \caption{\label{tab:box} Number of CG iterations/v-cycles for
+    different orders to converge to a relative tolerance of $10^{-8}$
+    on a two-dimensional unit square with constant coefficient
+    $\mu\equiv 1$. A total of 3 grids were used, the finest grid was
+    $32\times 32$, and the coarsest was $8\times 8$ \todo{still
+      true?}. For orders $2,4$, and $8$, we also evaluated the option
+    of first coarsening in $p$ as $p_{coarse} = p_{fine}/2$, till
+    $p=1$, and then coarsen in $h$. The coarsest grid in this case is
+    a $8\times 8$ grid with $p=1$. The number of CG
+    iterations/v-cycles for this case is given in the $p$ column.}
+  \centering
+  \begin{tabular}{|r|c|c|c|c|c|c|c|c|c|c|c|c|c|c|} 
+    \hline
+    & \multicolumn{6}{c|}{Multigrid} & \multicolumn{6}{c|}{MG pCG} & \multicolumn{2}{r|}{linearized} \\
+    \cline{2-13}
+    \!\!\! order \!\!\!\! &  \multicolumn{2}{c|}{\!\scriptsize  Jacobi(3)\!} &  \multicolumn{2}{c|}{\!\scriptsize Cheb(3)\!} & \multicolumn{2}{c|}{\!\scriptsize  SSOR(2)\!} & \multicolumn{2}{c|}{\!\scriptsize Jacobi(3)\!} &  \multicolumn{2}{c|}{\!\scriptsize Cheb(3)\!} & \multicolumn{2}{c|}{\!\scriptsize SSOR(2)\!} & \multicolumn{2}{r|}{pCG}\\
+\hline
+ & $h$ & $p$ & $h$ & $p$& $h$ & $p$& $h$ & $p$& $h$ & $p$& $h$ & $p$& GLL & unif.\\
+ \cline{2-15}
+1 & 7 & & 5 & & 4 & & 6 & & 4 & & 4 & & 1 & 1  \\
+2 & 10 & 13 & 5 & 6 & 4 & 5 & 7 & 7 & 4 & 5 & 4 & 4 & 16 & 16 \\
+3 & 9 & & 6 & & 4 & & 7 & & 5 & & 4 & & 18 & 19  \\
+4 & 10 & 19 & 6 & 7 & 4 & 5 & 8 & 8 & 5 & 6 & 4 & 4 & 20 & 23 \\
+5 & 12 & & 8 & & 5 & & 9 & & 6 & & 4 & & 22 & 26  \\
+6 & 12 & & 9 & & 5 & & 9 & & 6 & & 4 & & 25 & 31  \\
+7 & 16 & & 12 & & 6 & & 10 & & 8 & & 5 & & 26 & 36  \\
+8 & 17 & 29 & 13 & 11 & 7 & 6 & 10 & 11 & 8 & 8 & 5 & 5 & 28 & 42 \\
+16 & 40 & 49 & 33 & 27 & 13 & 11 & 16 & 17 & 13 & 13 & 8 & 8 & 41 & 88\\
+\hline
+  \end{tabular}
+\end{table}
 
-Present results here and analyze based on performance model.
 
 
-\input{results.tex}
+
+\begin{table}
+  \caption{\label{tab:fan} \todo{New} Number of CG iterations/v-cycles to converge to a relative tolerance of $10^{-8}$ for $h$-Multigrid applied to high-order operators on a fan domain. A total of 3 grids were used, the finest grid was $32\times 32$, and the coarsest was $8\times 8$. For orders $2,4$, and $8$, we also evaluated the option of first coarsening in $p$ as $p_{coarse} = p_{fine}/2$, till $p=1$, and then coarsen in $h$. The coarsest grid in this case is a $8\times 8$ grid with $p=1$. The number of CG iterations/v-cycles for this case is given in the $p$ column.}
+		\centering
+    \begin{tabular}{|l|c|c|c|c|c|c|c|c|c|c|c|c|r|} 
+\hline
+		 & \multicolumn{6}{c|}{Multigrid} & \multicolumn{6}{c|}{MG pCG} &          linearized \\
+		\cline{2-13}
+		order &  \multicolumn{2}{c|}{\scriptsize  Jacobi(3)} &  \multicolumn{2}{c|}{\scriptsize Chebyshev(3)} & \multicolumn{2}{c|}{\scriptsize  SSOR(2)} & \multicolumn{2}{c|}{\scriptsize Jacobi(3)} &  \multicolumn{2}{c|}{\scriptsize Chebyshev(3)} & \multicolumn{2}{c|}{\scriptsize SSOR(2)} & pCG\\
+				 \hline
+				  & $h$ & $p$ & $h$ & $p$& $h$ & $p$& $h$ & $p$& $h$ & $p$& $h$ & $p$& \\
+				  \cline{2-13}
+          1 & 6  & & 8  & & 4 & & 5  & & 6  & & 4 & & 4 \\
+          2 & 8  & & 22 & & 4 & & 6  & & 9  & & 4 & &   \\
+          3 & 10 & & 74 & & 5 & & 7  & & 11 & & 4 & &   \\
+          4 & 11 & & -  & & 5 & & 8  & & 12 & & 4 & &   \\
+          5 & 14 & & -  & & 6 & & 9  & & 15 & & 5 & &   \\ 
+          6 & 16 & & -  & & 6 & & 9  & & 16 & & 5 & &   \\
+          7 & 21 & & -  & & 8 & & 10 & & -  & & 5 & &   \\
+          8 & 22 & & -  & & 8 & & 11 & & -  & & 6 & &   \\
+          16 & 53 & & - & & 16 & & 17 & & - & & 8 & &  \\
+\hline
+	  \end{tabular}
+\end{table}
+
+
+
+%% anisotropy - stretched fan
+\begin{table}
+  \caption{\label{tab:fan-aniso} Number of CG iterations/v-cycles to converge to a relative tolerance of $10^{-8}$ for $h$-Multigrid applied to high-order operators on a stretched fan domain. A total of 3 grids were used, the finest grid was $48\times 16$, and the coarsest was $12\times 4$. For orders $2,4$, and $8$, we also evaluated the option of first coarsening in $p$ as $p_{coarse} = p_{fine}/2$, till $p=1$, and then coarsen in $h$. The coarsest grid in this case is a $12\times 4$ grid with $p=1$. The number of CG iterations/v-cycles for this case is given in the $p$ column.}
+		\centering
+    \begin{tabular}{|l|c|c|c|c|c|c|c|c|c|c|c|c|r|} 
+\hline
+		        & \multicolumn{6}{c|}{Multigrid} & \multicolumn{6}{c|}{MG pCG} &          linearized \\
+												 \cline{2-13}
+					order &  \multicolumn{2}{c|}{\scriptsize  Jacobi(3)} &  \multicolumn{2}{c|}{\scriptsize Chebyshev(3)} & \multicolumn{2}{c|}{\scriptsize  SSOR(2)} & \multicolumn{2}{c|}{\scriptsize Jacobi(3)} &  \multicolumn{2}{c|}{\scriptsize Chebyshev(3)} & \multicolumn{2}{c|}{\scriptsize SSOR(2)} & pCG\\
+		\hline
+		 & $h$ & $p$ & $h$ & $p$& $h$ & $p$& $h$ & $p$& $h$ & $p$& $h$ & $p$& \\
+		 \cline{2-13}
+ 1 &       16 &      &        21 &        &       6 &         &       9 &         &       10 &       &       5 &      & 5  \\
+ 2 &       22 &  23  &        24 &  24    &       7 &   7     &      10 &  11     &       11 &  11   &       5 &   5  & 67  \\
+ 3 &        - &      &        54 &        &       8 &         &      55 &         &       17 &       &       6 &      & 160  \\
+ 4 &        - &  -   &        97 &  92    &      14 &   13    &       - &         &       23 &  22   &       9 &   8  & 262  \\
+ 5 &        - &      &       313 &        &      22 &         &       - &         &       41 &       &      11 &      & 444  \\
+ 6 &        - &      &         - &        &      76 &         &       - &         &       73 &       &      21 &      & 654  \\
+ 7 &        - &      &         - &        &     259 &         &       - &         &      161 &       &      38 &      & 941  \\
+ 8 &        - &  -   &         - &  -     &       - &    -    &       - &         &        - & 271   &      88 &  72  & 1150  \\
+\hline
+	  \end{tabular}
+\end{table}
+
+
+
+
+%% 3D
+
+\begin{table}
+  \caption{\label{tab:box3} \todo{New} Number of CG iterations/v-cycles to converge to a relative tolerance of $10^{-8}$ for $h$-Multigrid applied to high-order operators on a cube domain. A total of 3 grids were used, the finest grid was $8\times 8\times 8$, and the coarsest was $2\times 2\times 2$. For orders $2,4$, and $8$, we also evaluated the option of first coarsening in $p$ as $p_{coarse} = p_{fine}/2$, till $p=1$, and then coarsen in $h$. The coarsest grid in this case is a $2\times 2\times 2$ grid with $p=1$. The number of CG iterations/v-cycles for this case is given in the $p$ column.}
+		\centering
+    \begin{tabular}{|l|c|c|c|c|c|c|c|c|c|c|c|c|r|} 
+	    \hline
+						        & \multicolumn{6}{c|}{Multigrid} & \multicolumn{6}{c|}{MG pCG} &          linearized \\
+																 \cline{2-13}
+									order &  \multicolumn{2}{c|}{\scriptsize  Jacobi(3)} &  \multicolumn{2}{c|}{\scriptsize Chebyshev(3)} & \multicolumn{2}{c|}{\scriptsize  SSOR(2)} & \multicolumn{2}{c|}{\scriptsize Jacobi(3)} &  \multicolumn{2}{c|}{\scriptsize Chebyshev(3)} & \multicolumn{2}{c|}{\scriptsize SSOR(2)} & pCG\\
+						\hline
+						 & $h$ & $p$ & $h$ & $p$& $h$ & $p$& $h$ & $p$& $h$ & $p$& $h$ & $p$& \\
+						 \cline{2-13}
+	1 & 5 & & 8 & & 3 & & 5 & & 5 & & 3 & & \\
+  2 & 7 & & 18 & & 3 & & 5 & & 9 & & 3 & & \\
+  3 & 8 & & 28 & & 4 & & 6 & & 12 & & 4 & & \\
+  4 & 9 & & 40 & & 4 & & 7 & & 15 & & 4 & & \\
+  5 & 13 & & 59 & & 5 & & 8 & & 18 & & 4 & & \\
+  6 & 14 & & 77 & & 5 & & 8 & & 20 & & 4 & & \\ 
+  7 & 18 & & 106 & & 6 & & 10 & & 24 & & 5 & & \\
+  8 & 20 & & 129 & & 7 & & 10 & & 26 & & 5 & & \\
+			\hline
+	  \end{tabular}
+\end{table}
+
+
+
+\begin{table}
+  \caption{\label{tab:fan3} \todo{New} Number of CG iterations/v-cycles to converge to a relative tolerance of $10^{-8}$ for $h$-Multigrid applied to high-order operators on a 3d fan domain. A total of 3 grids were used, the finest grid was $12\times 4\times 4$, and the coarsest was $6\times 2\times 2$.}
+		\centering
+    \begin{tabular}{|l|c|c|c|c|c|c|c|c|c|c|c|c|r|} 
+	    \hline
+						        & \multicolumn{6}{c|}{Multigrid} & \multicolumn{6}{c|}{MG pCG} &          linearized \\
+																 \cline{2-13}
+									order &  \multicolumn{2}{c|}{\scriptsize  Jacobi(3)} &  \multicolumn{2}{c|}{\scriptsize Chebyshev(3)} & \multicolumn{2}{c|}{\scriptsize  SSOR(2)} & \multicolumn{2}{c|}{\scriptsize Jacobi(3)} &  \multicolumn{2}{c|}{\scriptsize Chebyshev(3)} & \multicolumn{2}{c|}{\scriptsize SSOR(2)} & pCG\\
+						\hline
+						 & $h$ & $p$ & $h$ & $p$& $h$ & $p$& $h$ & $p$& $h$ & $p$& $h$ & $p$& \\
+						 \cline{2-13}
+						 
+  1 & 5 & & 8 & & 3 & & 4 & & 6 & & 3 & & \\
+  2 & 9 & & - & & 4 & & 6 & & - & & 3 & & \\
+  3 & 11 & & - & & 4 & & 7 & & - & & 4 & & \\
+  4 & 12 & & - & & 4 & & 8 & & - & & 4 & & \\
+  5 & 15 & & - & & 5 & & 9 & & - & & 4 & & \\
+  6 & 17 & & - & & 6 & & 10 & & - & & 5 & & \\
+  7 & 21 & & - & & 7 & & 12 & & - & & 5 & & \\
+  8 & 23 & & 350 & & 7 & & 13 & & 350 & & 5 & & \\
+			\hline
+	  \end{tabular}
+\end{table}
+
+
 
 \section{Discussion and conclusions}
 
 %Finalize and discuss ramifications.
 
 \begin{itemize}
-\item Using multigrid with Jacobi and Jacobi-based Chebyshev smoothing
-  as solver either fails to converge or converges slowly at orders
-  $p\ge 4$.
 \item Using Jacobi-based multigrid as preconditioner in the conjugate
   gradient method, the number of iterations for polynomial orders
   $p=2,3$ is similar to the number of iterations for linear elements.
