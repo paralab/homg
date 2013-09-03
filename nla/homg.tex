@@ -355,25 +355,29 @@ at nonconforming faces.
 \section{Smoothers}
 Here, we summarize the smoothers used in our numerical experiments, in
 which we restrict ourselves to the point smoothers summarized in
-Section~\ref{subsec:ptsmoothers}. We briefly comment on Schwarz-type
-smoothers in Section~\ref{subsec:schwarz}.
+Section~\ref{subsec:ptsmoothers}. For completeness of the
+presentation, we comment on Schwarz-type smoothers in
+Section~\ref{subsec:schwarz}.
 
 
 \subsection{Point smoothers}\label{subsec:ptsmoothers}
 In our numerical tests, we experiment with the Jacobi and the
 symmetric successive over relaxation (SSOR) smoothers
 (see~\cite{TrottenbergOosterleeSchuller01}), as well as with a
-Chebyshev-accelerated Jacobi smoother~\cite{....}. These smoothers
-require the diagonal of the system matrix, which has to be precomputed
-in the setup if a the system matrices are not assembled. The SSOR
-smoother is based on a lexicographic order or the unknowns.
-\gsnote{Hari, do you think it is worth trying SSOR with a different
-  node ordering to make it more red-black-like? We could simple
-  reorder the matrix as we do for the low-order preconditioner.}  Note
-that the parallelization of Gauss-Seidel smoothers (such as SSOR)
-requires coloring of unknowns at parallel boundaries, and, compared to
-Jacobi smoothing, more complex communication in a distributed memory
-implementation.
+Chebyshev-accelerated Jacobi smoother~\cite{....}. All of these
+smoothers require the diagonal of the system matrix; if matrices are
+not assembled (i.e., in a matrix-free approach), these diagonal
+entries must be precomputed in a setup step.  Note that the
+parallelization of Gauss-Seidel smoothers (such as SSOR) requires
+coloring of unknowns at parallel boundaries, and, compared to Jacobi
+smoothing, more complex communication in a distributed memory
+implementation. In parallel, the Chebyshev-accelerated Jacobi method
+is an attractive alternative to SSOR; it can significantly improve
+over Jacobi smoothing, while being as simple to
+implement~\cite{AdamsBrezinaHuEtAl03}. However, the acceleration of
+Jacobi smoothing with Chebyshev polynomials requires estimation of the
+maximum eigenvalues of the system matrix, which has to be done in a
+setup step using, for instance, a power method.
 
 
 
@@ -447,11 +451,19 @@ matrix-vector operations.
 
 
 
-
-
 \section{Evaluation}
 
+
+The SSOR smoother is based on a
+lexicographic order of the unknowns.  \gsnote{Hari, do you think it is
+  worth trying SSOR with a different node ordering to make it more
+  red-black-like? We could simple reorder the matrix as we do for the
+  low-order preconditioner.}
+
+
+
 Present results here and analyze based on performance model.
+
 
 \input{results.tex}
 
