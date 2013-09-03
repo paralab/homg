@@ -13,6 +13,7 @@
 \usepackage{caption,subcaption}
 % \usetkzobj{all} 
 \usepackage{amsmath,amsfonts,amssymb}
+\usepackage{cite}
 
 \definecolor{utorange}{RGB}{203,96,21}
 \definecolor{utblack}{RGB}{99,102,106}
@@ -69,64 +70,74 @@ their locality, resulting in improved efficiency of the calculations.
 %locality and thus the CPU efficiency of the calculations.
 \end{abstract}
 
-\keywords{geometric multigrid, high order finite elements, p-multigrid}
+\keywords{geometric multigrid, high-order finite elements, spectral method, $p$-multigrid}
 
 
 
 \section{Introduction}
 
-This paper presents a systematic comparision of geometric multigrid
-algorithms for the solution of systems arising from high order (we
+This paper presents a systematic comparison of geometric multigrid
+algorithms for the solution of systems arising from high-order (we
 target polynomial orders up to 16) discretizations of elliptic partial
 differential equations. Our particular interest is to compare the
-efficiency of different high order multigrid methods for problems with
+efficiency of different high-order multigrid methods for problems with
 varying coefficients and complex geometry.
-
-While we use moderate size model problems for the comparisons in this
-paper, we also discuss our findings with regard to parallel
-implementations on high performance computing platforms.  In
-particular, we discuss (1) matrix-free methods, i.e., methods that do
-not require assembled finite element matrices, and (2) their
-parallelization on shared or distributed memory architectures.
-% and (3)
-% cache-efficient methods with dominantly local memory access.
-
-High order spatial discretizations can have significant advantages
-over low order methods, especially when the solution is smooth and
+% High-order discretization
+High-order spatial discretizations can have significant advantages
+over low-order methods, especially when the solution is smooth and
 high accuracy is desired. However, the sparsity of finite element (or
 finite difference) operators decreases as the polynomial approximation
-order increases, which makes the application of high order operators
+order increases, which makes the application of high-order operators
 to vectors computationally significantly more expensive. This is also
 true if matrix-free methods are used, i.e., system matrices are never
 assembled, but their application on vectors is implemented through
 elemental loops.  Besides the loss of sparsity, another challenge in
-high order discretizations is due to the fact that the discretization
+high-order discretizations is due to the fact that the discretization
 matrices loose structural properties such as the M-matrix property,
 which allows to prove convergence of iterative solvers such as the
 Jacobi or Gauss-Seidel method.
 
-\noindent
-\gsnote{Needs a literature review.}\\
+\gsnote{nodal spectral elements}
 
+While we use moderate size model problems for the comparisons in this
+paper, we also discuss our findings with regard to parallel
+implementations on high performance computing platforms.  In
+particular, we discuss matrix-free methods, i.e., methods that do not
+require assembled finite element matrices, which becomes critical for
+high-order methods. Moreover, we discuss parallel aspects relevant for
+implementations on shared or distributed memory architectures.
+
+
+\noindent
+\gsnote{literature review.}
 \begin{itemize}
 
 \item Large-scale simulations, target:
 \cite{SundarBirosBursteddeEtAl12}
 
-\item Direct application of AMG to high order systems:
+\item Direct application of AMG to high-order systems:
 \cite{HeysManteuffelMcCormickEtAl05}
 
-\item Low-order preconditioning of high order systems:
-\cite{Brown10,Kim07,DevilleMund90,HeysManteuffelMcCormickEtAl05}.
+\item Low-order preconditioning of high-order systems:
+\cite{Brown10,Kim07,DevilleMund90,HeysManteuffelMcCormickEtAl05,Olson07}.
+
+\item p-multigrid
+\cite{HelenbrookMavriplisAtkins03}
+
+\item Foundations of spectral element multigrid
+\cite{RonquistPatera87,MadayMunoz88}
+
+\item Look into:
+\cite{CanutoGervasioQuarteroni10,DevilleMund90}
 
 \end{itemize}
 
 \noindent
 %\gsnote{Unify notion of mesh/grid etc}\\
-% \gsnote{Unify use of high order vs.\ higher order}\\
+% \gsnote{Unify use of high-order vs.\ higher order}\\
 \gsnote{We use hexas, motivated from spectral methods. Main
   advantage is tensorized basis functions (and, potential octree adaptivity)}\\
-\gsnote{High order discretizations map better to current architectures}
+\gsnote{high-order discretizations map better to current architectures}
 
 
 For three-dimensional hexahedral mesh finite element discretizations
@@ -138,10 +149,10 @@ $\mathcal O(p^7)$ operations.
 
 
 Although there are examples of using Algebraic Multigrid directly on
-operators resulting from high order discretizations, limited work
-has been done on using geometric multigrid with high order
+operators resulting from high-order discretizations, limited work
+has been done on using geometric multigrid with high-order
 discretizations. To the best of our knowledge, no prior work on using
-geometric multigrid for solving systems arising from high order
+geometric multigrid for solving systems arising from high-order
 discretizations on arbitrary geometries using highly adapted meshes.
 
 
@@ -179,12 +190,12 @@ discretizations on arbitrary geometries using highly adapted meshes.
 %higher-order discretizations.
 
 
-\section{Approaches for high order multigrid}
+\section{Approaches for high-order multigrid}
 \label{sec:approaches}
 % talk about the 4 main approaches and prior work.
 
 In this section, we summarize different approaches to geometric
-multigrid for high order finite element discretizations; for an
+multigrid for high-order finite element discretizations; for an
 overview see Figure~\ref{fig:approaches}. These methods can either be
 directly used as solvers, or as preconditioners within a Krylov method.
 
@@ -288,23 +299,23 @@ directly used as solvers, or as preconditioners within a Krylov method.
 			% \node at (2, -0.2) {\tiny $p=1$ collocated with $p=4$};
 		\end{tikzpicture}
 		\caption{\label{fig:approaches} Different approaches
-                  for high order multigrid: High order $h$-multigrid
+                  for high-order multigrid: high-order $h$-multigrid
                   (left), $p$-multigrid (middle) and low-order
                   preconditioned multigrid.}
 \end{figure}
 
 \subsection{$h$-multigrid}\label{subsec:h}
-A direct approach to high order multigrid is to use high order
-restriction and prolongation operators, and use the high order
+A direct approach to high-order multigrid is to use high-order
+restriction and prolongation operators, and use the high-order
 discretization of the operator for the residual computation on each
 multigrid level.  A potential difficulty in this approach is that it
-requires smoothers for matrices arising from high order
+requires smoothers for matrices arising from high-order
 discretization, which usually have less favorable properties compared
-to their low order counterparts; For instance, high order
+to their low order counterparts; For instance, high-order
 discretizations of scalar elliptic operators are usually not
 M-matrices, which is a useful property to prove the convergence of
 smoothers such as Jacobi of Gauss-Seidel.  Due to the decreased
-sparsity of high order discretized systems, the efficient computation
+sparsity of high-order discretized systems, the efficient computation
 of the residual can be a challenge. As a remedy, one can use
 matrix-free methods which do not require to assemble system matrices
 but rely on element-local computations. The performance of these
@@ -314,7 +325,7 @@ see e.g.~\cite{DevilleFischerMund02}.
 
 
 \subsection{$p$-multigrid}\label{subsec:p}
-In the $p$-multigrid approach to high order multigrid, one (initially)
+In the $p$-multigrid approach to high-order multigrid, one (initially)
 does not coarsen the mesh geometrically, but coarsens the system by
 reducing the polynomial order. Starting from an order-$p$ polynomial
 basis (for simplicity, we assume here that $p$ is a power of 2), the
@@ -323,30 +334,30 @@ followed by geometric coarsening of the $p=1$ grid (i.e., the usual
 low order geometric multigrid). Decreasing the polynomial order is an
 element-local operation and is particularly simple for discretizations
 with nonconforming meshes. \gsnote{Is that actually true?}. As for
-high order $h$-multigrid, devising smoothers is a challenge for
+high-order $h$-multigrid, devising smoothers is a challenge for
 $p$-multigrid.  Moreover, one often finds dependence of the
 convergence factor on the order of the polynomial basis. \gsnote{We
   need a citation here.}
 
 \subsection{Defect correction using lower-order operator}\label{subsec:low}
 In a defect correction approach (see
-\cite{TrottenbergOosterleeSchuller01}), the high order defect is
+\cite{TrottenbergOosterleeSchuller01}), the high-order defect is
 iteratively corrected using a low order operator obtained by
-overlaying the high order nodes with a low order (typically linear)
+overlaying the high-order nodes with a low order (typically linear)
 finite element mesh.  This construction of a low-order preconditioner
-based on the nodes of the high order discretization is also used for
+based on the nodes of the high-order discretization is also used for
 instance
 in~\cite{Brown10,Kim07,DevilleMund90,HeysManteuffelMcCormickEtAl05}.
 The resulting method is nearly independent of $p$, but this low-order
 preconditioning is not work optimal and the convergence factors can be
-lower than when multigrid is applied directly to the high order
+lower than when multigrid is applied directly to the high-order
 operator. \gsnote{Reference or remove statement.} Defect correction
-only requires computation of the residual for the high order
+only requires computation of the residual for the high-order
 discretized operator, while smoothing is based on the low order
 discretized operator, which is sparse and thus faster to apply.
 %
 Unfortunately, due to the non evenly spaced node spacing inherited
-from the high order discretization, the solution of the low order
+from the high-order discretization, the solution of the low order
 system is not straightforward. One possible approach to solve the low
 order system is to rely on algebraic multigrid,
 e.g.,~\cite{Brown10,HeysManteuffelMcCormickEtAl05}. Alternatively, a
@@ -356,7 +367,7 @@ experiment with the latter option in our numerical examples.
 
 Note that, for nonconforming meshes, constructing the low order
 operator can be a technical task at edges and faces of different size;
-while the basis functions for the high order operators can be made
+while the basis functions for the high-order operators can be made
 continuous through the use of algebraic constraints at nonconforming
 faces, the corresponding low order discretization has discontinuities
 at nonconforming faces.
@@ -444,7 +455,7 @@ setup step using, for instance, a power method.
 
 
 \subsection{Schwarz-based methods}\label{subsec:schwarz}
-An alternative smoothing approach for high order discretizations is
+An alternative smoothing approach for high-order discretizations is
 based on local block solves.  The main challenge with these approaches
 is that they require solving dense local systems.  This is either done
 by using direct methods or approximations that allow for a fast
@@ -465,7 +476,7 @@ dominate the overall computation. Denoting the number of unknowns on
 the finest level by $N$, the cost for a matrix-vector product is
 $Ng_p$, where $g_p>0$ is the cost per unknown for the application of
 an operator originating from a discretization with polynomial order
-$p$. Since high order discretizations result in less sparse operators,
+$p$. Since high-order discretizations result in less sparse operators,
 we have $g_1\le g_2\le \ldots$. The actual value of $g_p$ depends
 strongly on the implementation and on the system architecture. To
 illustrate this, consider an elemental matrix for a hexahedral mesh in
@@ -474,7 +485,7 @@ three dimensions, which is dense and of size $(p+1)^3\times
 O((p+1)^9)$ operations; for tensor bases, as common in spectral
 element methods, this can be reduced to $\mathcal O((p+1)^7)$
 operations \cite{DevilleFischerMund02}. \gsnote{These numbers must be
-  for assembly, not application\ldots} In addition, high order
+  for assembly, not application\ldots} In addition, high-order
 implementations allow more memory locality, which, compared to low
 order methods, results in higher performance.
 
@@ -491,19 +502,19 @@ multiplication per smoothing step, while SSOR requires $m=2$
 matrix-vector operations.
 
 \begin{itemize}
-\item {\em High order $h$-multigrid:} On the finest grid level, the
+\item {\em high-order $h$-multigrid:} On the finest grid level, the
   residual and the smoothing steps are all based on the order $p$
   discretization. Thus, the cost based on the matrix-vector products
   on the finest multigrid level is
   $g_p(1+m(s_\text{pre}+s_\text{post}))$.
 
-\item {\em $p$-multigrid:} As for high order $h$-multigrid, an
+\item {\em $p$-multigrid:} As for high-order $h$-multigrid, an
   estimate for the computational cost on the finest level is
   $g_p(1+m(s_\text{pre}+s_\text{post}))$.
 
-\item {\em High order defect correction with linear-order operator:}
-  High order defect correction requires the computation of the
-  high order residual, but uses smoothing based on the low-order
+\item {\em high-order defect correction with linear-order operator:}
+  high-order defect correction requires the computation of the
+  high-order residual, but uses smoothing based on the low-order
   operator. Using linear elements, the computational cost on the
   finest grid level is thus
   $g_p+g_1m(s_\text{pre}+s_\text{post})$.
@@ -757,16 +768,16 @@ the discrete residual by $10^8$ for our test problems, in particular,
   $p=2,3$ is similar to the number of iterations for linear elements.
   In general, for the same number of unknowns one can expect better
   accuracy for higher polynomial order. This advantage has to be
-  contrasted with the fact that high order operators are less sparse
+  contrasted with the fact that high-order operators are less sparse
   and thus their application to vectors is more time consuming.  Using
   Jacobi-based smoothers is attractive from a parallel perspective
   since no coloring of unknowns as in SSOR is necessary.
-\item Both, high order $h$-multigrid as well as $p$-multigrid yield
+\item Both, high-order $h$-multigrid as well as $p$-multigrid yield
   significantly faster convergence in terms of the number of
   iterations than preconditioning with the low-order
   operator. Although low order operators are sparser and thus faster
   to apply, the significant larger number of iterations results in
-  larger time-to-solution, in particular since the high order operator
+  larger time-to-solution, in particular since the high-order operator
   must be used to compute the residual on the finest mesh.
 \item For problems that only require a small number of smoothing
   steps, using Chebyshev acceleration for the Jacobi smoother does not
@@ -776,8 +787,8 @@ the discrete residual by $10^8$ for our test problems, in particular,
 \end{itemize}
 
 
-\bibliographystyle{wileyj}
-\bibliography{mg,ccgo}
+\bibliographystyle{siam}
+\bibliography{ccgo}
 
 
 \end{document}
