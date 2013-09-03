@@ -537,7 +537,7 @@ different polynomial orders, and solve the resulting discrete system
 using the multigrid variants discussed in this paper. The two and
 three dimensional domains $\Omega$ used in our experiments can be seen
 in Figures~\ref{fig:mesh2d} and \ref{fig:mesh3d}, respectively.
-
+%
 \begin{figure}
 	\includegraphics[width=0.48\textwidth]{figs/box}
 	\includegraphics[width=0.48\textwidth]{figs/fan}
@@ -557,31 +557,71 @@ in Figures~\ref{fig:mesh2d} and \ref{fig:mesh3d}, respectively.
 
 
 \subsection{Results for test problems}\label{subsec:results}
+Here, we summarize our results for the test problems and present
+comprehensive comparisons of the performance of our algorithms for the
+solution of high-order discretizations of \eqref{eq:Poisson}.  The
+Tables~\ref{tab:box}\ldots present the number of multigrid v-cycles or
+of conjugate gradient (CG) iterations required to reduce the norm of
+the discrete residual by $10^8$ for our test problems, in particular,
+\begin{itemize}
+\item[$\bullet$] The first column gives the polynomial order used for the finite
+  element discretization.
+\item[$\bullet$] The columns entitled by \emph{MG as solver} report the number of
+  v-cycles needed when multigrid is used as a solver. Here,
+  \begin{itemize}
+  \item \emph{Jacobi(3)} denotes that 3 pre-smoothing and 3
+    post-smoothing steps of a pointwise Jacobi smoother are used on
+    each level.
+  \item \emph{Cheb(3)} denotes that Chebyshev-accelerated Jacobi
+    smoothing is used. Again, we use 3 pre-smoothing and 3
+    post-smoothing steps.
+  \item \emph{SSOR(2)} denotes that a symmetric successive
+    over-relaxation method is employed, where 2 pre-smoothing and 1
+    post-smoothing step are employed. Note that each SSOR smoothing
+    iteration amounts to a forward and a backward smoothing step, and
+    thus requires double the computational than Jacobi
+    smoothing.\footnote{This ignores aspects occurring in parallel
+      environments, where Gauss-Seidel smoothing---such as SSOR---can be
+      significantly more technical to implement and also requires more
+      communication in distributed memory environments.}  \gsnote{Is
+      this really a 2/1?}  The SSOR smoother is based on a
+    lexicographic ordering of the unknowns. \gsnote{use different
+      ordering too?}
+  \end{itemize}
+  Note that we present results for high-order $h$-multigrid (columns
+  with \emph{h}; see Section~\ref{subsec:h}) as well as for
+  $p$-multigrid (columns with \emph{p}; see Section~\ref{subsec:p}),
+  where we restrict ourselves to orders that are powers of 2. For
+  $p$-multigrid we first coarsen in $p$ as $p_\text{coarse} = p_\text{fine}/2$,
+  till $p=1$, and then coarsen in $h$.
+\item[$\bullet$] The columns entitled with \emph{MG with pCG} presents
+  the results obtained when multigrid is uses as preconditioner in a
+  CG algorithm. The sub-columns are as described above.
+\item[$\bullet$] The columns headed by \emph{linearized pCG} present
+  the number of CG iterations needed to solve the high-order system
+  preconditioned with the low-order operator based on the high-order
+  node points (see Section~\ref{subsec:low}). In our implementation,
+  the low-order system is solved using a direct factorization method.
+  The sub-column headed by \emph{GLL} indicates that the non-evenly
+  spaces GLL points are used in the low-order system, where
+  \emph{unif.} indicates that a uniform node spacing is used for the
+  low-order operator.
+\end{itemize}
 
-The SSOR smoother is based on a
-lexicographic order of the unknowns.  \gsnote{Hari, do you think it is
-  worth trying SSOR with a different node ordering to make it more
-  red-black-like? We could simple reorder the matrix as we do for the
-  low-order preconditioner.}
+
 
 
 \begin{table}
-  \caption{\label{tab:box} Number of CG iterations/v-cycles for
-    different orders to converge to a relative tolerance of $10^{-8}$
-    on a two-dimensional unit square with constant coefficient
-    $\mu\equiv 1$. A total of 3 grids were used, the finest grid was
-    $32\times 32$, and the coarsest was $8\times 8$ \todo{still
-      true?}. For orders $2,4$, and $8$, we also evaluated the option
-    of first coarsening in $p$ as $p_{coarse} = p_{fine}/2$, till
-    $p=1$, and then coarsen in $h$. The coarsest grid in this case is
-    a $8\times 8$ grid with $p=1$. The number of CG
-    iterations/v-cycles for this case is given in the $p$ column.}
+  \caption{\label{tab:box} Results for two-dimensional unit square
+    with constant coefficient $\mu\equiv 1$.  A total of 3 grids were
+    used, the finest grid was $32\times 32$, and the coarsest was
+    $8\times 8$ \todo{still true?}.}
   \centering
-  \begin{tabular}{|r|c|c|c|c|c|c|c|c|c|c|c|c|c|c|} 
+  \begin{tabular}{|r|c c|c c|c c||c c|c c|c c||c c|} 
     \hline
-    & \multicolumn{6}{c|}{Multigrid} & \multicolumn{6}{c|}{MG pCG} & \multicolumn{2}{r|}{linearized} \\
+    & \multicolumn{6}{c||}{MG as solver} & \multicolumn{6}{c||}{MG with pCG} & \multicolumn{2}{r|}{linearized} \\
     \cline{2-13}
-    \!\!\! order \!\!\!\! &  \multicolumn{2}{c|}{\!\scriptsize  Jacobi(3)\!} &  \multicolumn{2}{c|}{\!\scriptsize Cheb(3)\!} & \multicolumn{2}{c|}{\!\scriptsize  SSOR(2)\!} & \multicolumn{2}{c|}{\!\scriptsize Jacobi(3)\!} &  \multicolumn{2}{c|}{\!\scriptsize Cheb(3)\!} & \multicolumn{2}{c|}{\!\scriptsize SSOR(2)\!} & \multicolumn{2}{r|}{pCG}\\
+    \!\!\! order \!\!\!\! &  \multicolumn{2}{c|}{\!\scriptsize  Jacobi(3)\!} &  \multicolumn{2}{c|}{\!\scriptsize Cheb(3)\!} & \multicolumn{2}{c||}{\!\scriptsize  SSOR(2)\!} & \multicolumn{2}{c|}{\!\scriptsize Jacobi(3)\!} &  \multicolumn{2}{c|}{\!\scriptsize Cheb(3)\!} & \multicolumn{2}{c||}{\!\scriptsize SSOR(2)\!} & \multicolumn{2}{r|}{pCG}\\
 \hline
  & $h$ & $p$ & $h$ & $p$& $h$ & $p$& $h$ & $p$& $h$ & $p$& $h$ & $p$& GLL & unif.\\
  \cline{2-15}
