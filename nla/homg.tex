@@ -152,9 +152,9 @@ $\mathcal O(p^7)$ operations.
 % talk about the 4 main approaches and prior work.
 
 In this section, we summarize different approaches to geometric
-multigrid for higher-order finite element discretizations; see
-Figure~\ref{fig:approaches}. These methods can either be directly used
-as solvers, or as preconditioners within Krylov methods.
+multigrid for higher-order finite element discretizations; for an
+overview see Figure~\ref{fig:approaches}. These methods can either be
+directly used as solvers, or as preconditioners within a Krylov method.
 
 \begin{figure}
 		% illustration for p-multigrid
@@ -297,34 +297,37 @@ convergence factor on the order of the polynomial basis. \gsnote{We
   need a citation here.}
 
 \subsection{Defect correction using lower-order operator}\label{subsec:low}
-Using a defect correction approach (see
-\cite{TrottenbergOosterleeSchuller01}), the high order defect can
-iteratively be corrected using a low order operator obtained by
-overlaying the higher-order nodes with a lower-order (typically
-linear) finite element mesh.  This construction of a low-order
-preconditioner based on the nodes of the high order discretization is
-also used for instance
+In a defect correction approach (see
+\cite{TrottenbergOosterleeSchuller01}), the high order defect is
+iteratively corrected using a low order operator obtained by
+overlaying the high order nodes with a low order (typically linear)
+finite element mesh.  This construction of a low-order preconditioner
+based on the nodes of the high order discretization is also used for
+instance
 in~\cite{Brown10,Kim07,DevilleMund90,HeysManteuffelMcCormickEtAl05}.
 The resulting method is nearly independent of $p$, but this low-order
 preconditioning is not work optimal and the convergence factors can be
 lower than when multigrid is applied directly to the higher-order
-operator. \gsnote{Cite or remove statement.} Defect correction only
-requires to compute the residual for the high order discretized
-operator, while the smoothing is based on the low order discretized
-operator, which is sparse and thus much faster to apply.
+operator. \gsnote{Reference or remove statement.} Defect correction
+only requires computation of the residual for the high order
+discretized operator, while smoothing is based on the low order
+discretized operator, which is sparse and thus faster to apply.
+%
+Unfortunately, due to the non evenly spaced node spacing inherited
+from the high-order discretization, the solution of the low order
+system is not straightforward. One possible approach to solve the low
+order system is to rely on algebraic multigrid,
+e.g.,~\cite{Brown10,HeysManteuffelMcCormickEtAl05}. Alternatively, a
+geometric multigrid has to be devised that either copes with the non
+evenly spaced points or replaces them by evenly spaced points---we
+experiment with the latter option in our numerical examples.
 
-Unfortunately, due to the non uniformly node spacing inherited from
-the high-order discretization, the solution of the low order system is
-not straightforward.  Additionally, for nonconforming meshes the
-constructing the low order operator can be technical at edges and
-faces of different size; while the basis functions for the high order
-operators can be made continuous through the use of algebraic
-constraints at nonconforming faces, the corresponding low order
-discretization has discontinuities at nonconforming faces.
-
-One possible approach to solve the low order system is to rely on
-algebraic multigrid,
-e.g.,~\cite{Brown10,HeysManteuffelMcCormickEtAl05}.
+Note that, for nonconforming meshes, constructing the low order
+operator can be a technical task at edges and faces of different size;
+while the basis functions for the high order operators can be made
+continuous through the use of algebraic constraints at nonconforming
+faces, the corresponding low order discretization has discontinuities
+at nonconforming faces.
 
 
 
@@ -350,10 +353,28 @@ e.g.,~\cite{Brown10,HeysManteuffelMcCormickEtAl05}.
 
 
 \section{Smoothers}
-Here, we summarize smoothers 
+Here, we summarize the smoothers used in our numerical experiments, in
+which we restrict ourselves to the point smoothers summarized in
+Section~\ref{subsec:ptsmoothers}. We briefly comment on Schwarz-type
+smoothers in Section~\ref{subsec:schwarz}.
 
 
-\subsection{Point smoothers}
+\subsection{Point smoothers}\label{subsec:ptsmoothers}
+In our numerical tests, we experiment with the Jacobi and the
+symmetric successive over relaxation (SSOR) smoothers
+(see~\cite{TrottenbergOosterleeSchuller01}), as well as with a
+Chebyshev-accelerated Jacobi smoother~\cite{....}. These smoothers
+require the diagonal of the system matrix, which has to be precomputed
+in the setup if a the system matrices are not assembled. The SSOR
+smoother is based on a lexicographic order or the unknowns.
+\gsnote{Hari, do you think it is worth trying SSOR with a different
+  node ordering to make it more red-black-like? We could simple
+  reorder the matrix as we do for the low-order preconditioner.}  Note
+that the parallelization of Gauss-Seidel smoothers (such as SSOR)
+requires coloring of unknowns at parallel boundaries, and, compared to
+Jacobi smoothing, more complex communication in a distributed memory
+implementation.
+
 
 
 
