@@ -1,26 +1,5 @@
  
-We are interested on asymptotically
-optimal---$\mathcal{O}(N)$---complexity solvers for approximating the
-solution of elliptic partial differential equations (PDEs), where $N$
-is the number of unknowns.  Multigrid is such a solver. In practice
-however, multigrid performs best for low-order uniform discretizations
-with smooth coefficients. 
 
-Our goal is to develop a parallel geometric multigrid for solving
-systems arising from higher-order discretizations of
-variable-coefficient elliptic partial differential equations on
-arbitrary geometries using highly adapted meshes.
-High-order discretizations offer several advantages.  According to
-standard isoparametric polynomial approximation theory,
-% the approximation error in the $L_2$-norm is bounded by,
-% \[
-% \|u-u_h\|_{L_2} \le Ch^{p+1}\|u\|_{H^{p+1}(\Omega)},
-% \]   
-% where $\|\cdot\|_{H^p}$ is the standard $H^p$ Sobolev norm, $\|\cdot\|_{L_2}$ is the $L_2$-norm, $u$ is the exact solution of the PDE, and $u_h$ is the solution of the $h$-discrete problem. Therefore, 
-by using a finite element basis of at least degree $p$, we can achieve
-very fast $\mathcal{O}(N^{-(p+1)})$ convergence for sufficiently
-smooth problems while improving the locality and thus the CPU
-efficiency of the calculations.
 
  Our method is designed for meshes that are built from an unstructured
 hexahedral macro mesh, in which each macro element is adaptively
