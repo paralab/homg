@@ -187,13 +187,13 @@ end
       self.set_order(order);
       % assemble the stiffness matrix
       refel = homg.refel ( self.dim, order );
+      
       dof = prod(self.nelems*order + 1);
       ne  = prod(self.nelems);
       
       % storage for indices and values
       NP = (order+1)^self.dim;
       NPNP = NP * NP;
-      eMat = zeros(NP, NP);
       
       I = zeros(ne * NPNP, 1);
       J = zeros(ne * NPNP, 1);
@@ -763,7 +763,7 @@ end
 				% detect if its an x or y face ...
 				nxf = (self.nelems(1)+1) * self.nelems(2);
 				if (fid > nxf)
-					% y face
+					% x face
 					[i,j] = ind2sub ([self.nelems(1), self.nelems(2)+1], fid-nxf);
 					if (j == 1)
 						e1 = -1;
@@ -777,7 +777,7 @@ end
 						e2 = (j-1)*self.nelems(1) + i;
 					end
 				else
-					% x face
+					% y face
 					[i,j] = ind2sub ([self.nelems(1)+1, self.nelems(2)], fid);
 					if (i == 1)
 						e1 = -1;
@@ -798,7 +798,35 @@ end
     end
 
     function idx = get_face_node_indices(self, fid, refel)
-			% gets continuous face-node only indices 	
+			% gets continuous face-node indices for given face
+			if (self.dim == 2)
+				num_row_x = refel.N * self.nelems(1) + 1; % just the x-face nodes
+				num_row_y = (refel.N-1)*(self.nelems(1)+1)  ; % contrib from the partial y face nodes
+				
+				% detect if its an x or y face ...
+				nxf = (self.nelems(1)+1) * self.nelems(2);
+				if (fid > nxf)
+					disp('x-face');
+					[i,j] = ind2sub ([self.nelems(1), self.nelems(2)+1], fid-nxf);
+					idx_start = (j-1)*(num_row_x + num_row_y) + (i-1)*(refel.N+1) + (i == 1) - (i > self.nelems(1)) ;
+					idx = idx_start:(idx_start+refel.N);
+				else
+					disp('y-face');
+					[i,j] = ind2sub ([self.nelems(1)+1, self.nelems(2)], fid);
+					
+          idx_first = (j-1)*(num_row_x + num_row_y) + (i-1)*(refel.N+1) + (i == 1) - (i > self.nelems(1));
+          idx_last  = (  j)*(num_row_x + num_row_y) + (i-1)*(refel.N+1) + (i == 1) - (i > self.nelems(1));
+          
+					idx_start = idx_first + (self.nelems(1)-i+1)*refel.N + i;
+					idx_end   = idx_start + (self.nelems(1)+1)*(refel.N -2); %idx_last  - (self.nelems(1)-i+1) - i*refel.N ;
+					
+          idx_step  = self.nelems(1)+1;
+          
+          idx = [idx_first, idx_start:idx_step:idx_end, idx_last];
+				end
+			else
+				% implement 3D ...
+			end 	
     end
 
   end % methods
