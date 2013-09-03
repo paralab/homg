@@ -1027,7 +1027,61 @@ end
       
       K = sparse(I,J,stiff_val,dof,dof);
     end
-    
+ 
+    % functions for dG ... 
+		function nf = get_num_faces(self)
+			nf = self.dim * ( prod(self.nelems) );
+			if (self.dim == 2)
+				nf = nf + sum(self.nelems);
+			else
+				nf = nf + sum(self.nelems .* circshift(self.nelems, [1 1]) );
+			end
+		end
+		
+    function [e1, e2] = get_face_elements (self, fid)
+			% returns -1 if on boundary
+			if (self.dim == 2)
+				% detect if its an x or y face ...
+				nxf = (self.nelems(1)+1) * self.nelems(2);
+				if (fid > nxf)
+					% y face
+					[i,j] = ind2sub ([self.nelems(1), self.nelems(2)+1], fid-nxf);
+					if (j == 1)
+						e1 = -1;
+					else
+						e1 = (j-2)*(self.nelems(1)) + i;
+					end
+					
+					if (j > self.nelems(2))
+						e2 = -1;
+					else
+						e2 = (j-1)*self.nelems(1) + i;
+					end
+				else
+					% x face
+					[i,j] = ind2sub ([self.nelems(1)+1, self.nelems(2)], fid);
+					if (i == 1)
+						e1 = -1;
+					else
+						e1 = (j-1)*self.nelems(1) + i-1;
+					end
+					
+					if (i > self.nelems(1))
+						e2 = -1;
+					else
+						e2 = (j-1)*self.nelems(1) + i;
+					end
+				end
+			else
+				% work out 3D case ...
+			end
+			
+    end
+
+    function idx = get_face_node_indices(self, fid, refel)
+			% gets continuous face-node only indices 	
+    end
+
   end % methods
   
   methods(Static) 
