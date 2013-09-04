@@ -345,7 +345,7 @@ In a defect correction approach (see
 iteratively corrected using a low order operator obtained by
 overlaying the high-order nodes with a low order (typically linear)
 finite element mesh.  This construction of a low-order preconditioner
-based on the nodes of the high-order discretization is also used for
+based on the nodes of the high-order discretization is used. for
 instance
 in~\cite{Brown10,Kim07,DevilleMund90,HeysManteuffelMcCormickEtAl05}.
 The resulting method is nearly independent of $p$, but this low-order
@@ -355,15 +355,20 @@ operator. \gsnote{Reference or remove statement.} Defect correction
 only requires computation of the residual for the high-order
 discretized operator, while smoothing is based on the low order
 discretized operator, which is sparse and thus faster to apply.
-%
-Unfortunately, due to the non evenly spaced node spacing inherited
-from the high-order discretization, the solution of the low order
-system is not straightforward. One possible approach to solve the low
-order system is to rely on algebraic multigrid,
-e.g.,~\cite{Brown10,HeysManteuffelMcCormickEtAl05}. Alternatively, a
-geometric multigrid has to be devised that either copes with the non
-evenly spaced points or replaces them by evenly spaced points---we
-experiment with the latter option in our numerical examples.
+
+Due to the non evenly spaced node spacing inherited from the
+high-order discretization, the solution of the low order system is not
+straightforward. One possible approach to solve the low order system
+is to rely on algebraic multigrid,
+e.g.,~\cite{Brown10,HeysManteuffelMcCormickEtAl05}; this approach is
+particularly attractive for high-order discretizations on unstructured
+meshes, where the construction of a grid hierarchy from geometric
+coarsening can be very difficult. For structured grids such as the
+ones used for the test problems in Section~\ref{sec:numerics}, a
+geometric multigrid method can be devised that either copes with the
+non evenly spaced points (which can be challenging) or replaces them
+by evenly spaced points---we experiment with the latter option in
+Section~\ref{sec:numerics}.
 
 Note that, for nonconforming meshes, constructing the low order
 operator can be a technical task at edges and faces of different size;
@@ -523,7 +528,7 @@ matrix-vector operations.
 
 % **************************************************
 % **************************************************
-\section{Numerical results}
+\section{Numerical results}\label{sec:numerics}
 We first introduce our test problems (Section~\ref{subsec:tests}), and
 then, in Section~\ref{subsec:results}, present a comprehensive
 comparison of the performance of the multigrid variants discussed
