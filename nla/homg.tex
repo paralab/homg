@@ -559,7 +559,10 @@ comparison of the performance of the multigrid variants discussed
 in this paper for these test problems.
 
 \subsection{Description of test problems}\label{subsec:tests}
-
+\gsnote{I think that either here or earlier in the paper it might be a
+  good idea to introduce the matrix problem to be solved; could be a
+  very compact representation but we should briefly describe the
+  restriction, prolongation operators etc---what do you think, Hari?}
 Our numerical tests are for the solution of the Poisson problem with
 homogeneous Dirichlet boundary conditions on a domain
 $\Omega\subset\mathbb R^d$ ($d=2$ or $d=3$), with boundary $\partial
@@ -791,28 +794,37 @@ the discrete residual by $10^8$ for our test problems, in particular,
 
 %Finalize and discuss ramifications.
 
+\todo{Preliminary list of conclusions:}
 \begin{itemize}
-\item Using Jacobi-based multigrid as preconditioner in the conjugate
-  gradient method, the number of iterations for polynomial orders
-  $p=2,3$ is similar to the number of iterations for linear elements.
-  In general, for the same number of unknowns one can expect better
-  accuracy for higher polynomial order. This advantage has to be
-  contrasted with the fact that high-order operators are less sparse
-  and thus their application to vectors is more time consuming.  Using
-  Jacobi-based smoothers is attractive from a parallel perspective
-  since no coloring of unknowns as in SSOR is necessary.
-\item Both, high-order $h$-multigrid as well as $p$-multigrid yield
-  significantly faster convergence in terms of the number of
-  iterations than preconditioning with the low-order
-  operator. Although low order operators are sparser and thus faster
-  to apply, the significant larger number of iterations results in
-  larger time-to-solution, in particular since the high-order operator
-  must be used to compute the residual on the finest mesh.
-\item For problems that only require a small number of smoothing
-  steps, using Chebyshev acceleration for the Jacobi smoother does not
-  improve the convergence. In all our tests, SSOR smoothing results in
-  the fastest convergence, in particular for orders $p\ge
-  4$. \gsnote{Revisit.}
+\item Chebyshev improves significantly over Jacobi smoothing and is
+  competitive with SSOR
+\item Point smoothers performed reasonably well for all tested orders,
+  in particular in combination with pCG
+\item low-order preconditioner competitive w.r. to number of
+  iterations; thus a good option as preconditioner when using AMG for
+  unstructured high-order meshes
+
+%\item Using Jacobi-based multigrid as preconditioner in the conjugate
+%  gradient method, the number of iterations for polynomial orders
+%  $p=2,3$ is similar to the number of iterations for linear elements.
+%  In general, for the same number of unknowns one can expect better
+%  accuracy for higher polynomial order. This advantage has to be
+%  contrasted with the fact that high-order operators are less sparse
+%  and thus their application to vectors is more time consuming.  Using
+%  Jacobi-based smoothers is attractive from a parallel perspective
+%  since no coloring of unknowns as in SSOR is necessary.
+%\item Both, high-order $h$-multigrid as well as $p$-multigrid yield
+%  significantly faster convergence in terms of the number of
+%  iterations than preconditioning with the low-order
+%  operator. Although low order operators are sparser and thus faster
+%  to apply, the significant larger number of iterations results in
+%  larger time-to-solution, in particular since the high-order operator
+%  must be used to compute the residual on the finest mesh.
+%\item For problems that only require a small number of smoothing
+%  steps, using Chebyshev acceleration for the Jacobi smoother does not
+%  improve the convergence. In all our tests, SSOR smoothing results in
+%  the fastest convergence, in particular for orders $p\ge
+%  4$. \gsnote{Revisit.}
 \end{itemize}
 
 
