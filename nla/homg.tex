@@ -425,7 +425,7 @@ at nonconforming faces.
 
 % **********************************************************
 \section{Smoothers}
-Here, we summarize the smoothers used in our numerical experiments, in
+Here, we summarize the smoothers used in our numerical experiments, for
 which we restrict ourselves to the point smoothers summarized in
 Section~\ref{subsec:ptsmoothers}. For completeness of the
 presentation, we comment on Schwarz-type smoothers in
@@ -433,9 +433,9 @@ Section~\ref{subsec:schwarz}.
 
 
 \subsection{Point smoothers}\label{subsec:ptsmoothers}
-In our numerical tests, we experiment with the Jacobi and the
+In our numerical tests, we compare the Jacobi and the
 symmetric successive over relaxation (SSOR) smoothers
-(see~\cite{TrottenbergOosterleeSchuller01}), as well as with a
+(see~\cite{TrottenbergOosterleeSchuller01}), as well as a
 Chebyshev-accelerated Jacobi smoother~\cite{....}. All of these
 smoothers require the diagonal of the system matrix; if matrices are
 not assembled (i.e., in a matrix-free approach), these diagonal
@@ -605,40 +605,43 @@ comprehensive comparisons of the performance of our algorithms for the
 solution of high-order discretizations of \eqref{eq:Poisson}.  The
 Tables~\ref{tab:box}\ldots present the number of multigrid v-cycles or
 of conjugate gradient (CG) iterations required to reduce the norm of
-the discrete residual by $10^8$ for our test problems, in particular,
+the discrete residual by a factor of $10^8$ for our test problems. In
+particular, these tables show:
 \begin{itemize}
-\item[$\bullet$] The first column gives the polynomial order used for the finite
-  element discretization.
-\item[$\bullet$] The columns entitled by \emph{MG as solver} report the number of
-  v-cycles needed when multigrid is used as a solver. Here,
+\item[$\bullet$] The first column gives the polynomial \emph{order}
+  used in the finite element discretization.
+\item[$\bullet$] The columns entitled by \emph{MG as solver} report
+  the number of v-cycles needed when multigrid is used as a
+  solver. The subcolums are:
   \begin{itemize}
   \item \emph{Jacobi(3)} denotes that 3 pre-smoothing and 3
     post-smoothing steps of a pointwise Jacobi smoother are used on
     each level.
   \item \emph{Cheb(3)} denotes that Chebyshev-accelerated Jacobi
     smoothing is used. Again, we use 3 pre-smoothing and 3
-    post-smoothing steps.
+    post-smoothing steps. The maximal eigenvalue required by the
+    Chebyshev method is estimated using \todo{XX iterations of
+      Lanczos}.
   \item \emph{SSOR(2)} denotes that a symmetric successive
     over-relaxation method is employed, where 2 pre-smoothing and 1
     post-smoothing step are employed. Note that each SSOR smoothing
-    iteration amounts to a forward and a backward smoothing step, and
-    thus requires double the computational than Jacobi
+    iteration amounts to a forward and a backward step, and thus
+    requires double the computational work compared to Jacobi
     smoothing.\footnote{This ignores aspects occurring in parallel
-      environments, where Gauss-Seidel smoothing---such as SSOR---can be
-      significantly more technical to implement and also requires more
-      communication in distributed memory environments.}  \gsnote{Is
-      this really a 2/1?}  The SSOR smoother is based on a
-    lexicographic ordering of the unknowns. \gsnote{use different
-      ordering too?}
+      environments, where Gauss-Seidel smoothing---such as SSOR---can
+      be challenging to implement and requires more communication in
+      distributed memory environments.}  \todo{Is this really a
+      2/1?}  The SSOR smoother is based on a lexicographic ordering of
+    the unknowns. \gsnote{use different ordering too?}
   \end{itemize}
-  Note that we present results for high-order $h$-multigrid (columns
-  with \emph{h}; see Section~\ref{subsec:h}) as well as for
-  $p$-multigrid (columns with \emph{p}; see Section~\ref{subsec:p}),
-  where we restrict ourselves to orders that are powers of 2. For
-  $p$-multigrid we first coarsen in $p$ as $p_\text{coarse} = p_\text{fine}/2$,
-  till $p=1$, and then coarsen in $h$.
+  Note that for each of the smoothers we results for high-order
+  $h$-multigrid (columns marked by \emph{h}; see
+  Section~\ref{subsec:h}) as well as for $p$-multigrid (columns marked
+  by \emph{p}; see Section~\ref{subsec:p}). For $p$-multigrid, we
+  restrict ourselves to orders that are powers of 2. After coarsening
+  in $p$ as till $p=1$, and then coarsen in $h$.
 \item[$\bullet$] The columns entitled with \emph{MG with pCG} presents
-  the results obtained when multigrid is uses as preconditioner in a
+  our results obtained when multigrid is uses as preconditioner in a
   CG algorithm. The sub-columns are as described above.
 \item[$\bullet$] The columns headed by \emph{linearized pCG} present
   the number of CG iterations needed to solve the high-order system
@@ -650,8 +653,6 @@ the discrete residual by $10^8$ for our test problems, in particular,
   \emph{unif.} indicates that a uniform node spacing is used for the
   low-order operator.
 \end{itemize}
-
-
 
 
 \begin{table}
