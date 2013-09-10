@@ -14,6 +14,7 @@ classdef hexmesh < handle
     
     % problem specific
     coeff
+		muvec
     rhs
   end % properties
   
@@ -73,7 +74,9 @@ classdef hexmesh < handle
       
       if strcmp(where, 'gll')
         pfx = @homg.hexmesh.getGLLcoords;
-      else
+			elseif strcmp(where, 'elem')
+				pfx = @homg.hexmesh.getElementCenters;
+			else
         pfx = @homg.hexmesh.getUniformCoords;
       end
       
@@ -121,6 +124,11 @@ classdef hexmesh < handle
       end
     end
     
+    function set_muvec(self, mu)
+      self.muvec = mu;
+    end
+    
+		
     function set_rhs(self, rhs)
       if ( ischar(rhs) )
         % is a string, so convert into a function
@@ -493,15 +501,20 @@ end
 %    Ke =                 | sx sy sz | J W | ry sy ty || Qy |
 %                         | tx ty tz |     | rz sz tz || Qz |
 
-      gpts = self.element_gauss(eid, r);
+     	gpts = self.element_gauss(eid, r);
 
-      factor = zeros(length(J), 6);
+			nn = length(J);
+			
+      factor = zeros(nn, 6);
 
       %             1  4  5
       % factor      4  2  6
       %             5  6  3
       
       
+			% idx = self.get_node_indices (eid, r.N);
+			% mu = self.muvec(eid); % *nn:(eid+1)*nn);
+			
       if (self.dim == 2 )
         mu = arrayfun( self.coeff, gpts(:,1), gpts(:,2) );
         
@@ -515,7 +528,7 @@ end
              + r.Qy' * diag(factor(:,3)) * r.Qx ;
       else
         mu = arrayfun( self.coeff, gpts(:,1), gpts(:,2), gpts(:,3) );
-        
+				
         % first compute dj.w.J.J'
         factor (:,1) = (D.rx.*D.rx + D.ry.*D.ry + D.rz.*D.rz ) .* J .* r.W .* mu ; % d2u/dx^2
         factor (:,2) = (D.sx.*D.sx + D.sy.*D.sy + D.sz.*D.sz ) .* J .* r.W .* mu ; % d2u/dy^2
@@ -775,6 +788,12 @@ end
     function coords = getUniformCoords(order, elems)
       coords = linspace(0, 1, order*elems+1);
     end
+		
+		function coords = getElementCenters(order, elems)
+			% order is ignored ... 
+			nodes = linspace(0,1, elems+1);
+			coords = 1/2*(nodes(1:end-1) + nodes(2:end));
+		end
       
     function C = stats(nelems, order)
       % function Ch = stats(nelems, order)

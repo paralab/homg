@@ -34,8 +34,8 @@ classdef grid < handle
   end % properties
   
   methods
-    function grid = grid(mesh, order, coeff, coarse)
-      if ((nargin < 4) || isempty(coarse))
+    function grid = grid(mesh, order, coarse)
+      if ((nargin < 3) || isempty(coarse))
         grid.level = 0;
         grid.Coarse = [];
       else
@@ -46,64 +46,82 @@ classdef grid < handle
       grid.dbg_spaces = '      ';
       grid.dbg_spaces = grid.dbg_spaces(1:end-4*grid.level);
       grid.debug = 0;
-      % for i=1:(grid.level)
-      %  grid.dbg_spaces = [grid.dbg_spaces  '  '];
-      % end
-
+      
       grid.Mesh = mesh;
-      % [grid.K, grid.L, grid.Null, grid.Ud] = mesh.assemble_poisson(order, 'gll');
-      %tic;
-      mesh.set_coeff( coeff );
-      [grid.K, grid.M] = mesh.assemble_poisson(order);
-      %tt = toc;
-      %disp(['---- assembled mass and stiffness : ' num2str(tt)])
-      % grid.K = mesh.assemble_stiffness (order);
-      % grid.M = mesh.assemble_mass (order);
-      %%
-        N = size(grid.K,1); 
-        % zero-Dirichlet boundary conditions
-        bdy = mesh.get_boundary_node_indices(order);
-
-        syms x y z
-        if ( mesh.dim==2 )
-          fx = matlabFunction(-8*pi^2*(sin(2*pi*x) * sin(2*pi*y)));
-        else
-          fx =matlabFunction(-12*pi^2*(sin(2*pi*x) * sin(2*pi*y) * sin(2*pi*z) ));
-        end
-        
-        % f   = mesh.evaluate(fx, order);
-        % f(bdy) = 0;
-        %tic;
-        grid.L = mesh.assemble_rhs(fx, order);
-        %tt = toc;
-        
-        %disp(['---- assembled rhs : ' num2str(tt)])
-        % grid.L = zeros(N,1); % - grid.M * f;
-        grid.L(bdy) = 0;
-        grid.Boundary = bdy;
-      %%
-      % grid.ZeroBoundary = grid.Null * grid.Null';
-      grid.smoother = 'sor';
-      if (mesh.dim == 2)
-        grid.jacobi_omega = 2/3;
-      else
-        grid.jacobi_omega = 6/7;
-      end
-
+      
+			mesh.set_order(order); 
       grid.sor_omega = 1;
       if (~ isempty(grid.Coarse) )
-         % ts1 = tic;
-         % tic;
          grid.P = grid.Coarse.Mesh.assemble_interpolation(order);
-         % tt = toc;
-         %disp(['---- assembled prolongation: ' num2str(tt)])
-         % toc(ts1);
-         % grid.R = inv(grid.Coarse.M) * grid.P' * grid.M ; 
          grid.R = grid.P';
       end
+			
+			% for Dirichlet boundary conditions
+			grid.Boundary = mesh.get_boundary_node_indices(order);
 
+			%% defaults ...
+		  grid.smoother = 'sor';
+      grid.jacobi_omega = 2/3;
     end
     
+		function assemble_poisson(grid, mu)
+			% fine grid material props ...
+			if isnumeric(mu)
+				grid.Mesh.set_muvec (mu) ;
+			else
+				grid.Mesh.set_coeff (mu) ;
+			end
+			% assemble for this level ... 
+      [grid.K, grid.M] = grid.Mesh.assemble_poisson(grid.Mesh.order);
+			syms x y z
+			if ( grid.Mesh.dim == 2 )
+				fx = matlabFunction(-8*pi^2*(sin(2*pi*x) * sin(2*pi*y)));
+			else
+				fx =matlabFunction(-12*pi^2*(sin(2*pi*x) * sin(2*pi*y) * sin(2*pi*z) ));
+			end
+			
+			grid.L = grid.Mesh.assemble_rhs(fx, grid.Mesh.order);
+			grid.L(grid.Boundary) = 0;
+      
+      % propagate to lower grids
+      if (~ isempty(grid.Coarse) )
+        if isnumeric(mu)
+          % M = grid.Coarse.Mesh.assemble_mass(1);
+          % mu_coarse =   M \ ( grid.R * grid.M * mu );
+          % max(mu)
+          % max(mu_coarse)
+          harmonic = 0;
+          if (grid.Mesh.dim == 2)
+            mu2 = reshape(mu, grid.Mesh.nelems(1), grid.Mesh.nelems(2));
+            if (harmonic)
+              mu_coarse = 4 ./ ( 1./mu2(1:2:end, 1:2:end) + 1./mu2(2:2:end, 1:2:end) + 1./mu2(1:2:end, 2:2:end) + 1./mu2(2:2:end, 2:2:end) );
+            else
+              mu_coarse = 0.25*(mu2(1:2:end, 1:2:end) + mu2(2:2:end, 1:2:end) + mu2(1:2:end, 2:2:end) + mu2(2:2:end, 2:2:end));
+            end
+          else
+            mu3 = reshape(mu, grid.Mesh.nelems(1), grid.Mesh.nelems(2), grid.Mesh.nelems(3));
+            if (harmonic)
+              mu_coarse = 8 ./ ( 1./mu3(1:2:end, 1:2:end, 1:2:end) + 1./mu3(2:2:end, 1:2:end, 1:2:end) ...
+                               + 1./mu3(1:2:end, 2:2:end, 1:2:end) + 1./mu3(2:2:end, 2:2:end, 1:2:end) ...
+                               + 1./mu3(1:2:end, 1:2:end, 2:2:end) + 1./mu3(2:2:end, 1:2:end, 2:2:end) ...
+                               + 1./mu3(1:2:end, 2:2:end, 2:2:end) + 1./mu3(2:2:end, 2:2:end, 2:2:end) );
+            else
+              mu_coarse = 0.125*(mu3(1:2:end, 1:2:end, 1:2:end) + mu3(2:2:end, 1:2:end, 1:2:end) + mu3(1:2:end, 2:2:end, 1:2:end) + mu3(2:2:end, 2:2:end, 1:2:end) + ...
+                mu3(1:2:end, 1:2:end, 2:2:end) + mu3(2:2:end, 1:2:end, 2:2:end) + mu3(1:2:end, 2:2:end, 2:2:end) + mu3(2:2:end, 2:2:end, 2:2:end) );
+            end
+          end
+          grid.Coarse.assemble_poisson (mu_coarse(:)) ;
+        else
+          grid.Coarse.assemble_poisson (mu) ;
+        end
+      end
+      
+    end
+    
+		function set_stiffness(grid, K)
+			grid.K = K;
+		end
+		
     % compute the residual
     function r = residual(grid, rhs, u)
     % function r = residual(grid, u, rhs)
@@ -175,8 +193,8 @@ classdef grid < handle
       % disp('outer v-cycle');
       rho = grid.vcycle(smooth_steps, smooth_steps, r, rho);
       p = rho;
-      %# disp(['Initial residual is ' num2str(norm(r))]);
-      %# disp('------------------------------------------');
+      disp(['Initial residual is ' num2str(norm(r))]);
+      disp('------------------------------------------');
       r0 = norm(r);
       for i=1:num_vcyc
         % disp(['inner v-cycle: ' num2str(i)]);
@@ -188,7 +206,7 @@ classdef grid < handle
 
         % rho_res_prev = rho_res;
         
-        %# disp([num2str(i, '%03d\t') ': |res| = ' num2str(norm(r),'\t%8.4e')]);
+        disp([num2str(i, '%03d\t') ': |res| = ' num2str(norm(r),'\t%8.4e')]);
         if (norm(r)/r0 < 1e-8)
           iter = i;
           rr = norm(r)/r0;
@@ -202,7 +220,7 @@ classdef grid < handle
         beta = dot(rho, r) / rho_res ;
         p = rho + beta*p;
       end
-      %# disp('------------------------------------------');
+      disp('------------------------------------------');
       iter = num_vcyc;
       rr = norm(r)/r0;
     end
@@ -213,20 +231,20 @@ classdef grid < handle
       % u = grid.ZeroBoundary*u;
       
       r = grid.residual(rhs, u);
-      %# disp(['Initial residual is ' num2str(norm(r))]);
-      %# disp('------------------------------------------');
+      disp(['Initial residual is ' num2str(norm(r))]);
+      disp('------------------------------------------');
       r0 = norm(r);
       for i=1:num_vcyc
         u = grid.vcycle(smooth_steps, smooth_steps, rhs, u);
         r = grid.residual(rhs, u);
-        %# disp([num2str(i) ': |res| = ' num2str(norm(r))]);
+        disp([num2str(i) ': |res| = ' num2str(norm(r))]);
         if (norm(r)/r0 < 1e-8)
           iter = i;
           rr = norm(r)/r0;
           return;
         end
       end
-      %# disp('------------------------------------------');
+      disp('------------------------------------------');
       iter = num_vcyc;
       rr = norm(r)/r0;
     end

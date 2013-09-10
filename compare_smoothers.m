@@ -1,4 +1,4 @@
-function [res, evec] = compare_smoothers (dim, xform, order, nelem) 
+function [res, evec] = compare_smoothers (dim, xform, mu, order, nelem, sfix) 
 % function compare_smoothers (dim, geom, order, nelem) 
 % 
 % valid smoothers are,
@@ -14,7 +14,7 @@ function [res, evec] = compare_smoothers (dim, xform, order, nelem)
 % g = homg.grid(m, order);
 
 % g = create_grid_hierarchy(dim, geom, order, [nelem/4 nelem/2 nelem], 1);
-g = create_hexmesh_grids(dim, xform, order,  [nelem/4 nelem/2 nelem]);
+g = create_hexmesh_grids(dim, mu, xform, order, [nelem/4 nelem/2 nelem]);
 
 nun = nelem*order + 1;
 
@@ -60,7 +60,7 @@ res(:,:,1) = reshape(u0, nun, nun);
 % jacobi 
 g.set_smoother('jacobi');
 u1 = u0; %evec*lam;
-u = g.smooth(3, g.L, u1);
+u = g.smooth(4, g.L, u1);
 % compute projections ...
 % q = repmat(u,size(u'));
 % r = g.residual(g.L, u);
@@ -73,7 +73,7 @@ res(:,:,2) = reshape(u, nun, nun);
 % chebyshev 
 g.set_smoother('chebyshev');
 u1 = u0; % evec*lam;
-u = g.smooth(3, g.L, u1);
+u = g.smooth(4, g.L, u1);
 g.set_smoother('ssor');
 u = g.smooth(2, g.L, u);
 % compute projections ...
@@ -104,14 +104,14 @@ grid on;
 
 % ylim([0.001, 10]);
 
-print ('-depsc2', ['smoothers-order' num2str(order) '.eps']);
-% matlab2tikz (['smoothers-order' num2str(order) '.tikz']);
+print ('-depsc2', ['smoothers-order' num2str(order) sfix '.eps']);
+matlab2tikz (['smoothers-order' num2str(order) sfix '.tikz'], 'checkForUpdates', false, 'showInfo', false);
 
 % Now for one v-cycle ...
-close all;
+% close all;
 % figure('DefaultAxesFontSize', 20);
 % figure (1);
-hFig = figure(1);
+hFig = figure(2);
 set(gcf,'PaperPositionMode','auto')
 set(hFig, 'Position', [200 200 800 800])
 
@@ -122,7 +122,7 @@ semilogy(b, 'k'); hold on;
 
 % jacobi 
 u1 = u0; %evec*lam;
-[u, rr, iter3] = g.solve(1, 'jacobi', 3, g.L, u1); 
+[u, rr, iter3] = g.solve(1, 'jacobi', 4, g.L, u1); 
 r = g.residual(g.L, u);
 b = u' * evec; % abs(dot (evec, q));
 % plot eigenvalues
@@ -130,7 +130,7 @@ semilogy(abs(b), 'b'); %, 'LineWidth', 3); hold on;
 
 % chebyshev 
 u1 = u0; % evec*lam;
-[u, rr, iter3] = g.solve(1, 'chebyshev', 3, g.L, u1); 
+[u, rr, iter3] = g.solve(1, 'chebyshev', 4, g.L, u1); 
 [u, rr, iter3] = g.solve(1, 'ssor', 2, g.L, u); 
 % compute projections ...
 % q = repmat(u,size(u'));
@@ -154,8 +154,8 @@ grid on;
 
 % ylim([0.00001, 1.2]);
 
-print ('-depsc2', ['vcycle-order' num2str(order) '.eps']);
-% matlab2tikz (['vcycle-order' num2str(order) '.tikz']);
+print ('-depsc2', ['vcycle-order' num2str(order) sfix '.eps']);
+matlab2tikz (['vcycle-order' num2str(order) sfix '.tikz'], 'checkForUpdates', false, 'showInfo', false);
 
 % close all;
 % hFig = figure(1);
