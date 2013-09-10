@@ -1,7 +1,19 @@
 
-\subsection{Meshes}
+\subsection{Test problems}
 
-Describe meshes and material properties used for testing.
+In this section we present results for the Poisson problem with
+spatially varying coefficient $\mu$ on two and three-dimensional
+domains $\Omega$ with boundary $\partial \Omega$, on which the
+solution satisfies a homogeneous Dirichlet boundary condition:
+\begin{equation}\label{eq:Laplace}
+  \begin{aligned}
+    -\nabla\cdot\left(\mu(x)\nabla u(x)\right) &= f(x) \quad { for } x\in \Omega,\\
+    \quad u(x)& = 0  \mbox{ for } x\in \partial\Omega.
+  \end{aligned}
+\end{equation}
+
+
+%Describe meshes and material properties used for testing.
 
 \begin{figure}
 	\includegraphics[width=0.48\textwidth]{figs/box}
@@ -16,8 +28,6 @@ Describe meshes and material properties used for testing.
 \end{figure}
 
 
-\subsection{Smoothers}
-
 % \begin{figure}
 % 	\includegraphics[width=0.45\textwidth]{figs/smoothers-order4}
 % 	\includegraphics[width=0.45\textwidth]{figs/vcycle-order4}
@@ -26,7 +36,6 @@ Describe meshes and material properties used for testing.
 
 \begin{figure}
 	\centering
-	
 	\begin{subfigure}[b]{0.45\textwidth}
 		\input{tikz/smoothers-order1.tikz}
 		\caption{$p=1$, smoothing}
@@ -56,30 +65,46 @@ Describe meshes and material properties used for testing.
 	\caption{\label{fig:smoothers2} The smoothing properties of the smoothers.}
 \end{figure}
 
-\subsection{Comparisons}
+\subsection{Results for test problems}
+
+The SSOR smoother is based on a
+lexicographic order of the unknowns.  \gsnote{Hari, do you think it is
+  worth trying SSOR with a different node ordering to make it more
+  red-black-like? We could simple reorder the matrix as we do for the
+  low-order preconditioner.}
+
 
 \begin{table}
-  \caption{\label{tab:box} \todo{New} Number of CG iterations/v-cycles to converge to a relative tolerance of $10^{-8}$ for $h$-Multigrid applied to high-order operators on a rectangular domain. A total of 3 grids were used, the finest grid was $32\times 32$, and the coarsest was $8\times 8$. For orders $2,4$, and $8$, we also evaluated the option of first coarsening in $p$ as $p_{coarse} = p_{fine}/2$, till $p=1$, and then coarsen in $h$. The coarsest grid in this case is a $8\times 8$ grid with $p=1$. The number of CG iterations/v-cycles for this case is given in the $p$ column.}
-		\centering
-    \begin{tabular}{|l|c|c|c|c|c|c|c|c|c|c|c|c|r|} 
+  \caption{\label{tab:box} Number of CG iterations/v-cycles for
+    different orders to converge to a relative tolerance of $10^{-8}$
+    on a two-dimensional unit square with constant coefficient
+    $\mu\equiv 1$. A total of 3 grids were used, the finest grid was
+    $32\times 32$, and the coarsest was $8\times 8$ \todo{still
+      true?}. For orders $2,4$, and $8$, we also evaluated the option
+    of first coarsening in $p$ as $p_{coarse} = p_{fine}/2$, till
+    $p=1$, and then coarsen in $h$. The coarsest grid in this case is
+    a $8\times 8$ grid with $p=1$. The number of CG
+    iterations/v-cycles for this case is given in the $p$ column.}
+  \centering
+  \begin{tabular}{|r|c|c|c|c|c|c|c|c|c|c|c|c|c|c|} 
+    \hline
+    & \multicolumn{6}{c|}{Multigrid} & \multicolumn{6}{c|}{MG pCG} & \multicolumn{2}{r|}{linearized} \\
+    \cline{2-13}
+    \!\!\! order \!\!\!\! &  \multicolumn{2}{c|}{\!\scriptsize  Jacobi(3)\!} &  \multicolumn{2}{c|}{\!\scriptsize Cheb(3)\!} & \multicolumn{2}{c|}{\!\scriptsize  SSOR(2)\!} & \multicolumn{2}{c|}{\!\scriptsize Jacobi(3)\!} &  \multicolumn{2}{c|}{\!\scriptsize Cheb(3)\!} & \multicolumn{2}{c|}{\!\scriptsize SSOR(2)\!} & \multicolumn{2}{r|}{pCG}\\
 \hline
-                     & \multicolumn{6}{c|}{Multigrid} & \multicolumn{6}{c|}{MG pCG} &          linearized \\
-										 \cline{2-13}
-			order &  \multicolumn{2}{c|}{\scriptsize  Jacobi(3)} &  \multicolumn{2}{c|}{\scriptsize Chebyshev(3)} & \multicolumn{2}{c|}{\scriptsize  SSOR(2)} & \multicolumn{2}{c|}{\scriptsize Jacobi(3)} &  \multicolumn{2}{c|}{\scriptsize Chebyshev(3)} & \multicolumn{2}{c|}{\scriptsize SSOR(2)} & pCG\\
+ & $h$ & $p$ & $h$ & $p$& $h$ & $p$& $h$ & $p$& $h$ & $p$& $h$ & $p$& GLL & unif.\\
+ \cline{2-15}
+1 & 7 & & 5 & & 4 & & 6 & & 4 & & 4 & & 1 & 1  \\
+2 & 10 & 13 & 5 & 6 & 4 & 5 & 7 & 7 & 4 & 5 & 4 & 4 & 16 & 16 \\
+3 & 9 & & 6 & & 4 & & 7 & & 5 & & 4 & & 18 & 19  \\
+4 & 10 & 19 & 6 & 7 & 4 & 5 & 8 & 8 & 5 & 6 & 4 & 4 & 20 & 23 \\
+5 & 12 & & 8 & & 5 & & 9 & & 6 & & 4 & & 22 & 26  \\
+6 & 12 & & 9 & & 5 & & 9 & & 6 & & 4 & & 25 & 31  \\
+7 & 16 & & 12 & & 6 & & 10 & & 8 & & 5 & & 26 & 36  \\
+8 & 17 & 29 & 13 & 11 & 7 & 6 & 10 & 11 & 8 & 8 & 5 & 5 & 28 & 42 \\
+16 & 40 & 49 & 33 & 27 & 13 & 11 & 16 & 17 & 13 & 13 & 8 & 8 & 41 & 88\\
 \hline
- & $h$ & $p$ & $h$ & $p$& $h$ & $p$& $h$ & $p$& $h$ & $p$& $h$ & $p$& \\
- \cline{2-13}
-    1 & 6 & & 5 & & 4 & & 5 & & 5 & & 4 & & 4 \\
-		2 & 7 & 7 & 15 & 12 & 4 & 4 & 6 & 6 & 8 & 7 & 4 & 4 & 14\\
-		3 & 8 & & 23 & & 4 & & 6 & & 9 & & 4 & & 16 \\
-		4 & 9 & 8 & 47 & 25 & 4 & 4 & 6 & 6 & 9 & 9 & 4 & 4 & 16 \\
-		5 & 12 & & - & & 5 & & 8 & & 12 & & 4 & & 17 \\
-		6 & 12 & & - & & 5 & & 8 & & 13 & & 4 & & 18 \\
-		7 & 16 & & - & & 6 & & 9 & & 15 & & 5 & & 18 \\
-		8 & 17 & 14 & - & - & 7 & 6 & 9 & 9 & 17 & 14 & 5 & 5 & 19\\             
-    16 & 40 & & 350 & & 13 & & 14 & & 350 & & 8 & & \\ 
-\hline
-	  \end{tabular}
+  \end{tabular}
 \end{table}
 
 % \begin{table}

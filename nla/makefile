@@ -9,9 +9,9 @@ all:
 	${compile}  ${filename}
 	-bibtex ${filename}
 	bibtex ${filename}
-	${compile} ${filename}
-	${compile} ${filename}
-	${compile} ${filename}
+#	${compile} ${filename}
+#	${compile} ${filename}
+#	${compile} ${filename}
 	@echo Done ....!
 
 pdf:

@@ -12,7 +12,7 @@
 % defining custom colors
 \definecolor{mycolor1}{rgb}{1,0,1}
 
-\begin{tikzpicture}[scale=0.225]
+\begin{tikzpicture}[scale=0.2]
 
 \begin{axis}[%
 width=10.8672222222222in,
