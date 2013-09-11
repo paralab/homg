@@ -555,6 +555,110 @@ setup step using, for instance, a power method.
 	\caption{\label{fig:smoothers2} The smoothing properties of the smoothers for constant coefficient 2D box.}
 \end{figure}
 
+\begin{figure}
+	\centering
+	\begin{subfigure}[b]{0.49\textwidth}
+		\centering
+		\begin{tikzpicture}[scale=0.8]
+		\begin{semilogyaxis}[ymajorgrids,ymin=1e-8,ymax=2,xmin=0,xmax=1081]
+		\addplot[color=black]  table[x=dof, y=u]{data/smoother-var-shell.dat};
+		\addplot[color=blue!70,opacity=0.5]   table[x=dof, y=jacobi1]{data/smoother-var-shell.dat};
+		\addplot[color=red!50!black,opacity=0.5] table[x=dof, y=chebyshev1]{data/smoother-var-shell.dat};
+		\addplot[color=green!70!black,opacity=0.5]  table[x=dof, y=ssor1]{data/smoother-var-shell.dat};
+		\end{semilogyaxis}
+		\end{tikzpicture}
+		\caption{$p=1$, smoothing}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.49\textwidth}
+		\centering
+		\begin{tikzpicture}[scale=0.8]
+		\begin{semilogyaxis}[ymajorgrids,ymin=1e-8,ymax=2,xmin=0,xmax=1081]
+		\addplot[color=black]  table[x=dof, y=u]{data/vcycle-var-shell.dat};
+		\addplot[color=blue!70,opacity=0.5]   table[x=dof, y=jacobi1]{data/vcycle-var-shell.dat};
+		\addplot[color=red!50!black,opacity=0.5] table[x=dof, y=chebyshev1]{data/vcycle-var-shell.dat};
+		\addplot[color=green!70!black,opacity=0.5]  table[x=dof, y=ssor1]{data/vcycle-var-shell.dat};
+		\end{semilogyaxis}
+		\end{tikzpicture}
+		\caption{$p=1$, single v-cycle}
+	\end{subfigure}
+	\\
+	\begin{subfigure}[b]{0.49\textwidth}
+		\centering
+		\begin{tikzpicture}[scale=0.8]
+		\begin{semilogyaxis}[ymajorgrids,ymin=1e-8,ymax=2,xmin=0,xmax=1081]
+		\addplot[color=black]  table[x=dof, y=u]{data/smoother-var-shell.dat};
+		\addplot[color=blue!70,opacity=0.5]   table[x=dof, y=jacobi2]{data/smoother-var-shell.dat};
+		\addplot[color=red!50!black,opacity=0.5] table[x=dof, y=chebyshev2]{data/smoother-var-shell.dat};
+		\addplot[color=green!70!black,opacity=0.5]  table[x=dof, y=ssor2]{data/smoother-var-shell.dat};
+		\end{semilogyaxis}
+		\end{tikzpicture}
+		\caption{$p=1$, smoothing}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.49\textwidth}
+		\centering
+		\begin{tikzpicture}[scale=0.8]
+		\begin{semilogyaxis}[ymajorgrids,ymin=1e-8,ymax=2,xmin=0,xmax=1081]
+		\addplot[color=black]  table[x=dof, y=u]{data/vcycle-var-shell.dat};
+		\addplot[color=blue!70,opacity=0.5]   table[x=dof, y=jacobi2]{data/vcycle-var-shell.dat};
+		\addplot[color=red!50!black,opacity=0.5] table[x=dof, y=chebyshev2]{data/vcycle-var-shell.dat};
+		\addplot[color=green!70!black,opacity=0.5]  table[x=dof, y=ssor2]{data/vcycle-var-shell.dat};
+		\end{semilogyaxis}
+		\end{tikzpicture}
+		\caption{$p=1$, single v-cycle}
+	\end{subfigure}
+	\\
+	\begin{subfigure}[b]{0.49\textwidth}
+		\centering
+		\begin{tikzpicture}[scale=0.8]
+		\begin{semilogyaxis}[ymajorgrids,ymin=1e-8,ymax=2,xmin=0,xmax=1081]
+		\addplot[color=black]  table[x=dof, y=u]{data/smoother-var-shell.dat};
+		\addplot[color=blue!70,opacity=0.5]   table[x=dof, y=jacobi4]{data/smoother-var-shell.dat};
+		\addplot[color=red!50!black,opacity=0.5] table[x=dof, y=chebyshev4]{data/smoother-var-shell.dat};
+		\addplot[color=green!70!black,opacity=0.5]  table[x=dof, y=ssor4]{data/smoother-var-shell.dat};
+		\end{semilogyaxis}
+		\end{tikzpicture}
+		\caption{$p=1$, smoothing}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.49\textwidth}
+		\centering
+		\begin{tikzpicture}[scale=0.8]
+		\begin{semilogyaxis}[ymajorgrids,ymin=1e-8,ymax=2,xmin=0,xmax=1081]
+		\addplot[color=black]  table[x=dof, y=u]{data/vcycle-var-shell.dat};
+		\addplot[color=blue!70,opacity=0.5]   table[x=dof, y=jacobi4]{data/vcycle-var-shell.dat};
+		\addplot[color=red!50!black,opacity=0.5] table[x=dof, y=chebyshev4]{data/vcycle-var-shell.dat};
+		\addplot[color=green!70!black,opacity=0.5]  table[x=dof, y=ssor4]{data/vcycle-var-shell.dat};
+		\end{semilogyaxis}
+		\end{tikzpicture}
+		\caption{$p=1$, single v-cycle}
+	\end{subfigure}
+	\\
+	\begin{subfigure}[b]{0.49\textwidth}
+		\centering
+		\begin{tikzpicture}[scale=0.8]
+		\begin{semilogyaxis}[ymajorgrids,ymin=1e-8,ymax=2,xmin=0,xmax=1081]
+		\addplot[color=black]  table[x=dof, y=u]{data/smoother-var-shell.dat};
+		\addplot[color=blue!70,opacity=0.5]   table[x=dof, y=jacobi8]{data/smoother-var-shell.dat};
+		\addplot[color=red!50!black,opacity=0.5] table[x=dof, y=chebyshev8]{data/smoother-var-shell.dat};
+		\addplot[color=green!70!black,opacity=0.5]  table[x=dof, y=ssor8]{data/smoother-var-shell.dat};
+		\end{semilogyaxis}
+		\end{tikzpicture}
+		\caption{$p=1$, smoothing}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.49\textwidth}
+		\centering
+		\begin{tikzpicture}[scale=0.8]
+		\begin{semilogyaxis}[ymajorgrids,ymin=1e-8,ymax=2,xmin=0,xmax=1081]
+		\addplot[color=black]  table[x=dof, y=u]{data/vcycle-var-shell.dat};
+		\addplot[color=blue!70,opacity=0.5]   table[x=dof, y=jacobi8]{data/vcycle-var-shell.dat};
+		\addplot[color=red!50!black,opacity=0.5] table[x=dof, y=chebyshev8]{data/vcycle-var-shell.dat};
+		\addplot[color=green!70!black,opacity=0.5]  table[x=dof, y=ssor8]{data/vcycle-var-shell.dat};
+		\end{semilogyaxis}
+		\end{tikzpicture}
+		\caption{$p=1$, single v-cycle}
+	\end{subfigure}
+	\caption{\label{fig:smoothers2} The smoothing properties of the smoothers for variable coefficient 2D fan.}
+\end{figure}
+
 % \begin{figure}
 % 	\centering
 % 	\begin{subfigure}[b]{0.49\textwidth}
