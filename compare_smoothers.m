@@ -16,6 +16,9 @@ function [res, evec] = compare_smoothers (dim, xform, mu, order, nelem, sfix)
 % g = create_grid_hierarchy(dim, geom, order, [nelem/4 nelem/2 nelem], 1);
 g = create_hexmesh_grids(dim, mu, xform, order, [nelem/4 nelem/2 nelem]);
 
+fname1 = ['smoother-' sfix '.dat'];
+fname2 = ['vcycle-' sfix '.dat'];
+
 nun = nelem*order + 1;
 
 % get eigenvectors 
@@ -53,7 +56,14 @@ set(hFig, 'Position', [200 200 800 800])
 % r = g.residual(g.L, u0);
 % q = repmat(u0,size(u0'));
 b = u0' * evec; % dot (evec, q);
-semilogy(b, 'k'); hold on;
+semilogy(abs(b), 'k'); hold on;
+
+%~~~~~~~~~~~~~~~~~~~~~~~~~ 
+if (order == 1)
+  dlmwrite(fname1,abs(b),'delimiter','\t','precision',6);
+  dlmwrite(fname2,abs(b),'delimiter','\t','precision',6);
+end
+
 
 res(:,:,1) = reshape(u0, nun, nun);
 
@@ -68,20 +78,23 @@ b = u' * evec; % abs(dot (evec, q));
 % plot eigenvalues
 semilogy(abs(b), 'b'); %, 'MarkerSize', 5); hold on;
 
+dlmwrite(fname1,abs(b),'delimiter','\t','precision',6, '-append');
+
 res(:,:,2) = reshape(u, nun, nun);
 
 % chebyshev 
 g.set_smoother('chebyshev');
 u1 = u0; % evec*lam;
 u = g.smooth(4, g.L, u1);
-g.set_smoother('ssor');
-u = g.smooth(2, g.L, u);
+%g.set_smoother('ssor');
+%%u = g.smooth(2, g.L, u);
 % compute projections ...
 % q = repmat(u,size(u'));
 r = g.residual(g.L, u);
 b = u' * evec; % abs(dot (evec, q));
 % plot eigenvalues
-semilogy(abs(b), 'm', 'LineWidth', 3); 
+semilogy(abs(b), 'm'); 
+dlmwrite(fname1,abs(b),'delimiter','\t','precision',6, '-append');
 
 res(:,:,3) = reshape(u, nun, nun);
 
@@ -95,6 +108,7 @@ r = g.residual(g.L, u);
 b = u' * evec; %abs(dot (evec, q));
 % plot eigenvalues
 semilogy(abs(b), 'g'); %, 'MarkerSize', 5); 
+dlmwrite(fname1,abs(b),'delimiter','\t','precision',6, '-append');
 
 res(:,:,4) = reshape(u, nun, nun);
 
@@ -104,8 +118,8 @@ grid on;
 
 % ylim([0.001, 10]);
 
-print ('-depsc2', ['smoothers-order' num2str(order) sfix '.eps']);
-matlab2tikz (['smoothers-order' num2str(order) sfix '.tikz'], 'checkForUpdates', false, 'showInfo', false);
+% print ('-depsc2', ['smoothers-order' num2str(order) sfix '.eps']);
+% matlab2tikz (['smoothers-order' num2str(order) sfix '.tikz'], 'checkForUpdates', false, 'showInfo', false);
 
 % Now for one v-cycle ...
 % close all;
@@ -118,7 +132,7 @@ set(hFig, 'Position', [200 200 800 800])
 
 r = g.residual(g.L, u0);
 b = u0' * evec; % dot (evec, q);
-semilogy(b, 'k'); hold on;
+semilogy(abs(b), 'k'); hold on;
 
 % jacobi 
 u1 = u0; %evec*lam;
@@ -127,18 +141,19 @@ r = g.residual(g.L, u);
 b = u' * evec; % abs(dot (evec, q));
 % plot eigenvalues
 semilogy(abs(b), 'b'); %, 'LineWidth', 3); hold on;
+dlmwrite(fname2,abs(b),'delimiter','\t','precision',6, '-append');
 
 % chebyshev 
 u1 = u0; % evec*lam;
 [u, rr, iter3] = g.solve(1, 'chebyshev', 4, g.L, u1); 
-[u, rr, iter3] = g.solve(1, 'ssor', 2, g.L, u); 
+%[u, rr, iter3] = g.solve(1, 'ssor', 2, g.L, u); 
 % compute projections ...
 % q = repmat(u,size(u'));
 r = g.residual(g.L, u);
 b = u' * evec; % abs(dot (evec, q));
 % plot eigenvalues
-semilogy(abs(b), 'm', 'LineWidth', 3); 
-
+semilogy(abs(b), 'm'); 
+dlmwrite(fname2,abs(b),'delimiter','\t','precision',6, '-append');
 % ssor 
 u1 = u0; % evec*lam;
 [u, rr, iter3] = g.solve(1, 'ssor', 2, g.L, u1); 
@@ -147,6 +162,7 @@ r = g.residual(g.L, u);
 b = u' * evec; %abs(dot (evec, q));
 % plot eigenvalues
 semilogy(abs(b), 'g'); %, 'LineWidth', 3); 
+dlmwrite(fname2,abs(b),'delimiter','\t','precision',6, '-append');
 
 title(['N = ' num2str(order*nelem+1) '^2' ' , p = ' num2str(order)]);
 
@@ -154,8 +170,8 @@ grid on;
 
 % ylim([0.00001, 1.2]);
 
-print ('-depsc2', ['vcycle-order' num2str(order) sfix '.eps']);
-matlab2tikz (['vcycle-order' num2str(order) sfix '.tikz'], 'checkForUpdates', false, 'showInfo', false);
+% print ('-depsc2', ['vcycle-order' num2str(order) sfix '.eps']);
+% matlab2tikz (['vcycle-order' num2str(order) sfix '.tikz'], 'checkForUpdates', false, 'showInfo', false);
 
 % close all;
 % hFig = figure(1);

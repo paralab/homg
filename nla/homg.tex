@@ -450,36 +450,302 @@ implement~\cite{AdamsBrezinaHuEtAl03}. However, the acceleration of
 Jacobi smoothing with Chebyshev polynomials requires estimation of the
 maximum eigenvalues of the system matrix, which has to be done in a
 setup step using, for instance, a power method.
+
 \begin{figure}
 	\centering
 	\begin{subfigure}[b]{0.49\textwidth}
-		\input{tikz/smoothers-order1.tikz}
+		\centering
+		\begin{tikzpicture}[scale=0.8]
+		\begin{semilogyaxis}[ymajorgrids,ymin=1e-8,ymax=2,xmin=0,xmax=1081]
+		\addplot[color=black]  table[x=dof, y=u]{data/smoother-const-box.dat};
+		\addplot[color=blue!70,opacity=0.5]   table[x=dof, y=jacobi1]{data/smoother-const-box.dat};
+		\addplot[color=red!50!black,opacity=0.5] table[x=dof, y=chebyshev1]{data/smoother-const-box.dat};
+		\addplot[color=green!70!black,opacity=0.5]  table[x=dof, y=ssor1]{data/smoother-const-box.dat};
+		\end{semilogyaxis}
+		\end{tikzpicture}
 		\caption{$p=1$, smoothing}
 	\end{subfigure}
 	\begin{subfigure}[b]{0.49\textwidth}
-		\input{tikz/vcycle-order1.tikz}
+		\centering
+		\begin{tikzpicture}[scale=0.8]
+		\begin{semilogyaxis}[ymajorgrids,ymin=1e-8,ymax=2,xmin=0,xmax=1081]
+		\addplot[color=black]  table[x=dof, y=u]{data/vcycle-const-box.dat};
+		\addplot[color=blue!70,opacity=0.5]   table[x=dof, y=jacobi1]{data/vcycle-const-box.dat};
+		\addplot[color=red!50!black,opacity=0.5] table[x=dof, y=chebyshev1]{data/vcycle-const-box.dat};
+		\addplot[color=green!70!black,opacity=0.5]  table[x=dof, y=ssor1]{data/vcycle-const-box.dat};
+		\end{semilogyaxis}
+		\end{tikzpicture}
 		\caption{$p=1$, single v-cycle}
 	\end{subfigure}
 	\\
 	\begin{subfigure}[b]{0.49\textwidth}
-		\input{tikz/smoothers-order2.tikz}
-		\caption{$p=2$, smoothing}
+		\centering
+		\begin{tikzpicture}[scale=0.8]
+		\begin{semilogyaxis}[ymajorgrids,ymin=1e-8,ymax=2,xmin=0,xmax=1081]
+		\addplot[color=black]  table[x=dof, y=u]{data/smoother-const-box.dat};
+		\addplot[color=blue!70,opacity=0.5]   table[x=dof, y=jacobi2]{data/smoother-const-box.dat};
+		\addplot[color=red!50!black,opacity=0.5] table[x=dof, y=chebyshev2]{data/smoother-const-box.dat};
+		\addplot[color=green!70!black,opacity=0.5]  table[x=dof, y=ssor2]{data/smoother-const-box.dat};
+		\end{semilogyaxis}
+		\end{tikzpicture}
+		\caption{$p=1$, smoothing}
 	\end{subfigure}
 	\begin{subfigure}[b]{0.49\textwidth}
-		\input{tikz/vcycle-order2.tikz}
-		\caption{$p=2$, single v-cycle}
+		\centering
+		\begin{tikzpicture}[scale=0.8]
+		\begin{semilogyaxis}[ymajorgrids,ymin=1e-8,ymax=2,xmin=0,xmax=1081]
+		\addplot[color=black]  table[x=dof, y=u]{data/vcycle-const-box.dat};
+		\addplot[color=blue!70,opacity=0.5]   table[x=dof, y=jacobi2]{data/vcycle-const-box.dat};
+		\addplot[color=red!50!black,opacity=0.5] table[x=dof, y=chebyshev2]{data/vcycle-const-box.dat};
+		\addplot[color=green!70!black,opacity=0.5]  table[x=dof, y=ssor2]{data/vcycle-const-box.dat};
+		\end{semilogyaxis}
+		\end{tikzpicture}
+		\caption{$p=1$, single v-cycle}
 	\end{subfigure}
 	\\
 	\begin{subfigure}[b]{0.49\textwidth}
-		\input{tikz/smoothers-order4.tikz}
-		\caption{$p=4$, smoothing}
+		\centering
+		\begin{tikzpicture}[scale=0.8]
+		\begin{semilogyaxis}[ymajorgrids,ymin=1e-8,ymax=2,xmin=0,xmax=1081]
+		\addplot[color=black]  table[x=dof, y=u]{data/smoother-const-box.dat};
+		\addplot[color=blue!70,opacity=0.5]   table[x=dof, y=jacobi4]{data/smoother-const-box.dat};
+		\addplot[color=red!50!black,opacity=0.5] table[x=dof, y=chebyshev4]{data/smoother-const-box.dat};
+		\addplot[color=green!70!black,opacity=0.5]  table[x=dof, y=ssor4]{data/smoother-const-box.dat};
+		\end{semilogyaxis}
+		\end{tikzpicture}
+		\caption{$p=1$, smoothing}
 	\end{subfigure}
 	\begin{subfigure}[b]{0.49\textwidth}
-		\input{tikz/vcycle-order4.tikz}
-		\caption{$p=4$, single v-cycle}
+		\centering
+		\begin{tikzpicture}[scale=0.8]
+		\begin{semilogyaxis}[ymajorgrids,ymin=1e-8,ymax=2,xmin=0,xmax=1081]
+		\addplot[color=black]  table[x=dof, y=u]{data/vcycle-const-box.dat};
+		\addplot[color=blue!70,opacity=0.5]   table[x=dof, y=jacobi4]{data/vcycle-const-box.dat};
+		\addplot[color=red!50!black,opacity=0.5] table[x=dof, y=chebyshev4]{data/vcycle-const-box.dat};
+		\addplot[color=green!70!black,opacity=0.5]  table[x=dof, y=ssor4]{data/vcycle-const-box.dat};
+		\end{semilogyaxis}
+		\end{tikzpicture}
+		\caption{$p=1$, single v-cycle}
 	\end{subfigure}
-	\caption{\label{fig:smoothers2} The smoothing properties of the smoothers.}
+	\\
+	\begin{subfigure}[b]{0.49\textwidth}
+		\centering
+		\begin{tikzpicture}[scale=0.8]
+		\begin{semilogyaxis}[ymajorgrids,ymin=1e-8,ymax=2,xmin=0,xmax=1081]
+		\addplot[color=black]  table[x=dof, y=u]{data/smoother-const-box.dat};
+		\addplot[color=blue!70,opacity=0.5]   table[x=dof, y=jacobi8]{data/smoother-const-box.dat};
+		\addplot[color=red!50!black,opacity=0.5] table[x=dof, y=chebyshev8]{data/smoother-const-box.dat};
+		\addplot[color=green!70!black,opacity=0.5]  table[x=dof, y=ssor8]{data/smoother-const-box.dat};
+		\end{semilogyaxis}
+		\end{tikzpicture}
+		\caption{$p=1$, smoothing}
+	\end{subfigure}
+	\begin{subfigure}[b]{0.49\textwidth}
+		\centering
+		\begin{tikzpicture}[scale=0.8]
+		\begin{semilogyaxis}[ymajorgrids,ymin=1e-8,ymax=2,xmin=0,xmax=1081]
+		\addplot[color=black]  table[x=dof, y=u]{data/vcycle-const-box.dat};
+		\addplot[color=blue!70,opacity=0.5]   table[x=dof, y=jacobi8]{data/vcycle-const-box.dat};
+		\addplot[color=red!50!black,opacity=0.5] table[x=dof, y=chebyshev8]{data/vcycle-const-box.dat};
+		\addplot[color=green!70!black,opacity=0.5]  table[x=dof, y=ssor8]{data/vcycle-const-box.dat};
+		\end{semilogyaxis}
+		\end{tikzpicture}
+		\caption{$p=1$, single v-cycle}
+	\end{subfigure}
+	\caption{\label{fig:smoothers2} The smoothing properties of the smoothers for constant coefficient 2D box.}
 \end{figure}
+
+% \begin{figure}
+% 	\centering
+% 	\begin{subfigure}[b]{0.49\textwidth}
+% 		\centering
+% 		\input{tikz/smoothers-order1-const-box.tikz}
+% 		\caption{$p=1$, smoothing}
+% 	\end{subfigure}
+% 	\begin{subfigure}[b]{0.49\textwidth}
+% 		\centering
+% 		\input{tikz/vcycle-order1-const-box.tikz}
+% 		\caption{$p=1$, single v-cycle}
+% 	\end{subfigure}
+% 	\\
+% 	\begin{subfigure}[b]{0.49\textwidth}
+% 		\centering
+% 		\input{tikz/smoothers-order2-const-box.tikz}
+% 		\caption{$p=2$, smoothing}
+% 	\end{subfigure}
+% 	\begin{subfigure}[b]{0.49\textwidth}
+% 		\centering
+% 		\input{tikz/vcycle-order2-const-box.tikz}
+% 		\caption{$p=2$, single v-cycle}
+% 	\end{subfigure}
+% 	\\
+% 	\begin{subfigure}[b]{0.49\textwidth}
+% 		\centering
+% 		\input{tikz/smoothers-order4-const-box.tikz}
+% 		\caption{$p=4$, smoothing}
+% 	\end{subfigure}
+% 	\begin{subfigure}[b]{0.49\textwidth}
+% 		\centering
+% 		\input{tikz/vcycle-order4-const-box.tikz}
+% 		\caption{$p=4$, single v-cycle}
+% 	\end{subfigure}
+% 	\\
+% 	\begin{subfigure}[b]{0.49\textwidth}
+% 		\centering
+% 		\input{tikz/smoothers-order8-const-box.tikz}
+% 		\caption{$p=8$, smoothing}
+% 	\end{subfigure}
+% 	\begin{subfigure}[b]{0.49\textwidth}
+% 		\centering
+% 		\input{tikz/vcycle-order8-const-box.tikz}
+% 		\caption{$p=8$, single v-cycle}
+% 	\end{subfigure}
+% 	\caption{\label{fig:smoothers2} The smoothing properties of the smoothers for constant coefficient 2D box.}
+% \end{figure}
+
+% \begin{figure}
+% 	\centering
+% 	\begin{subfigure}[b]{0.49\textwidth}
+% 		\centering
+% 		\input{tikz/smoothers-order1-var-box.tikz}
+% 		\caption{$p=1$, smoothing}
+% 	\end{subfigure}
+% 	\begin{subfigure}[b]{0.49\textwidth}
+% 		\centering
+% 		\input{tikz/vcycle-order1-var-box.tikz}
+% 		\caption{$p=1$, single v-cycle}
+% 	\end{subfigure}
+% 	\\
+% 	\begin{subfigure}[b]{0.49\textwidth}
+% 		\centering
+% 		\input{tikz/smoothers-order2-var-box.tikz}
+% 		\caption{$p=2$, smoothing}
+% 	\end{subfigure}
+% 	\begin{subfigure}[b]{0.49\textwidth}
+% 		\centering
+% 		\input{tikz/vcycle-order2-var-box.tikz}
+% 		\caption{$p=2$, single v-cycle}
+% 	\end{subfigure}
+% 	\\
+% 	\begin{subfigure}[b]{0.49\textwidth}
+% 		\centering
+% 		\input{tikz/smoothers-order4-var-box.tikz}
+% 		\caption{$p=4$, smoothing}
+% 	\end{subfigure}
+% 	\begin{subfigure}[b]{0.49\textwidth}
+% 		\centering
+% 		\input{tikz/vcycle-order4-var-box.tikz}
+% 		\caption{$p=4$, single v-cycle}
+% 	\end{subfigure}
+% 	\\
+% 	\begin{subfigure}[b]{0.49\textwidth}
+% 		\centering
+% 		\input{tikz/smoothers-order8-var-box.tikz}
+% 		\caption{$p=8$, smoothing}
+% 	\end{subfigure}
+% 	\begin{subfigure}[b]{0.49\textwidth}
+% 		\centering
+% 		\input{tikz/vcycle-order8-var-box.tikz}
+% 		\caption{$p=8$, single v-cycle}
+% 	\end{subfigure}
+% 	\caption{\label{fig:smoothers3} The smoothing properties of the smoothers for variable coefficient 2D box.}
+% \end{figure}
+
+% \begin{figure}
+% 	\centering
+% 	\begin{subfigure}[b]{0.49\textwidth}
+% 		\centering
+% 		\input{tikz/smoothers-order1-const-shell.tikz}
+% 		\caption{$p=1$, smoothing}
+% 	\end{subfigure}
+% 	\begin{subfigure}[b]{0.49\textwidth}
+% 		\centering
+% 		\input{tikz/vcycle-order1-const-shell.tikz}
+% 		\caption{$p=1$, single v-cycle}
+% 	\end{subfigure}
+% 	\\
+% 	\begin{subfigure}[b]{0.49\textwidth}
+% 		\centering
+% 		\input{tikz/smoothers-order2-const-shell.tikz}
+% 		\caption{$p=2$, smoothing}
+% 	\end{subfigure}
+% 	\begin{subfigure}[b]{0.49\textwidth}
+% 		\centering
+% 		\input{tikz/vcycle-order2-const-shell.tikz}
+% 		\caption{$p=2$, single v-cycle}
+% 	\end{subfigure}
+% 	\\
+% 	\begin{subfigure}[b]{0.49\textwidth}
+% 		\centering
+% 		\input{tikz/smoothers-order4-const-shell.tikz}
+% 		\caption{$p=4$, smoothing}
+% 	\end{subfigure}
+% 	\begin{subfigure}[b]{0.49\textwidth}
+% 		\centering
+% 		\input{tikz/vcycle-order4-const-shell.tikz}
+% 		\caption{$p=4$, single v-cycle}
+% 	\end{subfigure}
+% 	\\
+% 	\begin{subfigure}[b]{0.49\textwidth}
+% 		\centering
+% 		\input{tikz/smoothers-order8-const-shell.tikz}
+% 		\caption{$p=8$, smoothing}
+% 	\end{subfigure}
+% 	\begin{subfigure}[b]{0.49\textwidth}
+% 		\centering
+% 		\input{tikz/vcycle-order8-const-shell.tikz}
+% 		\caption{$p=8$, single v-cycle}
+% 	\end{subfigure}
+% 	\caption{\label{fig:smoothers4} The smoothing properties of the smoothers for constant coefficient 2D fan.}
+% \end{figure}
+
+% \begin{figure}
+% 	\centering
+% 	\begin{subfigure}[b]{0.49\textwidth}
+% 		\centering
+% 		\input{tikz/smoothers-order1-var-shell.tikz}
+% 		\caption{$p=1$, smoothing}
+% 	\end{subfigure}
+% 	\begin{subfigure}[b]{0.49\textwidth}
+% 		\centering
+% 		\input{tikz/vcycle-order1-var-shell.tikz}
+% 		\caption{$p=1$, single v-cycle}
+% 	\end{subfigure}
+% 	\\
+% 	\begin{subfigure}[b]{0.49\textwidth}
+% 		\centering
+% 		\input{tikz/smoothers-order2-var-shell.tikz}
+% 		\caption{$p=2$, smoothing}
+% 	\end{subfigure}
+% 	\begin{subfigure}[b]{0.49\textwidth}
+% 		\centering
+% 		\input{tikz/vcycle-order2-var-shell.tikz}
+% 		\caption{$p=2$, single v-cycle}
+% 	\end{subfigure}
+% 	\\
+% 	\begin{subfigure}[b]{0.49\textwidth}
+% 		\centering
+% 		\input{tikz/smoothers-order4-var-shell.tikz}
+% 		\caption{$p=4$, smoothing}
+% 	\end{subfigure}
+% 	\begin{subfigure}[b]{0.49\textwidth}
+% 		\centering
+% 		\input{tikz/vcycle-order4-var-shell.tikz}
+% 		\caption{$p=4$, single v-cycle}
+% 	\end{subfigure}
+% 	\\
+% 	\begin{subfigure}[b]{0.49\textwidth}
+% 		\centering
+% 		\input{tikz/smoothers-order8-var-shell.tikz}
+% 		\caption{$p=8$, smoothing}
+% 	\end{subfigure}
+% 	\begin{subfigure}[b]{0.49\textwidth}
+% 		\centering
+% 		\input{tikz/vcycle-order8-var-shell.tikz}
+% 		\caption{$p=8$, single v-cycle}
+% 	\end{subfigure}
+% 	\caption{\label{fig:smoothers5} The smoothing properties of the smoothers for variable coefficient 2D fan.}
+% \end{figure}
 
 
 
