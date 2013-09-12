@@ -55,7 +55,7 @@ set(hFig, 'Position', [200 200 800 800])
 % u0 = evec*lam;
 % r = g.residual(g.L, u0);
 % q = repmat(u0,size(u0'));
-b = u0' * evec; % dot (evec, q);
+b = evec' * u0; % dot (evec, q);
 semilogy(abs(b), 'k'); hold on;
 
 %~~~~~~~~~~~~~~~~~~~~~~~~~ 
@@ -70,11 +70,11 @@ res(:,:,1) = reshape(u0, nun, nun);
 % jacobi 
 g.set_smoother('jacobi');
 u1 = u0; %evec*lam;
-u = g.smooth(4, g.L, u1);
+u = g.smooth(4, 0*g.L, u1);
 % compute projections ...
 % q = repmat(u,size(u'));
-% r = g.residual(g.L, u);
-b = u' * evec; % abs(dot (evec, q));
+r = g.residual(u, 0*g.L);
+b = evec' * u; % abs(dot (evec, q));
 % plot eigenvalues
 semilogy(abs(b), 'b'); %, 'MarkerSize', 5); hold on;
 
@@ -85,13 +85,13 @@ res(:,:,2) = reshape(u, nun, nun);
 % chebyshev 
 g.set_smoother('chebyshev');
 u1 = u0; % evec*lam;
-u = g.smooth(4, g.L, u1);
+u = g.smooth(4, 0*g.L, u1);
 %g.set_smoother('ssor');
 %%u = g.smooth(2, g.L, u);
 % compute projections ...
 % q = repmat(u,size(u'));
-r = g.residual(g.L, u);
-b = u' * evec; % abs(dot (evec, q));
+r = g.residual(0*g.L, u);
+b = evec' * u; % abs(dot (evec, q));
 % plot eigenvalues
 semilogy(abs(b), 'm'); 
 dlmwrite(fname1,abs(b),'delimiter','\t','precision',6, '-append');
@@ -101,11 +101,11 @@ res(:,:,3) = reshape(u, nun, nun);
 % ssor 
 g.set_smoother('ssor');
 u1 = u0; % evec*lam;
-u = g.smooth(2, g.L, u1);
+u = g.smooth(2, 0*g.L, u1);
 % compute projections ...
 % q = repmat(u,size(u'));
-r = g.residual(g.L, u);
-b = u' * evec; %abs(dot (evec, q));
+r = g.residual(0*g.L, u);
+b = evec' * u; %abs(dot (evec, q));
 % plot eigenvalues
 semilogy(abs(b), 'g'); %, 'MarkerSize', 5); 
 dlmwrite(fname1,abs(b),'delimiter','\t','precision',6, '-append');
@@ -115,8 +115,7 @@ res(:,:,4) = reshape(u, nun, nun);
 title(['N = ' num2str(order*nelem+1) '^2' ' , p = ' num2str(order)]);
 
 grid on;
-
-% ylim([0.001, 10]);
+ylim([1e-7, 1.2]);
 
 % print ('-depsc2', ['smoothers-order' num2str(order) sfix '.eps']);
 % matlab2tikz (['smoothers-order' num2str(order) sfix '.tikz'], 'checkForUpdates', false, 'showInfo', false);
@@ -130,36 +129,36 @@ set(gcf,'PaperPositionMode','auto')
 set(hFig, 'Position', [200 200 800 800])
 
 
-r = g.residual(g.L, u0);
-b = u0' * evec; % dot (evec, q);
+r = g.residual(0*g.L, u0);
+b = evec' * u0; % dot (evec, q);
 semilogy(abs(b), 'k'); hold on;
 
 % jacobi 
 u1 = u0; %evec*lam;
-[u, rr, iter3] = g.solve(1, 'jacobi', 4, g.L, u1); 
-r = g.residual(g.L, u);
-b = u' * evec; % abs(dot (evec, q));
+[u, rr, iter3] = g.solve(1, 'jacobi', 4, 0*g.L, u1); 
+r = g.residual(0*g.L, u);
+b = evec' * u; % abs(dot (evec, q));
 % plot eigenvalues
 semilogy(abs(b), 'b'); %, 'LineWidth', 3); hold on;
 dlmwrite(fname2,abs(b),'delimiter','\t','precision',6, '-append');
 
 % chebyshev 
 u1 = u0; % evec*lam;
-[u, rr, iter3] = g.solve(1, 'chebyshev', 4, g.L, u1); 
+[u, rr, iter3] = g.solve(1, 'chebyshev', 4, 0*g.L, u1); 
 %[u, rr, iter3] = g.solve(1, 'ssor', 2, g.L, u); 
 % compute projections ...
 % q = repmat(u,size(u'));
-r = g.residual(g.L, u);
-b = u' * evec; % abs(dot (evec, q));
+r = g.residual(0*g.L, u);
+b = evec' * u; % abs(dot (evec, q));
 % plot eigenvalues
 semilogy(abs(b), 'm'); 
 dlmwrite(fname2,abs(b),'delimiter','\t','precision',6, '-append');
 % ssor 
 u1 = u0; % evec*lam;
-[u, rr, iter3] = g.solve(1, 'ssor', 2, g.L, u1); 
+[u, rr, iter3] = g.solve(1, 'ssor', 2, 0*g.L, u1); 
 % compute projections ...
-r = g.residual(g.L, u);
-b = u' * evec; %abs(dot (evec, q));
+r = g.residual(0*g.L, u);
+b = evec' * u; %abs(dot (evec, q));
 % plot eigenvalues
 semilogy(abs(b), 'g'); %, 'LineWidth', 3); 
 dlmwrite(fname2,abs(b),'delimiter','\t','precision',6, '-append');
@@ -168,7 +167,7 @@ title(['N = ' num2str(order*nelem+1) '^2' ' , p = ' num2str(order)]);
 
 grid on;
 
-% ylim([0.00001, 1.2]);
+ylim([1e-7, 1.2]);
 
 % print ('-depsc2', ['vcycle-order' num2str(order) sfix '.eps']);
 % matlab2tikz (['vcycle-order' num2str(order) sfix '.tikz'], 'checkForUpdates', false, 'showInfo', false);

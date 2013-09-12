@@ -600,7 +600,9 @@ classdef grid < handle
     function evec = get_eigenvectors(grid)
       % generate the correct matrix 
       Kc = grid.K; %(eye(size(grid.K)) - grid.ZeroBoundary) + grid.ZeroBoundary * grid.K * grid.ZeroBoundary;
-      [evec, eval] = eig(full(Kc)); % eig(full(Kc), full(grid.M));
+      [evec, eval] = svd(full(Kc)); %eig(full(Kc), full(grid.M));
+      [eval,per] = sort(diag(eval),'ascend');
+      evec = evec(:,per);
       grid.k_evec = evec;
       grid.k_lam = eval;
     end
