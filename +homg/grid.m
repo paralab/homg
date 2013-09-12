@@ -183,7 +183,7 @@ classdef grid < handle
     end
 
 
-    function [u, rr, iter] = solve_pcg(grid, num_vcyc, smoother, smooth_steps, rhs, u)
+    function [u, rr, iter] = solve_pcg(grid, num_vcyc, smoother, v1, v2, rhs, u)
       % disp('setting smoother');
       grid.set_smoother(smoother);
       
@@ -191,7 +191,7 @@ classdef grid < handle
       r = grid.residual(rhs, u);
       rho = zeros(size(u));
       % disp('outer v-cycle');
-      rho = grid.vcycle(smooth_steps, smooth_steps, r, rho);
+      rho = grid.vcycle(v1, v2, r, rho);
       p = rho;
       % disp(['Initial residual is ' num2str(norm(r))]);
       % disp('------------------------------------------');
@@ -215,7 +215,7 @@ classdef grid < handle
         
         % precondition ..
         rho = zeros(size(u)); % needed ?
-        rho = grid.vcycle(smooth_steps, smooth_steps, r, rho);
+        rho = grid.vcycle(v1, v2, r, rho);
         
         beta = dot(rho, r) / rho_res ;
         p = rho + beta*p;
@@ -225,7 +225,7 @@ classdef grid < handle
       rr = norm(r)/r0;
     end
     
-    function [u, rr, iter] = solve(grid, num_vcyc, smoother, smooth_steps, rhs, u)
+    function [u, rr, iter] = solve(grid, num_vcyc, smoother, v1, v2, rhs, u)
       grid.set_smoother(smoother);
       % bdy conditions ...
       % u = grid.ZeroBoundary*u;
@@ -235,7 +235,7 @@ classdef grid < handle
       % disp('------------------------------------------');
       r0 = norm(r);
       for i=1:num_vcyc
-        u = grid.vcycle(smooth_steps, smooth_steps, rhs, u);
+        u = grid.vcycle(v1, v2, rhs, u);
         r = grid.residual(rhs, u);
         % disp([num2str(i) ': |res| = ' num2str(norm(r))]);
         if (norm(r)/r0 < 1e-8)
@@ -597,7 +597,7 @@ classdef grid < handle
     end % chebyshev
 
 
-    function evec = get_eigenvectors(grid)
+    function [evec, eval] = get_eigenvectors(grid)
       % generate the correct matrix 
       Kc = grid.K; %(eye(size(grid.K)) - grid.ZeroBoundary) + grid.ZeroBoundary * grid.K * grid.ZeroBoundary;
       [evec, eval] = svd(full(Kc)); %eig(full(Kc), full(grid.M));
