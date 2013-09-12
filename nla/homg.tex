@@ -115,10 +115,9 @@ for spectral elements, e.g.,~\cite{DevilleFischerMund02}. We use
 quadrilateral and hexahedral finite elements in our comparisons. While
 this work is partly driven by our interest in scalable parallel
 simulations on nonconforming meshes derived from adaptive octrees
-(e.g.,\cite{SundarBirosBursteddeEtAl12} \todo{add 1-2 more of our refs
-  where high-order gmg would be handy}), for the comparisons presented
-in this paper we restrict ourselves to conforming meshes, for
-simplicity.
+(e.g.,\cite{SundarBirosBursteddeEtAl12, SampathBiros10,
+  BursteddeGhattasGurnisEtAl10}, for the comparisons presented in this
+paper we restrict ourselves to conforming meshes, for simplicity.
 
 
 Moreover, we consider parallelization aspects relevant for
@@ -153,8 +152,14 @@ performance competible with Gauss-Seidel smoothing.
 \item p-multigrid
 \cite{HelenbrookMavriplisAtkins03}
 
-\item Foundations of spectral element multigrid
-\cite{RonquistPatera87,MadayMunoz88}
+\item Foundations of spectral element multigrid: Already
+  in~\cite{RonquistPatera87}, the authors observe that point smoothers
+  such as the simple Jacobi method result in resolution-independent
+  convergence rates for high-order (spectral) elements on simple one
+  and two dimensional geometries. Theoretical background for these
+  results is given in~\cite{MadayMunoz88}, where the multigrid
+  convergence is studied for one dimensionional spectral and spectral
+  element problems.
 
 \item Also have to look into:
 \cite{CanutoGervasioQuarteroni10,DevilleMund90}
