@@ -60,8 +60,8 @@ semilogy(abs(b), 'k'); hold on;
 
 %~~~~~~~~~~~~~~~~~~~~~~~~~ 
 if (order == 1)
-  dlmwrite(fname1,abs(b),'delimiter','\t','precision',6);
-  dlmwrite(fname2,abs(b),'delimiter','\t','precision',6);
+  dlmwrite(fname1,abs(b'),'delimiter','\t','precision',6);
+  dlmwrite(fname2,abs(b'),'delimiter','\t','precision',6);
 end
 
 
@@ -78,7 +78,7 @@ b = evec' * u; % abs(dot (evec, q));
 % plot eigenvalues
 semilogy(abs(b), 'b'); %, 'MarkerSize', 5); hold on;
 
-dlmwrite(fname1,abs(b),'delimiter','\t','precision',6, '-append');
+dlmwrite(fname1,abs(b'),'delimiter','\t','precision',6, '-append');
 
 res(:,:,2) = reshape(u, nun, nun);
 
@@ -94,7 +94,7 @@ r = g.residual(0*g.L, u);
 b = evec' * u; % abs(dot (evec, q));
 % plot eigenvalues
 semilogy(abs(b), 'm'); 
-dlmwrite(fname1,abs(b),'delimiter','\t','precision',6, '-append');
+dlmwrite(fname1,abs(b'),'delimiter','\t','precision',6, '-append');
 
 res(:,:,3) = reshape(u, nun, nun);
 
@@ -108,7 +108,7 @@ r = g.residual(0*g.L, u);
 b = evec' * u; %abs(dot (evec, q));
 % plot eigenvalues
 semilogy(abs(b), 'g'); %, 'MarkerSize', 5); 
-dlmwrite(fname1,abs(b),'delimiter','\t','precision',6, '-append');
+dlmwrite(fname1,abs(b'),'delimiter','\t','precision',6, '-append');
 
 res(:,:,4) = reshape(u, nun, nun);
 
@@ -140,7 +140,7 @@ r = g.residual(0*g.L, u);
 b = evec' * u; % abs(dot (evec, q));
 % plot eigenvalues
 semilogy(abs(b), 'b'); %, 'LineWidth', 3); hold on;
-dlmwrite(fname2,abs(b),'delimiter','\t','precision',6, '-append');
+dlmwrite(fname2,abs(b'),'delimiter','\t','precision',6, '-append');
 
 % chebyshev 
 u1 = u0; % evec*lam;
@@ -152,7 +152,7 @@ r = g.residual(0*g.L, u);
 b = evec' * u; % abs(dot (evec, q));
 % plot eigenvalues
 semilogy(abs(b), 'm'); 
-dlmwrite(fname2,abs(b),'delimiter','\t','precision',6, '-append');
+dlmwrite(fname2,abs(b'),'delimiter','\t','precision',6, '-append');
 % ssor 
 u1 = u0; % evec*lam;
 [u, rr, iter3] = g.solve(1, 'ssor', 2, 0*g.L, u1); 
@@ -161,7 +161,7 @@ r = g.residual(0*g.L, u);
 b = evec' * u; %abs(dot (evec, q));
 % plot eigenvalues
 semilogy(abs(b), 'g'); %, 'LineWidth', 3); 
-dlmwrite(fname2,abs(b),'delimiter','\t','precision',6, '-append');
+dlmwrite(fname2,abs(b'),'delimiter','\t','precision',6, '-append');
 
 title(['N = ' num2str(order*nelem+1) '^2' ' , p = ' num2str(order)]);
 
