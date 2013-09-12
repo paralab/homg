@@ -193,8 +193,8 @@ classdef grid < handle
       % disp('outer v-cycle');
       rho = grid.vcycle(smooth_steps, smooth_steps, r, rho);
       p = rho;
-      disp(['Initial residual is ' num2str(norm(r))]);
-      disp('------------------------------------------');
+      % disp(['Initial residual is ' num2str(norm(r))]);
+      % disp('------------------------------------------');
       r0 = norm(r);
       for i=1:num_vcyc
         % disp(['inner v-cycle: ' num2str(i)]);
@@ -206,7 +206,7 @@ classdef grid < handle
 
         % rho_res_prev = rho_res;
         
-        disp([num2str(i, '%03d\t') ': |res| = ' num2str(norm(r),'\t%8.4e')]);
+        % disp([num2str(i, '%03d\t') ': |res| = ' num2str(norm(r),'\t%8.4e')]);
         if (norm(r)/r0 < 1e-8)
           iter = i;
           rr = norm(r)/r0;
@@ -220,7 +220,7 @@ classdef grid < handle
         beta = dot(rho, r) / rho_res ;
         p = rho + beta*p;
       end
-      disp('------------------------------------------');
+      % disp('------------------------------------------');
       iter = num_vcyc;
       rr = norm(r)/r0;
     end
@@ -231,20 +231,20 @@ classdef grid < handle
       % u = grid.ZeroBoundary*u;
       
       r = grid.residual(rhs, u);
-      disp(['Initial residual is ' num2str(norm(r))]);
-      disp('------------------------------------------');
+      % disp(['Initial residual is ' num2str(norm(r))]);
+      % disp('------------------------------------------');
       r0 = norm(r);
       for i=1:num_vcyc
         u = grid.vcycle(smooth_steps, smooth_steps, rhs, u);
         r = grid.residual(rhs, u);
-        disp([num2str(i) ': |res| = ' num2str(norm(r))]);
+        % disp([num2str(i) ': |res| = ' num2str(norm(r))]);
         if (norm(r)/r0 < 1e-8)
           iter = i;
           rr = norm(r)/r0;
           return;
         end
       end
-      disp('------------------------------------------');
+      % disp('------------------------------------------');
       iter = num_vcyc;
       rr = norm(r)/r0;
     end
