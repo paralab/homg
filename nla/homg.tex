@@ -456,11 +456,11 @@ setup step using, for instance, a power method.
 	\begin{subfigure}[b]{0.49\textwidth}
 		\centering
 		\begin{tikzpicture}[scale=0.8]
-		\begin{semilogyaxis}[ymajorgrids,ymin=1e-8,ymax=2,xmin=0,xmax=1081]
+		\begin{semilogyaxis}[ymajorgrids,ymin=1e-6,ymax=2,xmin=0,xmax=961]
 		\addplot[color=black]  table[x=dof, y=u]{data/smoother-const-box.dat};
-		\addplot[color=blue!70,opacity=0.5]   table[x=dof, y=jacobi1]{data/smoother-const-box.dat};
-		\addplot[color=red!50!black,opacity=0.5] table[x=dof, y=chebyshev1]{data/smoother-const-box.dat};
-		\addplot[color=green!70!black,opacity=0.5]  table[x=dof, y=ssor1]{data/smoother-const-box.dat};
+		\addplot[color=blue!70,only marks, mark=*,mark size=1pt]   table[x=dof, y=jacobi1]{data/smoother-const-box.dat};
+		\addplot[color=red!70!black,only marks, mark=*,mark size=1pt] table[x=dof, y=chebyshev1]{data/smoother-const-box.dat};
+		\addplot[color=green!70!black,only marks, opacity=0.5,mark=*,mark size=1pt]  table[x=dof, y=ssor1]{data/smoother-const-box.dat};
 		\end{semilogyaxis}
 		\end{tikzpicture}
 		\caption{$p=1$, smoothing}
@@ -468,11 +468,11 @@ setup step using, for instance, a power method.
 	\begin{subfigure}[b]{0.49\textwidth}
 		\centering
 		\begin{tikzpicture}[scale=0.8]
-		\begin{semilogyaxis}[ymajorgrids,ymin=1e-8,ymax=2,xmin=0,xmax=1081,yticklabels={,,}]
+		\begin{semilogyaxis}[ymajorgrids,ymin=1e-6,ymax=2,xmin=0,xmax=961,yticklabels={,,}]
 		\addplot[color=black]  table[x=dof, y=u]{data/vcycle-const-box.dat};
-		\addplot[color=blue!70,opacity=0.5]   table[x=dof, y=jacobi1]{data/vcycle-const-box.dat};
-		\addplot[color=red!50!black,opacity=0.5] table[x=dof, y=chebyshev1]{data/vcycle-const-box.dat};
-		\addplot[color=green!70!black,opacity=0.5]  table[x=dof, y=ssor1]{data/vcycle-const-box.dat};
+		\addplot[color=blue!70,opacity=0.5,only marks, mark=*,mark size=1pt]   table[x=dof, y=jacobi1]{data/vcycle-const-box.dat};
+		\addplot[color=red!70!black,opacity=0.5,only marks, mark=*,mark size=1pt] table[x=dof, y=chebyshev1]{data/vcycle-const-box.dat};
+		\addplot[color=green!70!black,opacity=0.5,only marks, mark=*,mark size=1pt]  table[x=dof, y=ssor1]{data/vcycle-const-box.dat};
 		\end{semilogyaxis}
 		\end{tikzpicture}
 		\caption{$p=1$, single v-cycle}
@@ -481,36 +481,11 @@ setup step using, for instance, a power method.
 	\begin{subfigure}[b]{0.49\textwidth}
 		\centering
 		\begin{tikzpicture}[scale=0.8]
-		\begin{semilogyaxis}[ymajorgrids,ymin=1e-8,ymax=2,xmin=0,xmax=1081]
+		\begin{semilogyaxis}[ymajorgrids,ymin=1e-6,ymax=2,xmin=0,xmax=961]
 		\addplot[color=black]  table[x=dof, y=u]{data/smoother-const-box.dat};
-		\addplot[color=blue!70,opacity=0.5]   table[x=dof, y=jacobi2]{data/smoother-const-box.dat};
-		\addplot[color=red!50!black,opacity=0.5] table[x=dof, y=chebyshev2]{data/smoother-const-box.dat};
-		\addplot[color=green!70!black,opacity=0.5]  table[x=dof, y=ssor2]{data/smoother-const-box.dat};
-		\end{semilogyaxis}
-		\end{tikzpicture}
-		\caption{$p=2$, smoothing}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.49\textwidth}
-		\centering
-		\begin{tikzpicture}[scale=0.8]
-		\begin{semilogyaxis}[ymajorgrids,ymin=1e-8,ymax=2,xmin=0,xmax=1081,yticklabels={,,}]
-		\addplot[color=black]  table[x=dof, y=u]{data/vcycle-const-box.dat};
-		\addplot[color=blue!70,opacity=0.5]   table[x=dof, y=jacobi2]{data/vcycle-const-box.dat};
-		\addplot[color=red!50!black,opacity=0.5] table[x=dof, y=chebyshev2]{data/vcycle-const-box.dat};
-		\addplot[color=green!70!black,opacity=0.5]  table[x=dof, y=ssor2]{data/vcycle-const-box.dat};
-		\end{semilogyaxis}
-		\end{tikzpicture}
-		\caption{$p=2$, single v-cycle}
-	\end{subfigure}
-	\\
-	\begin{subfigure}[b]{0.49\textwidth}
-		\centering
-		\begin{tikzpicture}[scale=0.8]
-		\begin{semilogyaxis}[ymajorgrids,ymin=1e-8,ymax=2,xmin=0,xmax=1081,yticklabels={,,}]
-		\addplot[color=black]  table[x=dof, y=u]{data/smoother-const-box.dat};
-		\addplot[color=blue!70,opacity=0.5]   table[x=dof, y=jacobi4]{data/smoother-const-box.dat};
-		\addplot[color=red!50!black,opacity=0.5] table[x=dof, y=chebyshev4]{data/smoother-const-box.dat};
-		\addplot[color=green!70!black,opacity=0.5]  table[x=dof, y=ssor4]{data/smoother-const-box.dat};
+		\addplot[color=blue!70,opacity=0.5,only marks, mark=*,mark size=1pt]   table[x=dof, y=jacobi4]{data/smoother-const-box.dat};
+		\addplot[color=red!70!black,opacity=0.5,only marks, mark=*,mark size=1pt] table[x=dof, y=chebyshev4]{data/smoother-const-box.dat};
+		\addplot[color=green!70!black,opacity=0.5,only marks, mark=*,mark size=1pt]  table[x=dof, y=ssor4]{data/smoother-const-box.dat};
 		\end{semilogyaxis}
 		\end{tikzpicture}
 		\caption{$p=4$, smoothing}
@@ -518,11 +493,11 @@ setup step using, for instance, a power method.
 	\begin{subfigure}[b]{0.49\textwidth}
 		\centering
 		\begin{tikzpicture}[scale=0.8]
-		\begin{semilogyaxis}[ymajorgrids,ymin=1e-8,ymax=2,xmin=0,xmax=1081,yticklabels={,,}]
+		\begin{semilogyaxis}[ymajorgrids,ymin=1e-6,ymax=2,xmin=0,xmax=961,yticklabels={,,}]
 		\addplot[color=black]  table[x=dof, y=u]{data/vcycle-const-box.dat};
-		\addplot[color=blue!70,opacity=0.5]   table[x=dof, y=jacobi4]{data/vcycle-const-box.dat};
-		\addplot[color=red!50!black,opacity=0.5] table[x=dof, y=chebyshev4]{data/vcycle-const-box.dat};
-		\addplot[color=green!70!black,opacity=0.5]  table[x=dof, y=ssor4]{data/vcycle-const-box.dat};
+		\addplot[color=blue!70,only marks,opacity=0.5, mark=*,mark size=1pt]   table[x=dof, y=jacobi4]{data/vcycle-const-box.dat};
+		\addplot[color=red!70!black,only marks,opacity=0.5, mark=*,mark size=1pt] table[x=dof, y=chebyshev4]{data/vcycle-const-box.dat};
+		\addplot[color=green!70!black,only marks,opacity=0.5, mark=*,mark size=1pt]  table[x=dof, y=ssor4]{data/vcycle-const-box.dat};
 		\end{semilogyaxis}
 		\end{tikzpicture}
 		\caption{$p=4$, single v-cycle}
@@ -531,26 +506,26 @@ setup step using, for instance, a power method.
 	\begin{subfigure}[b]{0.49\textwidth}
 		\centering
 		\begin{tikzpicture}[scale=0.8]
-		\begin{semilogyaxis}[ymajorgrids,ymin=1e-8,ymax=2,xmin=0,xmax=1081]
+		\begin{semilogyaxis}[ymajorgrids,ymin=1e-6,ymax=2,xmin=0,xmax=961]
 		\addplot[color=black]  table[x=dof, y=u]{data/smoother-const-box.dat};
-		\addplot[color=blue!70,opacity=0.5]   table[x=dof, y=jacobi8]{data/smoother-const-box.dat};
-		\addplot[color=red!50!black,opacity=0.5] table[x=dof, y=chebyshev8]{data/smoother-const-box.dat};
-		\addplot[color=green!70!black,opacity=0.5]  table[x=dof, y=ssor8]{data/smoother-const-box.dat};
+		\addplot[color=blue!70,opacity=0.5,only marks, mark=*,mark size=1pt]   table[x=dof, y=jacobi16]{data/smoother-const-box.dat};
+		\addplot[color=red!70!black,opacity=0.5,only marks, mark=*,mark size=1pt] table[x=dof, y=chebyshev16]{data/smoother-const-box.dat};
+		\addplot[color=green!70!black,opacity=0.5,only marks, mark=*,mark size=1pt]  table[x=dof, y=ssor16]{data/smoother-const-box.dat};
 		\end{semilogyaxis}
 		\end{tikzpicture}
-		\caption{$p=8$, smoothing}
+		\caption{$p=16$, smoothing}
 	\end{subfigure}
 	\begin{subfigure}[b]{0.49\textwidth}
 		\centering
 		\begin{tikzpicture}[scale=0.8]
-		\begin{semilogyaxis}[ymajorgrids,ymin=1e-8,ymax=2,xmin=0,xmax=1081,yticklabels={,,}]
+		\begin{semilogyaxis}[ymajorgrids,ymin=1e-6,ymax=2,xmin=0,xmax=961,yticklabels={,,}]
 		\addplot[color=black]  table[x=dof, y=u]{data/vcycle-const-box.dat};
-		\addplot[color=blue!70,opacity=0.5]   table[x=dof, y=jacobi8]{data/vcycle-const-box.dat};
-		\addplot[color=red!50!black,opacity=0.5] table[x=dof, y=chebyshev8]{data/vcycle-const-box.dat};
-		\addplot[color=green!70!black,opacity=0.5]  table[x=dof, y=ssor8]{data/vcycle-const-box.dat};
+		\addplot[color=blue!70,opacity=0.5,only marks, mark=square*,mark size=1pt]   table[x=dof, y=jacobi16]{data/vcycle-const-box.dat};
+		\addplot[color=red!70!black,opacity=0.4,only marks, mark=*,mark size=1pt] table[x=dof, y=chebyshev16]{data/vcycle-const-box.dat};
+		\addplot[color=green!70!black,opacity=0.6,only marks, mark=diamond*,mark size=1pt]  table[x=dof, y=ssor16]{data/vcycle-const-box.dat};
 		\end{semilogyaxis}
 		\end{tikzpicture}
-		\caption{$p=8$, single v-cycle}
+		\caption{$p=16$, single v-cycle}
 	\end{subfigure}
 	\caption{\label{fig:smoothers2} The smoothing properties of the smoothers for constant coefficient 2D box.}
 \end{figure}
@@ -562,11 +537,11 @@ setup step using, for instance, a power method.
 	\begin{subfigure}[b]{0.49\textwidth}
 		\centering
 		\begin{tikzpicture}[scale=0.8]
-		\begin{semilogyaxis}[ymajorgrids,ymin=1e-5,ymax=2,xmin=0,xmax=1081]
+		\begin{semilogyaxis}[ymajorgrids,ymin=1e-6,ymax=2,xmin=0,xmax=961]
 		\addplot[color=black]  table[x=dof, y=u]{data/smoother-var-shell.dat};
-		\addplot[color=blue!70,opacity=0.5]   table[x=dof, y=jacobi1]{data/smoother-var-shell.dat};
-		\addplot[color=red!50!black,opacity=0.5] table[x=dof, y=chebyshev1]{data/smoother-var-shell.dat};
-		\addplot[color=green!70!black,opacity=0.5]  table[x=dof, y=ssor1]{data/smoother-var-shell.dat};
+		\addplot[color=blue!70,only marks, mark=*,mark size=1pt]   table[x=dof, y=jacobi1]{data/smoother-var-shell.dat};
+		\addplot[color=red!70!black,only marks, mark=*,mark size=1pt] table[x=dof, y=chebyshev1]{data/smoother-var-shell.dat};
+		\addplot[color=green!70!black,only marks, opacity=0.5,mark=*,mark size=1pt]  table[x=dof, y=ssor1]{data/smoother-var-shell.dat};
 		\end{semilogyaxis}
 		\end{tikzpicture}
 		\caption{$p=1$, smoothing}
@@ -574,11 +549,11 @@ setup step using, for instance, a power method.
 	\begin{subfigure}[b]{0.49\textwidth}
 		\centering
 		\begin{tikzpicture}[scale=0.8]
-		\begin{semilogyaxis}[ymajorgrids,ymin=1e-5,ymax=2,xmin=0,xmax=1081,yticklabels={,,}]
+		\begin{semilogyaxis}[ymajorgrids,ymin=1e-6,ymax=2,xmin=0,xmax=961,yticklabels={,,}]
 		\addplot[color=black]  table[x=dof, y=u]{data/vcycle-var-shell.dat};
-		\addplot[color=blue!70,opacity=0.5]   table[x=dof, y=jacobi1]{data/vcycle-var-shell.dat};
-		\addplot[color=red!50!black,opacity=0.5] table[x=dof, y=chebyshev1]{data/vcycle-var-shell.dat};
-		\addplot[color=green!70!black,opacity=0.5]  table[x=dof, y=ssor1]{data/vcycle-var-shell.dat};
+		\addplot[color=blue!70,opacity=0.5,only marks, mark=*,mark size=1pt]   table[x=dof, y=jacobi1]{data/vcycle-var-shell.dat};
+		\addplot[color=red!70!black,opacity=0.5,only marks, mark=*,mark size=1pt] table[x=dof, y=chebyshev1]{data/vcycle-var-shell.dat};
+		\addplot[color=green!70!black,opacity=0.5,only marks, mark=*,mark size=1pt]  table[x=dof, y=ssor1]{data/vcycle-var-shell.dat};
 		\end{semilogyaxis}
 		\end{tikzpicture}
 		\caption{$p=1$, single v-cycle}
@@ -587,36 +562,11 @@ setup step using, for instance, a power method.
 	\begin{subfigure}[b]{0.49\textwidth}
 		\centering
 		\begin{tikzpicture}[scale=0.8]
-		\begin{semilogyaxis}[ymajorgrids,ymin=1e-5,ymax=2,xmin=0,xmax=1081]
+		\begin{semilogyaxis}[ymajorgrids,ymin=1e-6,ymax=2,xmin=0,xmax=961]
 		\addplot[color=black]  table[x=dof, y=u]{data/smoother-var-shell.dat};
-		\addplot[color=blue!70,opacity=0.5]   table[x=dof, y=jacobi2]{data/smoother-var-shell.dat};
-		\addplot[color=red!50!black,opacity=0.5] table[x=dof, y=chebyshev2]{data/smoother-var-shell.dat};
-		\addplot[color=green!70!black,opacity=0.5]  table[x=dof, y=ssor2]{data/smoother-var-shell.dat};
-		\end{semilogyaxis}
-		\end{tikzpicture}
-		\caption{$p=2$, smoothing}
-	\end{subfigure}
-	\begin{subfigure}[b]{0.49\textwidth}
-		\centering
-		\begin{tikzpicture}[scale=0.8]
-		\begin{semilogyaxis}[ymajorgrids,ymin=1e-5,ymax=2,xmin=0,xmax=1081,yticklabels={,,}]
-		\addplot[color=black]  table[x=dof, y=u]{data/vcycle-var-shell.dat};
-		\addplot[color=blue!70,opacity=0.5]   table[x=dof, y=jacobi2]{data/vcycle-var-shell.dat};
-		\addplot[color=red!50!black,opacity=0.5] table[x=dof, y=chebyshev2]{data/vcycle-var-shell.dat};
-		\addplot[color=green!70!black,opacity=0.5]  table[x=dof, y=ssor2]{data/vcycle-var-shell.dat};
-		\end{semilogyaxis}
-		\end{tikzpicture}
-		\caption{$p=2$, single v-cycle}
-	\end{subfigure}
-	\\
-	\begin{subfigure}[b]{0.49\textwidth}
-		\centering
-		\begin{tikzpicture}[scale=0.8]
-		\begin{semilogyaxis}[ymajorgrids,ymin=1e-5,ymax=2,xmin=0,xmax=1081]
-		\addplot[color=black]  table[x=dof, y=u]{data/smoother-var-shell.dat};
-		\addplot[color=blue!70,opacity=0.5]   table[x=dof, y=jacobi4]{data/smoother-var-shell.dat};
-		\addplot[color=red!50!black,opacity=0.5] table[x=dof, y=chebyshev4]{data/smoother-var-shell.dat};
-		\addplot[color=green!70!black,opacity=0.5]  table[x=dof, y=ssor4]{data/smoother-var-shell.dat};
+		\addplot[color=blue!70,opacity=0.5,only marks, mark=*,mark size=1pt]   table[x=dof, y=jacobi4]{data/smoother-var-shell.dat};
+		\addplot[color=red!70!black,opacity=0.5,only marks, mark=*,mark size=1pt] table[x=dof, y=chebyshev4]{data/smoother-var-shell.dat};
+		\addplot[color=green!70!black,opacity=0.5,only marks, mark=*,mark size=1pt]  table[x=dof, y=ssor4]{data/smoother-var-shell.dat};
 		\end{semilogyaxis}
 		\end{tikzpicture}
 		\caption{$p=4$, smoothing}
@@ -624,11 +574,11 @@ setup step using, for instance, a power method.
 	\begin{subfigure}[b]{0.49\textwidth}
 		\centering
 		\begin{tikzpicture}[scale=0.8]
-		\begin{semilogyaxis}[ymajorgrids,ymin=1e-5,ymax=2,xmin=0,xmax=1081,yticklabels={,,}]
+		\begin{semilogyaxis}[ymajorgrids,ymin=1e-6,ymax=2,xmin=0,xmax=961,yticklabels={,,}]
 		\addplot[color=black]  table[x=dof, y=u]{data/vcycle-var-shell.dat};
-		\addplot[color=blue!70,opacity=0.5]   table[x=dof, y=jacobi4]{data/vcycle-var-shell.dat};
-		\addplot[color=red!50!black,opacity=0.5] table[x=dof, y=chebyshev4]{data/vcycle-var-shell.dat};
-		\addplot[color=green!70!black,opacity=0.5]  table[x=dof, y=ssor4]{data/vcycle-var-shell.dat};
+		\addplot[color=blue!70,only marks, mark=*,opacity=0.5,mark size=1pt]   table[x=dof, y=jacobi4]{data/vcycle-var-shell.dat};
+		\addplot[color=red!70!black,only marks, mark=*,opacity=0.5,mark size=1pt] table[x=dof, y=chebyshev4]{data/vcycle-var-shell.dat};
+		\addplot[color=green!70!black,only marks, mark=*,opacity=0.5,mark size=1pt]  table[x=dof, y=ssor4]{data/vcycle-var-shell.dat};
 		\end{semilogyaxis}
 		\end{tikzpicture}
 		\caption{$p=4$, single v-cycle}
@@ -637,26 +587,26 @@ setup step using, for instance, a power method.
 	\begin{subfigure}[b]{0.49\textwidth}
 		\centering
 		\begin{tikzpicture}[scale=0.8]
-		\begin{semilogyaxis}[ymajorgrids,ymin=1e-5,ymax=2,xmin=0,xmax=1081]
+		\begin{semilogyaxis}[ymajorgrids,ymin=1e-6,ymax=2,xmin=0,xmax=961]
 		\addplot[color=black]  table[x=dof, y=u]{data/smoother-var-shell.dat};
-		\addplot[color=blue!70,opacity=0.5]   table[x=dof, y=jacobi8]{data/smoother-var-shell.dat};
-		\addplot[color=red!50!black,opacity=0.5] table[x=dof, y=chebyshev8]{data/smoother-var-shell.dat};
-		\addplot[color=green!70!black,opacity=0.5]  table[x=dof, y=ssor8]{data/smoother-var-shell.dat};
+		\addplot[color=blue!70,opacity=0.5,only marks, mark=*,mark size=1pt]   table[x=dof, y=jacobi16]{data/smoother-var-shell.dat};
+		\addplot[color=red!70!black,opacity=0.5,only marks, mark=*,mark size=1pt] table[x=dof, y=chebyshev16]{data/smoother-var-shell.dat};
+		\addplot[color=green!70!black,opacity=0.5,only marks, mark=*,mark size=1pt]  table[x=dof, y=ssor16]{data/smoother-var-shell.dat};
 		\end{semilogyaxis}
 		\end{tikzpicture}
-		\caption{$p=8$, smoothing}
+		\caption{$p=16$, smoothing}
 	\end{subfigure}
 	\begin{subfigure}[b]{0.49\textwidth}
 		\centering
 		\begin{tikzpicture}[scale=0.8]
-		\begin{semilogyaxis}[ymajorgrids,ymin=1e-5,ymax=2,xmin=0,xmax=1081,yticklabels={,,}]
+		\begin{semilogyaxis}[ymajorgrids,ymin=1e-6,ymax=2,xmin=0,xmax=961,yticklabels={,,}]
 		\addplot[color=black]  table[x=dof, y=u]{data/vcycle-var-shell.dat};
-		\addplot[color=blue!70,opacity=0.5]   table[x=dof, y=jacobi8]{data/vcycle-var-shell.dat};
-		\addplot[color=red!50!black,opacity=0.5] table[x=dof, y=chebyshev8]{data/vcycle-var-shell.dat};
-		\addplot[color=green!70!black,opacity=0.5]  table[x=dof, y=ssor8]{data/vcycle-var-shell.dat};
+		\addplot[color=blue!70,opacity=0.5,only marks, mark=square*,mark size=1pt]   table[x=dof, y=jacobi16]{data/vcycle-var-shell.dat};
+		\addplot[color=red!70!black,opacity=0.5,only marks, mark=*,mark size=1pt] table[x=dof, y=chebyshev16]{data/vcycle-var-shell.dat};
+		\addplot[color=green!70!black,opacity=0.5,only marks, mark=diamond*,mark size=1pt]  table[x=dof, y=ssor16]{data/vcycle-var-shell.dat};
 		\end{semilogyaxis}
 		\end{tikzpicture}
-		\caption{$p=8$, single v-cycle}
+		\caption{$p=16$, single v-cycle}
 	\end{subfigure}
 	\caption{\label{fig:smoothers-var} The smoothing properties of the smoothers for variable coefficient 2D fan.}
 \end{figure}
