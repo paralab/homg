@@ -467,8 +467,8 @@ setup step using, for instance, a power method.
 		\begin{tikzpicture}[scale=0.8]
 		\begin{semilogyaxis}[ymajorgrids,ymin=1e-6,ymax=2,xmin=0,xmax=961]
 		\addplot[color=black]  table[x=dof, y=u]{data/smoother-const-box.dat};
-		\addplot[color=blue!70,only marks, mark=*,mark size=1pt]   table[x=dof, y=jacobi1]{data/smoother-const-box.dat};
-		\addplot[color=red!70!black,only marks, mark=*,mark size=1pt] table[x=dof, y=chebyshev1]{data/smoother-const-box.dat};
+		\addplot[color=blue!70, opacity=0.5,only marks, mark=*,mark size=1pt]   table[x=dof, y=jacobi1]{data/smoother-const-box.dat};
+		\addplot[color=red!70!black, opacity=0.5,only marks, mark=*,mark size=1pt] table[x=dof, y=chebyshev1]{data/smoother-const-box.dat};
 		\addplot[color=green!70!black,only marks, opacity=0.5,mark=*,mark size=1pt]  table[x=dof, y=ssor1]{data/smoother-const-box.dat};
 		\end{semilogyaxis}
 		\end{tikzpicture}
@@ -548,8 +548,8 @@ setup step using, for instance, a power method.
 		\begin{tikzpicture}[scale=0.8]
 		\begin{semilogyaxis}[ymajorgrids,ymin=1e-5,ymax=2,xmin=0,xmax=961]
 		\addplot[color=black]  table[x=dof, y=u]{data/smoother-var-shell.dat};
-		\addplot[color=blue!70,only marks, mark=*,mark size=1pt]   table[x=dof, y=jacobi1]{data/smoother-var-shell.dat};
-		\addplot[color=red!70!black,only marks, mark=*,mark size=1pt] table[x=dof, y=chebyshev1]{data/smoother-var-shell.dat};
+		\addplot[color=blue!70, opacity=0.5,only marks, mark=*,mark size=1pt]   table[x=dof, y=jacobi1]{data/smoother-var-shell.dat};
+		\addplot[color=red!70!black, opacity=0.5,only marks, mark=*,mark size=1pt] table[x=dof, y=chebyshev1]{data/smoother-var-shell.dat};
 		\addplot[color=green!70!black,only marks, opacity=0.5,mark=*,mark size=1pt]  table[x=dof, y=ssor1]{data/smoother-var-shell.dat};
 		\end{semilogyaxis}
 		\end{tikzpicture}
@@ -798,7 +798,7 @@ particular, these tables show:
   \caption{\label{tab:box} Results for two-dimensional unit square
     with constant coefficient $\mu\equiv 1$.  A total of 3 grids were
     used, the finest grid was $32\times 32$, and the coarsest was
-    $8\times 8$ \todo{New}.}
+    $8\times 8$ \todo{Final}.}
   \centering
   \begin{tabular}{|r|c c|c c|c c||c c|c c|c c||c c|} 
     \hline
@@ -809,14 +809,14 @@ particular, these tables show:
  & $h$ & $p$ & $h$ & $p$& $h$ & $p$& $h$ & $p$& $h$ & $p$& $h$ & $p$& GLL & unif.\\
  \cline{2-15}
 1 & 6 & & 5 & & 5 & & 5 & & 4 & & 4 & & 1 & 1  \\
-2 & 7 & 7 & 5 & 5 & 5 & 5 & 6 & 6 & 4 & 4 & 4 & 4 & 16 & 16 \\
-3 & 8 & & 6 & & 5 & & 6 & & 5 & & 5 & & 18 & 19  \\
-4 & 9 & 8 & 6 & 6 & 5 & 5 & 6 & 6 & 5 & 5 & 5 & 5 & 20 & 22 \\
+2 & 7 & 7 & 5 & 6 & 5 & 5 & 5 & 5 & 4 & 4 & 4 & 4 & 16 & 16 \\
+3 & 8 & & 6 & & 5 & & 6 & & 5 & & 4 & & 18 & 19  \\
+4 & 9 & 8 & 6 & 6 & 5 & 5 & 6 & 5 & 5 & 5 & 4 & 4 & 20 & 22 \\
 5 & 12 & & 8 & & 7 & & 7 & & 6 & & 5 & & 22 & 26  \\
-6 & 12 & & 9 & & 7 & & 8 & & 6 & & 5 & & 25 & 31  \\
-7 & 16 & & 12 & & 8 & & 9 & & 7 & & 6 & & 26 & 36  \\
-8 & 17 & 14 & 13 & 10 & 8 & 7 & 9 & 9 & 8 & 7 & 6 & 6 & 28 & 42 \\
-16 & 40 & 49 & 33 & 27 & 13 & 11 & 16 & 17 & 13 & 13 & 8 & 8 & 41 & 88\\
+6 & 12 & & 9 & & 7 & & 7 & & 6 & & 5 & & 25 & 31  \\
+7 & 16 & & 12 & & 8 & & 8 & & 7 & & 6 & & 26 & 36  \\
+8 & 17 & 14 & 13 & 10 & 8 & 7 & 9 & 8 & 7 & 6 & 6 & 5 & 28 & 42 \\
+16 & 40 & 33 & 33 & 27 & 17 & 14 & 14 & 12 & 12 & 11 & 9 & 8 & 41 & 87 \\
 \hline
   \end{tabular}
 \end{table}
@@ -824,7 +824,7 @@ particular, these tables show:
 
 \begin{table}
   \caption{\label{tab:2d-fan} Results for two-dimensional warped geometry
-    with varying coefficient \todo{$\mu(\bs x) =$}.}
+    with varying coefficient $\mu(x,y) = 1 + 10^6(\cos^2(2\pi x) + \cos^2(2\pi y))$.}
   \centering
   \begin{tabular}{|r|c c|c c|c c||c c|c c|c c||c c|} 
     \hline
@@ -834,12 +834,14 @@ particular, these tables show:
 \hline
  & $h$ & $p$ & $h$ & $p$& $h$ & $p$& $h$ & $p$& $h$ & $p$& $h$ & $p$& GLL & unif.\\
  \cline{2-15}
-1 & 5 & & 4 & & 4 & & 5 & & 4 & & 3 & & 1 & 1  \\
-2 & 8 & 8 & 5 & 5 & 4 & 5 & 6 & 6 & 4 & 5 & 4 & 4 & 26 & 26 \\
-3 & 9 & & 7 & & 5 & & 7 & & 5 & & 5 & & 29 & 33  \\
-4 & 11 & 10 & 8 & 7 & 6 & 5 & 7 & 7 & 6 & 5 & 5 & 4 & 33 & 42 \\
-8 & 106 & 350 & 46 & 350 & 17 & 15 & 23 & 24 & 20 & 20 & 10 & 10 & 26 & 41 \\
-16 & 350 & 350 & 350 & 350 & 35 & 31 & 35 & 37 & 31 & 30 & 14 & 15 & 33 & 72 \\
+1 & 14 & & 11 & & 6 & & 8 & & 7 & & 5 & & 1 & 1  \\
+2 & 20 & 19 & 15 & 15 & 7 & 8 & 10 & 10 & 8 & 8 & 5 & 6 & 16 & 16 \\
+3 & 20 & & 16 & & 8 & & 10 & & 9 & & 6 & & 19 & 20  \\
+4 & 22 & 21 & 21 & 19 & 10 & 9 & 11 & 10 & 10 & 10 & 7 & 6 & 21 & 24 \\
+5 & -  & & 28 & & 12 & & 14 & & 12 & & 7 & & 22 & 27  \\
+6 & -  & & 35 & & 13 & & 15 & & 13 & & 8 & & 24 & 31  \\
+7 & -  & & 45 & & 16 & & 18 & & 15 & & 9 & & 25 & 35  \\
+8 & -  & - & 52 & 46 & 17 & 15 & 20 & 20 & 16 & 15 & 9 & 8 & 26 & 39 \\
 \hline
   \end{tabular}
 \end{table}
@@ -857,14 +859,14 @@ particular, these tables show:
 \hline
  & $h$ & $p$ & $h$ & $p$& $h$ & $p$& $h$ & $p$& $h$ & $p$& $h$ & $p$& GLL & unif.\\
  \cline{2-15}
-1 & 5 & & 4 & & 4 & & 5 & & 4 & & 3 & & 1 & 1  \\
-2 & 8 & 8 & 5 & 5 & 4 & 5 & 6 & 6 & 4 & 5 & 4 & 4 & 26 & 26 \\
-3 & 9 & & 7 & & 5 & & 7 & & 5 & & 5 & & 29 & 33  \\
+1 & 6 & & 4 & & 4 & & 5 & & 4 & & 3 & & 1 & 1  \\
+2 & 8 & 8 & 4 & 5 & 4 & 5 & 6 & 6 & 4 & 4 & 4 & 4 & 26 & 26 \\
+3 & 10 & & 7 & & 5 & & 6 & & 5 & & 5 & & 29 & 33  \\
 4 & 11 & 10 & 8 & 7 & 6 & 5 & 7 & 7 & 6 & 5 & 5 & 4 & 33 & 42 \\
+5 & 14 & & 10 & & 7 & & 8 & & 7 & & 5 & & 36 & 50  \\
+6 & 16 & & 12 & & 7 & & 9 & & 7 & & 6 & & 40 & 61  \\
+7 & 20 & & 16 & & 9 & & 10 & & 9 & & 6 & & 44 & 74  \\
 \hline
-5 & 14 & & 10 & & 5 & & 8 & & 7 & & 5 & & 36 & 50  \\
-6 & 16 & & 12 & & 6 & & 9 & & 8 & & 5 & & 40 & 61  \\
-7 & 20 & & 15 & & 7 & & 10 & & 9 & & 5 & & 44 & 74  \\
 8 & 22 & 18 & 17 & 15 & 7 & 6 & 11 & 10 & 10 & 8 & 5 & 5 & 52 & 99 \\
 \hline
   \end{tabular}
@@ -872,7 +874,7 @@ particular, these tables show:
 
 \begin{table}
   \caption{\label{tab:3d-fan} Results for three-dimensional warped geometry
-    with varying coefficient \todo{$\mu(\bs x)=$}.}
+    with varying coefficient $\mu(x,y,z) = 1 + 10^6(\cos^2(2\pi x) + \cos^2(2\pi y) + \cos^2(2\pi z))$.}
   \centering
   \begin{tabular}{|r|c c|c c|c c||c c|c c|c c||c c|} 
     \hline
