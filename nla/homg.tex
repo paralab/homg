@@ -467,8 +467,8 @@ setup step using, for instance, a power method.
 		\begin{tikzpicture}[scale=0.8]
 		\begin{semilogyaxis}[ymajorgrids,ymin=1e-6,ymax=2,xmin=0,xmax=961]
 		\addplot[color=black]  table[x=dof, y=u]{data/smoother-const-box.dat};
-		\addplot[color=blue!70,only marks, mark=*,mark size=1pt]   table[x=dof, y=jacobi1]{data/smoother-const-box.dat};
-		\addplot[color=red!70!black,only marks, mark=*,mark size=1pt] table[x=dof, y=chebyshev1]{data/smoother-const-box.dat};
+		\addplot[color=blue!70, opacity=0.5,only marks, mark=*,mark size=1pt]   table[x=dof, y=jacobi1]{data/smoother-const-box.dat};
+		\addplot[color=red!70!black, opacity=0.5,only marks, mark=*,mark size=1pt] table[x=dof, y=chebyshev1]{data/smoother-const-box.dat};
 		\addplot[color=green!70!black,only marks, opacity=0.5,mark=*,mark size=1pt]  table[x=dof, y=ssor1]{data/smoother-const-box.dat};
 		\end{semilogyaxis}
 		\end{tikzpicture}
@@ -548,8 +548,8 @@ setup step using, for instance, a power method.
 		\begin{tikzpicture}[scale=0.8]
 		\begin{semilogyaxis}[ymajorgrids,ymin=1e-5,ymax=2,xmin=0,xmax=961]
 		\addplot[color=black]  table[x=dof, y=u]{data/smoother-var-shell.dat};
-		\addplot[color=blue!70,only marks, mark=*,mark size=1pt]   table[x=dof, y=jacobi1]{data/smoother-var-shell.dat};
-		\addplot[color=red!70!black,only marks, mark=*,mark size=1pt] table[x=dof, y=chebyshev1]{data/smoother-var-shell.dat};
+		\addplot[color=blue!70, opacity=0.5,only marks, mark=*,mark size=1pt]   table[x=dof, y=jacobi1]{data/smoother-var-shell.dat};
+		\addplot[color=red!70!black, opacity=0.5,only marks, mark=*,mark size=1pt] table[x=dof, y=chebyshev1]{data/smoother-var-shell.dat};
 		\addplot[color=green!70!black,only marks, opacity=0.5,mark=*,mark size=1pt]  table[x=dof, y=ssor1]{data/smoother-var-shell.dat};
 		\end{semilogyaxis}
 		\end{tikzpicture}
