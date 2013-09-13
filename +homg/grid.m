@@ -237,7 +237,7 @@ classdef grid < handle
       for i=1:num_vcyc
         u = grid.vcycle(v1, v2, rhs, u);
         r = grid.residual(rhs, u);
-        % disp([num2str(i) ': |res| = ' num2str(norm(r))]);
+        % disp([num2str(i, '%03d\t') ': |res| = ' num2str(norm(r),'\t%8.4e')]);
         if (norm(r)/r0 < 1e-8)
           iter = i;
           rr = norm(r)/r0;
@@ -279,6 +279,7 @@ classdef grid < handle
       
       % 3. restrict
       res_coarse = grid.R * res;
+      res_coarse(grid.Coarse.Boundary) = 0;
       
       % 4. recurse
       u_corr_coarse = grid.Coarse.vcycle(v1, v2, res_coarse, zeros(size(res_coarse)));
@@ -590,7 +591,7 @@ classdef grid < handle
 	  d2 = 2*rhokp1 / delta;
 	  rhok = rhokp1;
 	  res = -grid.residual ( rhs, u ); 
-	  %norm(res)
+	  % disp([num2str(iter) ':' num2str(norm(res))]);
 	  d = d1 * d + d2 * res.*grid.jacobi_invdiag;
 	  u = u + d;
       end

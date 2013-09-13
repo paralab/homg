@@ -1,6 +1,6 @@
 filename=homg
 abstract=homg_abstract
-compilePdfOptions=
+compilePdfOptions=-shell-escape
 
 compile= ${compPdftex}
 compPdftex=pdflatex ${compilePdfOptions}
@@ -25,7 +25,7 @@ bib:
 	bibtex ${filename}
 
 clean:
-	rm -f *.aux *.log *.dvi *.blg *.bbl *.out
+	rm -f *.aux *.log *.dvi *.blg *.bbl *.out ${filename}-figure*
 	@echo Cleaned ....! 
 
 %.pdf: %.tex
