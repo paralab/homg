@@ -1000,14 +1000,14 @@ particular, these tables show:
 \hline
  & $h$ & $p$ & $h$ & $p$& $h$ & $p$& $h$ & $p$& $h$ & $p$& $h$ & $p$& GLL & unif.\\
  \cline{2-15}
-1 & 7 & & 5 & & 4 & & 6 & & 4 & & 4 & & 1 & 1  \\
-2 & 10 & 13 & 5 & 6 & 4 & 5 & 7 & 7 & 4 & 5 & 4 & 4 & 16 & 16 \\
-3 & 9 & & 6 & & 4 & & 7 & & 5 & & 4 & & 18 & 19  \\
-4 & 10 & 19 & 6 & 7 & 4 & 5 & 8 & 8 & 5 & 6 & 4 & 4 & 20 & 23 \\
-5 & 12 & & 8 & & 5 & & 9 & & 6 & & 4 & & 22 & 26  \\
-6 & 12 & & 9 & & 5 & & 9 & & 6 & & 4 & & 25 & 31  \\
-7 & 16 & & 12 & & 6 & & 10 & & 8 & & 5 & & 26 & 36  \\
-8 & 17 & 29 & 13 & 11 & 7 & 6 & 10 & 11 & 8 & 8 & 5 & 5 & 28 & 42 \\
+1 & 6 & & 5 & & 5 & & 5 & & 4 & & 4 & & 1 & 1  \\
+2 & 7 & 7 & 5 & 5 & 5 & 5 & 6 & 6 & 4 & 4 & 4 & 4 & 16 & 16 \\
+3 & 8 & & 6 & & 5 & & 6 & & 5 & & 5 & & 18 & 19  \\
+4 & 9 & 8 & 6 & 6 & 5 & 5 & 6 & 6 & 5 & 5 & 5 & 5 & 20 & 22 \\
+5 & 12 & & 8 & & 7 & & 7 & & 6 & & 5 & & 22 & 26  \\
+6 & 12 & & 9 & & 7 & & 8 & & 6 & & 5 & & 25 & 31  \\
+7 & 16 & & 12 & & 8 & & 9 & & 7 & & 6 & & 26 & 36  \\
+8 & 17 & 14 & 13 & 10 & 8 & 7 & 9 & 9 & 8 & 7 & 6 & 6 & 28 & 42 \\
 16 & 40 & 49 & 33 & 27 & 13 & 11 & 16 & 17 & 13 & 13 & 8 & 8 & 41 & 88\\
 \hline
   \end{tabular}
@@ -1026,13 +1026,10 @@ particular, these tables show:
 \hline
  & $h$ & $p$ & $h$ & $p$& $h$ & $p$& $h$ & $p$& $h$ & $p$& $h$ & $p$& GLL & unif.\\
  \cline{2-15}
-1 & 18 & & 15 & & 6 & & 11 & & 10 & & 5 & & 1 & 1  \\
-2 & 25 & 31 & 20 & 20 & 7 & 8 & 14 & 15 & 12 & 13 & 6 & 7 & 17 & 17 \\
-3 & 27 & & 21 & & 8 & & 15 & & 13 & & 7 & & 19 & 20  \\
-4 & 36 & 350 & 24 & 57 & 10 & 10 & 17 & 18 & 14 & 15 & 7 & 8 & 21 & 25 \\
-5 & 39 & & 30 & & 12 & & 18 & & 15 & & 8 & & 23 & 28  \\
-6 & 63 & & 34 & & 13 & & 20 & & 17 & & 9 & & 25 & 31  \\
-7 & 58 & & 40 & & 15 & & 22 & & 18 & & 9 & & 26 & 37  \\
+1 & 5 & & 4 & & 4 & & 5 & & 4 & & 3 & & 1 & 1  \\
+2 & 8 & 8 & 5 & 5 & 4 & 5 & 6 & 6 & 4 & 5 & 4 & 4 & 26 & 26 \\
+3 & 9 & & 7 & & 5 & & 7 & & 5 & & 5 & & 29 & 33  \\
+4 & 11 & 10 & 8 & 7 & 6 & 5 & 7 & 7 & 6 & 5 & 5 & 4 & 33 & 42 \\
 8 & 106 & 350 & 46 & 350 & 17 & 15 & 23 & 24 & 20 & 20 & 10 & 10 & 26 & 41 \\
 16 & 350 & 350 & 350 & 350 & 35 & 31 & 35 & 37 & 31 & 30 & 14 & 15 & 33 & 72 \\
 \hline
@@ -1066,7 +1063,7 @@ particular, these tables show:
 
 \begin{table}
   \caption{\label{tab:3d-fan} Results for three-dimensional warped geometry
-    with coefficient \todo{$\mu(\bs x)=$}.}
+    with varying coefficient \todo{$\mu(\bs x)=$}.}
   \centering
   \begin{tabular}{|r|c c|c c|c c||c c|c c|c c||c c|} 
     \hline
@@ -1087,39 +1084,6 @@ particular, these tables show:
 \hline
   \end{tabular}
 \end{table}
-
-
-%%% anisotropy - stretched fan
-%\begin{table}
-%  \caption{\label{tab:fan-aniso} Number of CG iterations/v-cycles to converge to a relative tolerance of $10^{-8}$ for $h$-Multigrid applied to high-order operators on a stretched fan domain. A total of 3 grids were used, the finest grid was $48\times 16$, and the coarsest was $12\times 4$. For orders $2,4$, and $8$, we also evaluated the option of first coarsening in $p$ as $p_{coarse} = p_{fine}/2$, till $p=1$, and then coarsen in $h$. The coarsest grid in this case is a $12\times 4$ grid with $p=1$. The number of CG iterations/v-cycles for this case is given in the $p$ column.}
-%		\centering
-%    \begin{tabular}{|l|c|c|c|c|c|c|c|c|c|c|c|c|r|} 
-%\hline
-%		        & \multicolumn{6}{c|}{Multigrid} & \multicolumn{6}{c|}{MG pCG} &          linearized \\
-%												 \cline{2-13}
-%					order &  \multicolumn{2}{c|}{\scriptsize  Jacobi(3)} &  \multicolumn{2}{c|}{\scriptsize Chebyshev(3)} & \multicolumn{2}{c|}{\scriptsize  SSOR(2)} & \multicolumn{2}{c|}{\scriptsize Jacobi(3)} &  \multicolumn{2}{c|}{\scriptsize Chebyshev(3)} & \multicolumn{2}{c|}{\scriptsize SSOR(2)} & pCG\\
-%		\hline
-%		 & $h$ & $p$ & $h$ & $p$& $h$ & $p$& $h$ & $p$& $h$ & $p$& $h$ & $p$& \\
-%		 \cline{2-13}
-% 1 &       16 &      &        21 &        &       6 &         &       9 &         &       10 &       &       5 &      & 5  \\
-% 2 &       22 &  23  &        24 &  24    &       7 &   7     &      10 &  11     &       11 &  11   &       5 &   5  & 67  \\
-% 3 &        - &      &        54 &        &       8 &         &      55 &         &       17 &       &       6 &      & 160  \\
-% 4 &        - &  -   &        97 &  92    &      14 &   13    &       - &         &       23 &  22   &       9 &   8  & 262  \\
-% 5 &        - &      &       313 &        &      22 &         &       - &         &       41 &       &      11 &      & 444  \\
-% 6 &        - &      &         - &        &      76 &         &       - &         &       73 &       &      21 &      & 654  \\
-% 7 &        - &      &         - &        &     259 &         &       - &         &      161 &       &      38 &      & 941  \\
-% 8 &        - &  -   &         - &  -     &       - &    -    &       - &         &        - & 271   &      88 &  72  & 1150  \\
-%\hline
-%	  \end{tabular}
-%\end{table}
-%
-
-
-
-%% 3D
-
-
-
 
 
 \section{Discussion and conclusions}
