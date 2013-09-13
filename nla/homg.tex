@@ -10,6 +10,8 @@
 \usetikzlibrary{shapes,arrows,trees,snakes} %,decorations.pathreplacing,fit}
 % \usepackage{tkz-euclide}
 \usepackage{pgfplots}
+\usepgfplotslibrary{external} 
+\tikzexternalize
 \usepackage{caption,subcaption}
 % \usetkzobj{all} 
 \usepackage{amsmath,amsfonts,amssymb}
@@ -112,73 +114,81 @@ tensorized nodal basis functions on hexahedral meshes, the application
 of elemental matrices to vectors can be implemented efficiently by
 exploiting the tensor structure of the basis functions, as is common
 for spectral elements, e.g.,~\cite{DevilleFischerMund02}. We use
-quadrilateral and hexahedral finite elements in our comparisons. While
-this work is partly driven by our interest in scalable parallel
-simulations on nonconforming meshes derived from adaptive octrees
-(e.g.,\cite{SundarBirosBursteddeEtAl12} \todo{add 1-2 more of our refs
-  where high-order gmg would be handy}), for the comparisons presented
-in this paper we restrict ourselves to conforming meshes, for
-simplicity.
-
+geometry-resolving, isoparametric quadrilateral and hexahedral finite
+elements in our comparisons. While this work is partly driven by our
+interest in scalable parallel simulations on nonconforming meshes
+derived from adaptive octrees (e.g.,\cite{SundarBirosBursteddeEtAl12,
+  SampathBiros10, BursteddeGhattasGurnisEtAl10}, for the comparisons
+presented in this paper we restrict ourselves to conforming meshes,
+for simplicity.
 
 Moreover, we consider parallelization aspects relevant for
 implementations on shared or distributed memory architectures. For
 instance, the implementation of Gauss-Seidel smoothers can be
-challenging in parallel; we thus include a Chebyshev-accelerated
+challenging in parallel~\cite{AdamsBrezinaHuEtAl03,
+  BakerFalgoutKolevEtAl11}; we thus include a Chebyshev-accelerated
 Jacobi smoother in our comparisons. This polynomial smoother is as
-easy to implement in parallel as Jacobi smoothing, but yields a
-performance competible with Gauss-Seidel smoothing.
+easy to implement in parallel as Jacobi smoothing, but often yields a
+performance that is comparable to Gauss-Seidel smoothing.
 
 % The naive assembly and application
 %of these elemental matrices requires $\mathcal O(p^9)$ operatrions,
 %but exploiting the tensor structure of the basis functions allows to
 %reduce this to $\mathcal O(p^7)$ operations
 
+Multigrid for high-order/spectral finite elements has been studied as
+early as in the 1980s. In~~\cite{RonquistPatera87}, the authors
+observe that point smoothers such as the simple Jacobi method result
+in resolution-independent convergence rates for high-order elements on
+simple one and two dimensional geometries. Initial theoretical
+evidence for this behavior is given in~\cite{MadayMunoz88}, where
+multigrid convergence is studied for one-dimensional spectral methods
+and spectral element problems. This high-order geometric multigrid
+requires the computation of high-order residuals and high-order
+interpolation and prolongation. Thus, an efficient implementation
+cannot assemble these operators, i.e., has to be matrix-free.  In this
+paper, we compare different smoothers for such a high-order
+$h$-multigrid method on two and three dimensional complex geometries
+with varying coefficients.
 
+An alternative to this high-order geometric multigrid, which is based
+on a mesh hierarchy is $p$-multigrid, which coarsens the polynomial
+degree while (at least, initially) keeping the mesh unchained, see,
+e.g.,~\cite{HelenbrookMavriplisAtkins03}. Here, we compare the
+performance and this $p$-multigrid approach with $h$-multigrid for
+different smoothers and polynomial orders.
 
+%Even though high-order discretizations can, in principle, benefit from
+%modern hardware, the rapid loss of sparsity of the involved systems as
+%the polynomial order increases represents a significant challenge.
 
-\noindent
-\gsnote{literature review.}
-\begin{itemize}
+A popular strategy for high-order discretizations for unstructured
+meshes, for which the application of geometric multigrid is
+challenging, is to assemble a low-order approximation of the
+high-order system and use an algebraic multigrid method to invert the
+low order (and thus much sparser) operator~\cite{Brown10, Kim07,
+  DevilleMund90, Olson07,
+  CanutoGervasioQuarteroni10}. In~\cite{HeysManteuffelMcCormickEtAl05},
+this approach is compared with the direct application of algebraic
+multigrid to the high-order operator. In our test problems, we compare
+the performance of this low-order preconditioning approach to the
+performance obtained with $h$-multigrid and $p$-multigrid.
 
-\item Large-scale simulations, target:
-\cite{SundarBirosBursteddeEtAl12}
+This paper is organized as follows \ldots
 
-\item Direct application of AMG to high-order systems:
-\cite{HeysManteuffelMcCormickEtAl05}
-
-\item Low-order preconditioning of high-order systems:
-\cite{Brown10,Kim07,DevilleMund90,HeysManteuffelMcCormickEtAl05,Olson07}.
-
-\item p-multigrid
-\cite{HelenbrookMavriplisAtkins03}
-
-\item Foundations of spectral element multigrid
-\cite{RonquistPatera87,MadayMunoz88}
-
-\item Also have to look into:
-\cite{CanutoGervasioQuarteroni10,DevilleMund90}
-
-\end{itemize}
-
-\noindent
 %\gsnote{Unify notion of mesh/grid etc}\\
 % \gsnote{Unify use of high-order vs.\ higher order}\\
-\gsnote{We use hexas, motivated from spectral methods. Main
-  advantage is tensorized basis functions (and, potential octree adaptivity)}\\
-\gsnote{high-order discretizations map better to current architectures}
+%\gsnote{We use hexas, motivated from spectral methods. Main
+%  advantage is tensorized basis functions (and, potential octree adaptivity)}\\
+%\gsnote{high-order discretizations map better to current architectures}
 
 
-
-
-Although there are examples of using Algebraic Multigrid directly on
-operators resulting from high-order discretizations, limited work
-has been done on using geometric multigrid with high-order
-discretizations. To the best of our knowledge, no prior work on using
-geometric multigrid for solving systems arising from high-order
-discretizations on arbitrary geometries using highly adapted meshes.
-
-
+%Although there are examples of using Algebraic Multigrid directly on
+%operators resulting from high-order discretizations, limited work
+%has been done on using geometric multigrid with high-order
+%discretizations. To the best of our knowledge, no prior work on using
+%geometric multigrid for solving systems arising from high-order
+%discretizations on arbitrary geometries using highly adapted meshes.
 
 %In this work, we develop
 %geometric multigrid methods to support higher-order discretizations
@@ -365,7 +375,7 @@ convergence factor on the order of the polynomial basis. \gsnote{We
 
 \subsection{Defect correction using lower-order operator}\label{subsec:low}
 In a defect correction approach (see
-\cite{TrottenbergOosterleeSchuller01}), the high-order defect is
+\cite{TrottenbergOosterleeSchuller01, Hackbusch85}), the high-order defect is
 iteratively corrected using a low order operator obtained by
 overlaying the high-order nodes with a low order (typically linear)
 finite element mesh.  This construction of a low-order preconditioner
@@ -434,9 +444,8 @@ Section~\ref{subsec:schwarz}.
 
 \subsection{Point smoothers}\label{subsec:ptsmoothers}
 In our numerical tests, we compare the Jacobi and the
-symmetric successive over relaxation (SSOR) smoothers
-(see~\cite{TrottenbergOosterleeSchuller01}), as well as a
-Chebyshev-accelerated Jacobi smoother~\cite{....}. All of these
+symmetric successive over relaxation (SSOR) smoothers, as well as a
+Chebyshev-accelerated Jacobi smoother~\cite{Brandt77}. All of these
 smoothers require the diagonal of the system matrix; if matrices are
 not assembled (i.e., in a matrix-free approach), these diagonal
 entries must be precomputed in a setup step.  Note that the
