@@ -60,3 +60,5 @@ grid.assemble_poisson(mu);
 % 	coarse = coarse.Coarse;	
 % end
 
+
+% grid.use_linearized_smoothers();

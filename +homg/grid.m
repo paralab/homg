@@ -18,9 +18,11 @@ classdef grid < handle
     sor_c
     sor_omega
     smoother
-    K
+    linear_smoother
+		K
     L
-    % Null
+    K_lin
+		% Null
     % Zero
     Boundary
     Ud
@@ -62,7 +64,8 @@ classdef grid < handle
 			%% defaults ...
 		  grid.smoother = 'sor';
       grid.jacobi_omega = 2/3;
-    end
+			linear_smoother = false;
+		end
     
 		function assemble_poisson(grid, mu)
 			% fine grid material props ...
@@ -114,10 +117,17 @@ classdef grid < handle
         else
           grid.Coarse.assemble_poisson (mu) ;
         end
-      end
-      
+      end      
     end
     
+		function use_linearized_smoothers(grid)
+			grid.linear_smoother = true;
+			[grid.K_lin, ~]  =  grid.Mesh.assemble_poisson_linearized (grid.Mesh.order);
+			if (~ isempty(grid.Coarse) )
+				grid.Coarse.use_linearized_smoothers();
+			end
+		end
+		
 		function set_stiffness(grid, K)
 			grid.K = K;
 		end
@@ -139,6 +149,9 @@ classdef grid < handle
       % r(grid.Boundary) = 0;
     end
 
+    function r = residual_lin(grid, rhs, u)
+      r = grid.K_lin*u - rhs;
+    end
 
     function [u, rr, iter] = solve_lin_pcg(grid, num_vcyc, smoother, smooth_steps, rhs, u)
       % disp('setting smoother');
@@ -263,7 +276,11 @@ classdef grid < handle
         % Kc = grid.Null' * grid.K * grid.Null;
         % Lc = grid.Null' * rhs;
         % u = grid.Null * (Kc \ Lc) + grid.Ud;
-        u = grid.K \ rhs;
+				if (grid.linear_smoother)
+					u = grid.K_lin \ rhs;
+				else
+					u = grid.K \ rhs;
+				end
         return;
       end
       
@@ -275,8 +292,12 @@ classdef grid < handle
       grid.plot_spectrum(u, 'b', rhs);
       
       % 2. compute residual
-      res = grid.residual(rhs, u);
-      
+			if (grid.linear_smoother)
+				res = grid.residual_lin(rhs, u);
+			else
+				res = grid.residual(rhs, u);
+			end
+			
       % 3. restrict
       res_coarse = grid.R * res;
       res_coarse(grid.Coarse.Boundary) = 0;
@@ -348,12 +369,21 @@ classdef grid < handle
       % standard jacobi smoother
       if ( isempty(grid.jacobi_invdiag) )
         % Kc = (eye(size(grid.K)) - grid.ZeroBoundary) + grid.ZeroBoundary * grid.K * grid.ZeroBoundary;
-        D = diag(grid.K);
-        grid.jacobi_invdiag = 1./D;
+        if (grid.linear_smoother)
+					D = diag(grid.K_lin);
+				else
+					D = diag(grid.K);
+				end
+				grid.jacobi_invdiag = 1./D;
       end
       
       for i=1:v
-        res  = grid.jacobi_invdiag .* grid.residual(rhs, u);
+				if (grid.linear_smoother)
+					res  = grid.jacobi_invdiag .* grid.residual_lin(rhs, u);
+				else
+					res  = grid.jacobi_invdiag .* grid.residual(rhs, u);
+				end
+				% res  = grid.jacobi_invdiag .* grid.residual(rhs, u);
         u = u - grid.jacobi_omega.*res;
         % r = norm(res);
         % disp([grid.dbg_spaces num2str(r)]); 
@@ -366,7 +396,7 @@ classdef grid < handle
       if ( isempty ( grid.sor_G ) )
         % Kc = (eye(size(grid.K)) - grid.ZeroBoundary) + grid.ZeroBoundary * grid.K * grid.ZeroBoundary;
         kL = tril(grid.K, -1);
-        kD = diag(diag(Kc));
+        kD = diag(diag(K));
         kU = triu(Kc, 1);
         grid.sor_G = - (kD + grid.sor_omega*kL) \ (grid.sor_omega*kU + (grid.sor_omega - 1.0)*kD );
         grid.sor_c = grid.ZeroBoundary *( (kD + grid.sor_omega*kL) \ (grid.sor_omega*rhs) );
@@ -381,13 +411,22 @@ classdef grid < handle
       if ( isempty ( grid.ssor_M ) )
         w = grid.sor_omega;
         n = length(u);
-        grid.ssor_M = spdiags( (1/w)*diag(grid.K), 0, n, n) + tril(grid.K,-1);
-        grid.ssor_N = spdiags(((1-w)/w)*diag(grid.K), 0, n, n) - triu(grid.K,1);
-      end
+				if ( grid.linear_smoother )
+        	grid.ssor_M = spdiags( (1/w)*diag(grid.K_lin), 0, n, n) + tril(grid.K_lin,-1);
+        	grid.ssor_N = spdiags(((1-w)/w)*diag(grid.K_lin), 0, n, n) - triu(grid.K_lin,1);
+				else
+        	grid.ssor_M = spdiags( (1/w)*diag(grid.K), 0, n, n) + tril(grid.K,-1);
+        	grid.ssor_N = spdiags(((1-w)/w)*diag(grid.K), 0, n, n) - triu(grid.K,1);
+				end
+			end
 
       for i=1:v
-        r = grid.residual(rhs, u);
-        u = u - grid.ssor_M \ r;
+				if (grid.linear_smoother)
+					r = grid.residual_lin(rhs, u);
+				else 
+        	r = grid.residual(rhs, u);
+				end
+				u = u - grid.ssor_M \ r;
         u = grid.ssor_M' \ (grid.ssor_N'*u + rhs);
       end
     end
@@ -556,46 +595,57 @@ classdef grid < handle
       end
     end % chebyshev
 
-    function u = smoother_chebyshev (grid, v, rhs, u)
-      if ( isempty ( grid.eig_max ) )
-        % disp('computing eigenvalues');
-        % Kc = grid.Null' * grid.K * grid.Null;
-        D = diag(grid.K);
-        grid.jacobi_invdiag = 1./D;
-        Kc = spdiags(grid.jacobi_invdiag,0,length(D), length(D)) * grid.K;
-        % d = eigs(Kc, 2, 'be');
-        opts.tol = 0.01;
-        grid.eig_max = eigs(Kc, 1, 'lm', opts);  
-        % grid.eig_min = eigs(Kc, 1, 'sm');  
-      end
+		function u = smoother_chebyshev (grid, v, rhs, u)
+			if ( isempty ( grid.eig_max ) )
+				if ( grid.linear_smoother )
+					D = diag(grid.K_lin);
+					grid.jacobi_invdiag = 1./D;
+					Kc = spdiags(grid.jacobi_invdiag,0,length(D), length(D)) * grid.K_lin;
+				else
+					D = diag(grid.K);
+					grid.jacobi_invdiag = 1./D;
+					Kc = spdiags(grid.jacobi_invdiag,0,length(D), length(D)) * grid.K;
+				end
+				opts.tol = 0.01;
+				grid.eig_max = eigs(Kc, 1, 'lm', opts);  
+				% grid.eig_min = eigs(Kc, 1, 'sm');  
+			end
 
-      % adjust the eigenvalues to hit the upper spectrum
-      beta = grid.eig_max;
-      alpha = 0.25*grid.eig_max;% (grid.eig_min + grid.eig_max)/2;
+			% adjust the eigenvalues to hit the upper spectrum
+			beta = grid.eig_max;
+			alpha = 0.25*grid.eig_max;% (grid.eig_min + grid.eig_max)/2;
 
-      delta = (beta - alpha)/2;
-      theta = (beta + alpha)/2;
-      s1 = theta/delta;
-      rhok = 1./s1;
+			delta = (beta - alpha)/2;
+			theta = (beta + alpha)/2;
+			s1 = theta/delta;
+			rhok = 1./s1;
 
-      d = zeros(size(u));
+			d = zeros(size(u));
 
-      % first loop
-      res = -grid.residual ( rhs, u );
-      d = res/theta.* grid.jacobi_invdiag;
-      u = u + d;
+			% first loop
+			if (grid.linear_smoother)
+				res = -grid.residual_lin ( rhs, u );
+			else
+				res = -grid.residual ( rhs, u );
+			end
+			d = res/theta.* grid.jacobi_invdiag;
+			u = u + d;
 
-      for iter = 2:v
-	  rhokp1 = 1/ (2*s1 - rhok);
-	  d1 = rhokp1 * rhok;
-	  d2 = 2*rhokp1 / delta;
-	  rhok = rhokp1;
-	  res = -grid.residual ( rhs, u ); 
-	  % disp([num2str(iter) ':' num2str(norm(res))]);
-	  d = d1 * d + d2 * res.*grid.jacobi_invdiag;
-	  u = u + d;
-      end
-    end % chebyshev
+			for iter = 2:v
+				rhokp1 = 1/ (2*s1 - rhok);
+				d1 = rhokp1 * rhok;
+				d2 = 2*rhokp1 / delta;
+				rhok = rhokp1;
+				if (grid.linear_smoother)
+					res = -grid.residual_lin ( rhs, u );
+				else
+					res = -grid.residual ( rhs, u );
+				end
+				% disp([num2str(iter) ':' num2str(norm(res))]);
+				d = d1 * d + d2 * res.*grid.jacobi_invdiag;
+				u = u + d;
+			end
+		end % chebyshev
 
 
     function [evec, eval] = get_eigenvectors(grid)
