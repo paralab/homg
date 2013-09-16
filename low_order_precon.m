@@ -1,13 +1,12 @@
 % Example usage: low_order_precon([16 16], @homg.xform.identity, 3)
-
-function [it_gll, it_uni] = low_order_precon(nelems, xform, order)
+function [it_gll, it_uni, it_smooth_gll] = low_order_precon(nelems, xform, order)
 
 mesh = homg.hexmesh(nelems, xform); 
 
 if (mesh.dim == 2)
-  mu = @(x,y)(1 + 1000000*( (cos(2*pi*x))^2 + (cos(2*pi*y))^2 ));
+  mu = @(xx,yy)(1 + 1000000*( (cos(2*pi*xx))^2 + (cos(2*pi*yy))^2 ));
 else
-  mu = @(x,y,z)(1 + 1000000*( (cos(2*pi*x))^2 + (cos(2*pi*y))^2 + (cos(2*pi*z))^2 ));
+  mu = @(xx,yy,zz)(1 + 1000000*( (cos(2*pi*xx))^2 + (cos(2*pi*yy))^2 + (cos(2*pi*zz))^2 ));
 end
 
 mesh.set_coeff(mu);
@@ -15,20 +14,26 @@ mesh.set_coeff(mu);
 [K, M]          =  mesh.assemble_poisson (order);
 [K_lin, M_lin]  =  mesh.assemble_poisson_linearized (order);
 
+grid = homg.grid(mesh, order);
+grid.assemble_poisson(mu);
+
 muni = homg.hexmesh(nelems*order, xform); 
 muni.set_coeff(mu);
 
 [K_uni, M_uni]  =  muni.assemble_poisson_linearized (1);
 
+grid_lin = homg.grid(mesh, order);
+grid_lin.assemble_poisson(mu);
+grid_lin.use_linearized_smoothers();
 
 bdy     = mesh.get_boundary_node_indices(order);
 
-syms x y z
-if ( mesh.dim==2 )
-  fx = matlabFunction(-8*pi^2*(sin(2*pi*x) * sin(2*pi*y)));
-else
-  fx = matlabFunction(-12*pi^2*(sin(2*pi*x) * sin(2*pi*y) * sin(2*pi*z) ));
-end
+% syms x,y,z;
+% if ( mesh.dim==2 )
+%   fx = matlabFunction(-8*pi^2*(sin(2*pi*x) * sin(2*pi*y)));
+% else
+%   fx = matlabFunction(-12*pi^2*(sin(2*pi*x) * sin(2*pi*y) * sin(2*pi*z) ));
+% end
 
 % rhs       = mesh.assemble_rhs(fx, order);
 
@@ -69,12 +74,24 @@ K_uni_chol = chol(K_uni(per_uni,per_uni));
 x2(per_uni) = x2;
 %toc
 
+[x3,fl3,rr3,it3,rv3] = gmres(K, rhs, [], 1e-8, maxit, @smooth_gll);
+
+function yo = smooth_gll(xi) 
+	% first smooth 
+	xs = grid_lin.smoother_chebyshev (3, rhs, xi);
+	
+	yo = xs - (K_lin \ grid.residual(rhs, xs));
+	
+	% yo = grid_lin.smoother_chebyshev (3, rhs, ys);
+end
+
 %fprintf('Difference between solutions: %g\n', norm(x1-x0,'fro')/norm(x0,'fro'));
 
 % disp(['order: ' num2str(order) ' -- iterations: ' num2str(it1(2)) ' --- uniform : ' num2str(it2(2))]);
 
-it_gll = it1(2);
-it_uni = it2(2);
+it_gll 				= it1(2);
+it_uni 				= it2(2);
+it_smooth_gll	= it3(2);
 
 %semilogy(rv1/norm(rhs),'r-o');
 %hold off;
