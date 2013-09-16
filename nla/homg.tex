@@ -153,10 +153,10 @@ with varying coefficients.
 
 An alternative to this high-order geometric multigrid, which is based
 on a mesh hierarchy is $p$-multigrid, which coarsens the polynomial
-degree while (at least, initially) keeping the mesh unchained, see,
+degree while (at least, initially) keeping the mesh unchanged, see,
 e.g.,~\cite{HelenbrookMavriplisAtkins03}. Here, we compare the
-performance and this $p$-multigrid approach with $h$-multigrid for
-different smoothers and polynomial orders.
+performance and this $p$-multigrid approach\footnote{when $p$ is a power of $2$.} with $h$-multigrid for
+different smoothers and polynomial orders. 
 
 %Even though high-order discretizations can, in principle, benefit from
 %modern hardware, the rapid loss of sparsity of the involved systems as
@@ -370,8 +370,7 @@ element-local operation and is particularly simple for discretizations
 with nonconforming meshes. \gsnote{Is that actually true?}. As for
 high-order $h$-multigrid, devising smoothers is a challenge for
 $p$-multigrid.  Moreover, one often finds dependence of the
-convergence factor on the order of the polynomial basis. \gsnote{We
-  need a citation here.}
+convergence factor on the order of the polynomial basis \cite{MadayMunoz89}.
 
 \subsection{Defect correction using lower-order operator}\label{subsec:low}
 In a defect correction approach (see
@@ -382,10 +381,11 @@ finite element mesh.  This construction of a low-order preconditioner
 based on the nodes of the high-order discretization is used. for
 instance
 in~\cite{Brown10,Kim07,DevilleMund90,HeysManteuffelMcCormickEtAl05}.
-The resulting method is nearly independent of $p$, but this low-order
-preconditioning is not work optimal and the convergence factors can be
-lower than when multigrid is applied directly to the high-order
-operator. \gsnote{Reference or remove statement.} Defect correction
+% The resulting method is nearly independent of $p$, but this low-order
+% preconditioning is not work optimal and the convergence factors can be
+% lower than when multigrid is applied directly to the high-order
+% operator. \gsnote{Reference or remove statement.} 
+Defect correction
 only requires computation of the residual for the high-order
 discretized operator, while smoothing is based on the low order
 discretized operator, which is sparse and thus faster to apply.
@@ -869,12 +869,13 @@ particular, these tables show:
 7 & 20 & & 15 & & 9 & & 10 & & 9 & & 6 & & 47 & 83  \\
 8 & 22 & 19 & 17 & 15 & 9 & 8 & 10 & 10 & 9 & 8 & 6 & 6 & 52 & 100 \\
 16 & 47 & 42 & 38 & 34 & 17 & 15 & 16 & 14 & 14 & 13 & 9 & 9 & 44 & 118 \\
-  \end{tabular}
+\hline 
+ \end{tabular}
 \end{table}
 
 \begin{table}
   \caption{\label{tab:3d-fan} Results for three-dimensional warped geometry
-    with varying coefficient $\mu(x,y,z) = 1 + 10^6(\cos^2(2\pi x) + \cos^2(2\pi y) + \cos^2(2\pi z))$. \todo{Old}}
+    with varying coefficient $\mu(x,y,z) = 1 + 10^6(\cos^2(2\pi x) + \cos^2(2\pi y) + \cos^2(2\pi z))$.}
   \centering
   \begin{tabular}{|r|c c|c c|c c||c c|c c|c c||c c|} 
     \hline
