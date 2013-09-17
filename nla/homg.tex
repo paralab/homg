@@ -6,6 +6,12 @@
 \usepackage{moreverb}
 
 \usepackage[colorlinks,bookmarksopen,bookmarksnumbered,citecolor=red,urlcolor=red]{hyperref}
+
+% Tools for mathematical typesetting
+\usepackage{algpseudocode} 
+% Typesetting algorithms
+\usepackage[section]{algorithm}
+
 \usepackage{tikz}
 \usetikzlibrary{shapes,arrows,trees,snakes} %,decorations.pathreplacing,fit}
 % \usepackage{tkz-euclide}
@@ -29,6 +35,9 @@
 \newcommand{\gsnote}[1]{\textcolor{blue}{GS: #1}}
 \newcommand{\bs}[1]{\ensuremath{\boldsymbol #1}}
 
+\renewcommand{\algorithmicforall}{\textbf{parallel for}}
+\renewcommand{\algorithmicrequire}{\textbf{Input:}} 
+\renewcommand{\algorithmicensure}{\textbf{Output:}} 
 
 \newcommand\BibTeX{{\rmfamily B\kern-.05em \textsc{i\kern-.025em b}\kern-.08em
 T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
@@ -624,7 +633,8 @@ setup step using, for instance, a power method.
 		\end{tikzpicture}
 		\caption{$p=16$, single v-cycle}
 	\end{subfigure}
-	\caption{\label{fig:smoothers-var} The smoothing properties of the smoothers for variable coefficient 2D fan.}
+	\caption{\label{fig:smoothers-var} The smoothing properties of the smoothers for  two-dimensional warped geometry with varying coefficient $\mu(x,y) = 1 + 10^6(\cos^2(2\pi x) + \cos^2(2\pi y))$.
+	}
 \end{figure}
 
 
@@ -640,9 +650,6 @@ orders up to XX. However, the coarse-grid solves can become fairly
 expensive; moreover, it is not straightforward to achieve good
 parallel scalability.
 
-
-
-
 \section{Performance model}
 To compare the computational cost of the different methods, we focus
 on matrix-vector multiplications on the finest multigrid level, which
@@ -656,12 +663,36 @@ strongly on the implementation and on the system architecture. To
 illustrate this, consider an elemental matrix for a hexahedral mesh in
 three dimensions, which is dense and of size $(p+1)^3\times
 (p+1)^3$. Its naive application to a vector amounts to $\mathcal
-O((p+1)^9)$ operations; for tensor bases, as common in spectral
-element methods, this can be reduced to $\mathcal O((p+1)^7)$
-operations \cite{DevilleFischerMund02}. \gsnote{These numbers must be
-  for assembly, not application\ldots} In addition, high-order
+O((p+1)^6)$ operations; for tensor bases, as common in spectral
+element methods, this can be reduced to $\mathcal O((p+1)^4)$
+operations \cite{DevilleFischerMund02}. In addition, high-order
 implementations allow more memory locality, which, compared to low
-order methods, results in higher performance.
+order methods, results in higher performance. When considering 
+the steps in multigrid preconditioned CG, we see that most steps
+are $\mathcal{O}(N)$ (see Algorithm~\ref{alg:pcg}). 
+
+
+\begin{algorithm}[ht] 
+	% v-cycle 
+	\caption{Multigrid preconditioned Conjugate Gradients} \label{alg:pcg} 
+	\begin{algorithmic}[1]
+		\Require rhs and guess
+		\Ensure  solution
+		\While {not converged} 
+			\State $\bs{h} = A \bs{p}$ 											\Comment $~~\quad\quad\quad\quad\mathcal{O}(ng_p)$
+			\State $\rho_r = (\rho, \bs{r})$								\Comment $~~\quad\quad\quad\quad\mathcal{O}(n)~~~$
+			\State $\alpha = \rho_r / ( \bs{p}, \bs{h} )$		\Comment $~~\quad\quad\quad\quad\mathcal{O}(n)~~~$
+			\State $\bs{u} = \bs{u} + \alpha\bs{p}$					\Comment $~~\quad\quad\quad\quad\mathcal{O}(n)~~~$
+			\State $\bs{r} = \bs{r} - \alpha\bs{h}$					\Comment $~~\quad\quad\quad\quad\mathcal{O}(n)~~~$
+			\State Convergence Test
+			\State $\rho = M\bs{r}$ 												\Comment V-cycle $\quad\mathcal{O}(ng_p)$
+      \State $\beta = (\rho, \bs{r}) / \rho_r$				\Comment $~~\quad\quad\quad\quad\mathcal{O}(n)~~~$
+      \State $\bs{p} = \rho + \beta\bs{p}$						\Comment $~~\quad\quad\quad\quad\mathcal{O}(n)~~~$
+		\EndWhile
+		% \Comment Comm: p2p
+	\end{algorithmic}
+\end{algorithm}
+
 
 Based on this simple performance model, we next summarize the
 computational cost of the high oder multigrid approaches from
@@ -831,7 +862,9 @@ particular, these tables show:
 
 \begin{table}
   \caption{\label{tab:2d-fan} Results for two-dimensional warped geometry
-    with varying coefficient $\mu(x,y) = 1 + 10^6(\cos^2(2\pi x) + \cos^2(2\pi y))$.}
+    with varying coefficient $\mu(x,y) = 1 + 10^6(\cos^2(2\pi x) + \cos^2(2\pi y))$. 
+		A total of 3 grids were used, the finest grid was $32\times 32$, and the coarsest was
+    $8\times 8$.}
   \centering
   \begin{tabular}{|r|c c|c c|c c||c c|c c|c c||c c|} 
     \hline

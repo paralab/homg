@@ -61,4 +61,5 @@ grid.assemble_poisson(mu);
 % end
 
 
-% grid.use_linearized_smoothers();
+grid.use_linearized_smoothers();
+grid.is_finest = true;

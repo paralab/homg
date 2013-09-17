@@ -4,6 +4,7 @@ classdef grid < handle
   
   properties
     level
+		is_finest
     eig_max
     eig_min
     k_evec
@@ -64,7 +65,8 @@ classdef grid < handle
 			%% defaults ...
 		  grid.smoother = 'sor';
       grid.jacobi_omega = 2/3;
-			linear_smoother = false;
+			grid.linear_smoother = false;
+      grid.is_finest       = false;
 		end
     
 		function assemble_poisson(grid, mu)
@@ -206,8 +208,8 @@ classdef grid < handle
       % disp('outer v-cycle');
       rho = grid.vcycle(v1, v2, r, rho);
       p = rho;
-      % disp(['Initial residual is ' num2str(norm(r))]);
-      % disp('------------------------------------------');
+      disp(['Initial residual is ' num2str(norm(r))]);
+      disp('------------------------------------------');
       r0 = norm(r);
       for i=1:num_vcyc
         % disp(['inner v-cycle: ' num2str(i)]);
@@ -219,7 +221,7 @@ classdef grid < handle
 
         % rho_res_prev = rho_res;
         
-        % disp([num2str(i, '%03d\t') ': |res| = ' num2str(norm(r),'\t%8.4e')]);
+        disp([num2str(i, '%03d\t') ': |res| = ' num2str(norm(r),'\t%8.4e')]);
         if (norm(r)/r0 < 1e-8)
           iter = i;
           rr = norm(r)/r0;
@@ -233,7 +235,7 @@ classdef grid < handle
         beta = dot(rho, r) / rho_res ;
         p = rho + beta*p;
       end
-      % disp('------------------------------------------');
+      disp('------------------------------------------');
       iter = num_vcyc;
       rr = norm(r)/r0;
     end
@@ -285,16 +287,14 @@ classdef grid < handle
       end
       
       % 1. pre-smooth
-      if (grid.debug) clf; end
-      grid.plot_spectrum(u, 'k', rhs); 
-      if (grid.debug) hold on; end
       u = grid.smooth ( v1, rhs, u );
-      grid.plot_spectrum(u, 'b', rhs);
       
       % 2. compute residual
-			if (grid.linear_smoother)
+			if (grid.linear_smoother && ~grid.is_finest)
+        disp('linear residual');
 				res = grid.residual_lin(rhs, u);
-			else
+      else
+        disp('high-order residual');
 				res = grid.residual(rhs, u);
 			end
 			
@@ -369,7 +369,7 @@ classdef grid < handle
       % standard jacobi smoother
       if ( isempty(grid.jacobi_invdiag) )
         % Kc = (eye(size(grid.K)) - grid.ZeroBoundary) + grid.ZeroBoundary * grid.K * grid.ZeroBoundary;
-        if (grid.linear_smoother)
+        if (grid.linear_smoother && ~grid.is_finest)
 					D = diag(grid.K_lin);
 				else
 					D = diag(grid.K);
@@ -600,14 +600,14 @@ classdef grid < handle
 				if ( grid.linear_smoother )
 					D = diag(grid.K_lin);
 					grid.jacobi_invdiag = 1./D;
-					Kc = spdiags(grid.jacobi_invdiag,0,length(D), length(D)) * grid.K_lin;
+					Kc = spdiags(grid.jacobi_invdiag,0,length(D), length(D)) * grid.K;
 				else
 					D = diag(grid.K);
 					grid.jacobi_invdiag = 1./D;
 					Kc = spdiags(grid.jacobi_invdiag,0,length(D), length(D)) * grid.K;
 				end
 				opts.tol = 0.01;
-				grid.eig_max = eigs(Kc, 1, 'lm', opts);  
+				grid.eig_max = eigs(Kc, 1, 'lm', opts)  
 				% grid.eig_min = eigs(Kc, 1, 'sm');  
 			end
 
@@ -623,7 +623,7 @@ classdef grid < handle
 			d = zeros(size(u));
 
 			% first loop
-			if (grid.linear_smoother)
+			if (grid.linear_smoother && ~grid.is_finest)
 				res = -grid.residual_lin ( rhs, u );
 			else
 				res = -grid.residual ( rhs, u );
@@ -636,7 +636,7 @@ classdef grid < handle
 				d1 = rhokp1 * rhok;
 				d2 = 2*rhokp1 / delta;
 				rhok = rhokp1;
-				if (grid.linear_smoother)
+				if (grid.linear_smoother && ~grid.is_finest)
 					res = -grid.residual_lin ( rhs, u );
 				else
 					res = -grid.residual ( rhs, u );
