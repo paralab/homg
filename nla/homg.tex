@@ -252,7 +252,8 @@ discuss smoothers in Section~\ref{subsec:smoothers}.
 
 \subsection{Hierarchy construction}\label{subsec:hierarchy}
 Several approaches to building a multilevel hierarchy for high-order
-discretized problems are possible. One option is the construction of a
+discretized problems are possible; see the overview shown in
+Figure~\ref{fig:approaches}. One option is the construction of a
 geometric mesh hierarchy while keeping the polynomial order unchanged;
 below we refer to this approach as \emph{$h$-multigrid}. An
 alternative is to construct coarse problems by reducing the polynomial
@@ -473,11 +474,11 @@ high-order or the low-order residual can be used in the smoother.
 
 % **********************************************************
 \subsection{Smoothers}\label{subsec:smoothers}
-Here, we summarize the smoothers used in our numerical experiments, for
-which we restrict ourselves to the point smoothers summarized in
-Section~\ref{subsec:ptsmoothers}. For completeness of the
-presentation, we comment on Schwarz-type smoothers in
-Section~\ref{subsec:schwarz}.
+Next we summarize different smoothing approaches. In our numerical
+experiments, we restrict ourselves to the point smoothers which are
+summarized and tested in Section~\ref{subsec:ptsmoothers}. For
+completeness of the presentation, we briefly describe Schwarz-type
+smoothers in Section~\ref{subsec:schwarz}.
 
 
 \subsubsection{Point smoothers}\label{subsec:ptsmoothers}
