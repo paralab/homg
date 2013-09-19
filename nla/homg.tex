@@ -31,7 +31,7 @@
 \definecolor{utsecblue}{RGB}{127,169,174}
 
 
-\newcommand{\todo}[1]{\textcolor{red}{\bf #1}}
+\newcommand{\todo}[1]{\textcolor{red}{ #1}}
 \newcommand{\gsnote}[1]{\textcolor{blue}{GS: #1}}
 \newcommand{\bs}[1]{\ensuremath{\boldsymbol #1}}
 
@@ -515,9 +515,9 @@ are decreased for all smoothers, but the error decreases slower for
 higher polynomial degrees. For high polynomial order, a two-grid
 iteration with SSOR smooters results in a significantly better error
 reduction compared to Jacobi or Chebyshev smoothing. \todo{Say
-  something about which of these cases converge.}
+  something about which of these cases converge and which not.}
 
-In Figure~\ref{fig:smoother-var}, we study the case with deformed
+In Figure~\ref{fig:smoothers-var}, we study the case with deformed
 geometry and varying coefficient. Note that, comparing with the
 constant coefficient case, now Jacobi smoothing performs significantly
 worse, both when used as a solver and as a smoother. In particular,
@@ -704,17 +704,16 @@ method still retains a satisfactory convergence rate.
 \end{figure}
 
 
-\subsubsection{Schwarz-based methods}\label{subsec:schwarz}
+\subsubsection{Schwarz-based smoothers}\label{subsec:schwarz}
 An alternative smoothing approach for high-order discretizations is
 based on local block solves.  The main challenge with these approaches
-is that they require solving dense local systems.  This is either done
-by using direct methods or approximations that allow for a fast
-iterative solution
-\cite{LottesFischer05,FischerLottes05}. Schwarz-type smoothers have
-been used successfully for spectral element discretizations with
-orders up to XX. However, the coarse-grid solves can become fairly
-expensive; moreover, it is not straightforward to achieve good
-parallel scalability.
+is that they require the solution of dense local systems.  This is
+either done by using direct methods or approximations that allow for a
+fast iterative solution \cite{LottesFischer05,
+  FischerLottes05}. Schwarz-type smoothers have been used successfully
+for spectral element discretizations with orders up to \todo{XX}. However,
+the coarse-grid solves can become fairly expensive; moreover, it is
+not straightforward to achieve good parallel scalability.
 
 \section{Performance model}
 To compare the computational cost of the different methods, we focus
