@@ -494,14 +494,36 @@ smoothing, more complex communication in a distributed memory
 implementation. Thus, the Chebyshev-accelerated Jacobi method is an
 attractive alternative to SSOR; it can significantly improve over
 Jacobi smoothing, while being as simple to
-implement~\cite{AdamsBrezinaHuEtAl03}. However, the acceleration of
-Jacobi smoothing with Chebyshev polynomials requires estimation of the
+implement~\cite{AdamsBrezinaHuEtAl03}. The acceleration of Jacobi
+smoothing with Chebyshev polynomials requires estimation of the
 maximum eigenvalues of the system matrix, which has to be done in a
-setup step using, for instance, a power method.  In
-Figures~\ref{fig:smoothers2} and~\ref{fig:smoothers-var}, we compare
-the efficiency of these point smoothers for different polynomial
-orders. The results for the constant coefficient unit square
-(Figure~\ref{fig:smoothers2}) show that the smoother
+setup step using, for instance, a power method.
+
+In Figures~\ref{fig:smoothers2} and~\ref{fig:smoothers-var}, we
+compare the efficiency of these point smoothers for different
+polynomial orders. The results for the constant coefficient Laplacian
+operator on the unit square (Figure~\ref{fig:smoothers2}) show that
+all point smoothers decrease the error components in the upper half of
+the spectrum, but that this damping factor is smaller for high-order
+elements. Note that Chebyshev accelerated Jacobi smoothing results in
+a uniform damping of a larger party of the spectrum. Both, Chebyshev
+and SSOR smoothing outperform Jacobi smoothing, in particular for
+higher orders. Combining the smoothers with a two-grid
+cycle\footnote{For simplicity, we chose two grids for this test; the
+  results for a multigrid v-cycle are similar.}, all error components
+are decreased for all smoothers, but the error decreases slower for
+higher polynomial degrees. For high polynomial order, a two-grid
+iteration with SSOR smooters results in a significantly better error
+reduction compared to Jacobi or Chebyshev smoothing. \todo{Say
+  something about which of these cases converge.}
+
+In Figure~\ref{fig:smoother-var}, we study the case with deformed
+geometry and varying coefficient. Note that, comparing with the
+constant coefficient case, now Jacobi smoothing performs significantly
+worse, both when used as a solver and as a smoother. In particular,
+for $p=16$ Jacobi smoothing does not lead to a converging two-grid
+algorithm. In particular, SSOR smoothing combined with the two-grid
+method still retains a satisfactory convergence rate.
 
 
 \begin{figure}
@@ -582,9 +604,13 @@ orders. The results for the constant coefficient unit square
 	\end{subfigure}
 	\caption{\label{fig:smoothers2} Error decay for different
           point smoothers when used as solver (a,c,e) and when used
-          within a single multigrid v-cycle (b,d,f) for a
-          two-dimensional, constant coefficient Laplace problem on a
-          unit square. Plotted are the coefficients of the error
+          within a single two-grid step (b,d,f) for a two-dimensional,
+          constant coefficient Laplace problem on a unit square
+          discretized. To keep the number of unknowns the same for
+          different polynomial orders, meshes of $32\times 32$,
+          $8\times 8$ and $2\times 2$ elements are used for polynomial
+          orders $p=1$, $p=4$ and $p=16$, respectively.
+          Plotted are the coefficients of the error
           expanded in the eigenvectors of the discretized Laplace
           operator. The order of the eigenvectors is such that the
           corresponding eigenvalues are descending; thus, the
@@ -672,7 +698,7 @@ orders. The results for the constant coefficient unit square
 		\caption{$p=16$, single v-cycle}
 	\end{subfigure}
 	\caption{\label{fig:smoothers-var} Same as
-          Figure~\ref{fig:smoother2}, but for two-dimensional warped
+          Figure~\ref{fig:smoothers2}, but for two-dimensional warped
           geometry shown in Figure~\todo{X} with varying coefficient
           $\mu(x,y) = 1 + 10^6(\cos(2\pi x)^2 + \cos(2\pi y)^2)$.}
 \end{figure}
