@@ -256,6 +256,9 @@ discretize \eqref{eq:Poisson} with hexahedral finite elements with
 different polynomial orders, and solve the resulting discrete system
 using the multigrid variants discussed in this paper.
 
+\todo{Here or in numerics section: Discuss quadrature, maybe refer to
+  Quarteroni paper; Discussion of h- and p-multigrid interpolation and
+  restriction operators.}
 
 
 % ***********************************************************
@@ -792,35 +795,35 @@ matrix-vector operations.
 % **************************************************
 % **************************************************
 \section{Numerical results}\label{sec:numerics}
-In this section we present a comprehensive comparison of the
-performance of our algorithms for the solution of high-order
-discretizations of \eqref{eq:Poisson}.  After introducing our test
-problems in Section~\ref{subsec:tests}, we describe in
-Section~\ref{subsec:measures} how we compare the performance of
-methods for high-order multigrid. The results for our test problem are
-then presented and discussed Section~\ref{subsec:results}.
+In this section we present a comprehensive comparison of our
+algorithms for the solution of high-order discretizations of
+\eqref{eq:Poisson}.  After introducing our test problems in
+Section~\ref{subsec:tests}, in Section~\ref{subsec:measures} we
+describe how we compare our methods for high-order multigrid. The
+results for our test problem are then presented and discussed
+Section~\ref{subsec:results}.
 
 
 \subsection{Presentation of test problems}\label{subsec:tests}
-We compare our algorithms to solve \eqref{eq:Poisson} in two and three
-dimensions. We use a unit square and unit cube with constant
-coefficients, as well as warped the two and three dimensional domains
-with varying coefficient $\mu(\bs x)$, shown in
-Figure~\ref{fig:mesh}. We use isoparametric elements, i.e., the
-geometry transformation is approximated using the same polynomial
-order as the finite element functions. The Jacobian is computed at
-every quadrature point and \todo{say here how we deal with the varying
-  coeffs on the coarser meshes?}
+We compare our algorithms for the solution of~\eqref{eq:Poisson} on a
+unit square and a unit cube with constant coefficient $\mu\equiv 1$,
+as well as on the warped two and three dimensional domains shown in
+Figure~\ref{fig:mesh}, where we use a varying coefficient $\mu(\bs
+x)$. We use isoparametric elements for these deformed geometries,
+i.e., the geometry transformation is approximated using the same
+polynomial order as the finite element functions. The Jacobians for
+this transformation are computed at every quadrature point. The
+coefficient $\mu$ at the coarse grid quadrature points is computed as
+the linear interpolation of the coefficient at the fine grid
+quadrature points.
 
 \begin{figure}
-%	\includegraphics[width=0.48\textwidth]{figs/box}
 	\includegraphics[width=0.48\textwidth]{figs/fan}
 	\includegraphics[width=0.48\textwidth]{figs/fan3a}
 	\caption{\label{fig:mesh} Two and three dimensional warped
           meshes used in our numerical experiments. The color
           illustrates the value of the coefficient $\mu(\bs x)$.}
 \end{figure}
-
 
 
 \subsection{Setup of comparisons}\label{subsec:measures}
