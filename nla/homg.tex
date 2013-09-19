@@ -238,6 +238,27 @@ This paper is organized as follows \ldots
 %approaches for extending our geometric multigrid solver to support
 %higher-order discretizations.
 
+\section{Test problem setup}
+
+We target the solution of the Poisson problem with
+homogeneous Dirichlet boundary conditions on a domain
+$\Omega\subset\mathbb R^d$ ($d=2$ or $d=3$), with boundary $\partial
+\Omega$, i.e., for the solution $u(\bs x)$ of:
+\begin{equation}\label{eq:Poisson}
+  \begin{aligned}
+    -\nabla\cdot\left(\mu(\bs x)\nabla u(\bs x)\right) &= f(\bs x) \quad &&\text{ for } \bs x\in \Omega,\\
+    \quad u(\bs x)& = 0  \quad &&\text{ for } \bs x\in \partial\Omega.
+  \end{aligned}
+\end{equation}
+Here, $\mu(\bs x)\ge \mu_0>0$ is a spatially varying coefficient that
+is bounded away from zero, and $f(x)$ is a given right hand side. We
+discretize \eqref{eq:Poisson} with hexahedral finite elements with
+different polynomial orders, and solve the resulting discrete system
+using the multigrid variants discussed in this paper.
+
+
+
+% ***********************************************************
 
 \section{Multigrid approaches for high-order finite elements}
 \label{sec:approaches}
@@ -515,7 +536,8 @@ are decreased for all smoothers, but the error decreases slower for
 higher polynomial degrees. For high polynomial order, a two-grid
 iteration with SSOR smooters results in a significantly better error
 reduction compared to Jacobi or Chebyshev smoothing. \todo{Say
-  something about which of these cases converge and which not.}
+  something about which of these cases converge and which not; say
+  that SSOR is based on lexicographic ordering.}
 
 In Figure~\ref{fig:smoothers-var}, we study the case with deformed
 geometry and varying coefficient. Note that, comparing with the
@@ -715,7 +737,7 @@ for spectral element discretizations with orders up to \todo{XX}. However,
 the coarse-grid solves can become fairly expensive; moreover, it is
 not straightforward to achieve good parallel scalability.
 
-\section{Performance model}
+\subsection{Comparing computational complexity}
 To compare the computational cost of the different methods, we focus
 on matrix-vector multiplications on the finest multigrid level, which
 dominate the overall computation. Denoting the number of unknowns on
@@ -738,24 +760,23 @@ are $\mathcal{O}(N)$ (see Algorithm~\ref{alg:pcg}).
 
 
 \begin{algorithm}[ht] 
-	% v-cycle 
-	\caption{Multigrid preconditioned Conjugate Gradients} \label{alg:pcg} 
-	\begin{algorithmic}[1]
-		\Require rhs and guess
-		\Ensure  solution
-		\While {not converged} 
-			\State $\bs{h} = A \bs{p}$ 											\Comment $~~\quad\quad\quad\quad\mathcal{O}(ng_p)$
-			\State $\rho_r = (\rho, \bs{r})$								\Comment $~~\quad\quad\quad\quad\mathcal{O}(n)~~~$
-			\State $\alpha = \rho_r / ( \bs{p}, \bs{h} )$		\Comment $~~\quad\quad\quad\quad\mathcal{O}(n)~~~$
-			\State $\bs{u} = \bs{u} + \alpha\bs{p}$					\Comment $~~\quad\quad\quad\quad\mathcal{O}(n)~~~$
-			\State $\bs{r} = \bs{r} - \alpha\bs{h}$					\Comment $~~\quad\quad\quad\quad\mathcal{O}(n)~~~$
-			\State Convergence Test
-			\State $\rho = M\bs{r}$ 												\Comment V-cycle $\quad\mathcal{O}(ng_p)$
-      \State $\beta = (\rho, \bs{r}) / \rho_r$				\Comment $~~\quad\quad\quad\quad\mathcal{O}(n)~~~$
-      \State $\bs{p} = \rho + \beta\bs{p}$						\Comment $~~\quad\quad\quad\quad\mathcal{O}(n)~~~$
-		\EndWhile
-		% \Comment Comm: p2p
-	\end{algorithmic}
+  % v-cycle 
+  \caption{Multigrid preconditioned Conjugate Gradient Method} \label{alg:pcg} 
+  \begin{algorithmic}[1]
+    \Require rhs and guess
+    \Ensure  solution
+    \While {not converged} 
+    \State $\bs{h} = A \bs{p}$ 											\Comment $~~\quad\quad\quad\quad\mathcal{O}(Ng_p)$
+    \State $\rho_r = (\rho, \bs{r})$								\Comment $~~\quad\quad\quad\quad\mathcal{O}(N)~~~$
+    \State $\alpha = \rho_r / ( \bs{p}, \bs{h} )$		\Comment $~~\quad\quad\quad\quad\mathcal{O}(N)~~~$
+    \State $\bs{u} = \bs{u} + \alpha\bs{p}$					\Comment $~~\quad\quad\quad\quad\mathcal{O}(N)~~~$
+    \State $\bs{r} = \bs{r} - \alpha\bs{h}$					\Comment $~~\quad\quad\quad\quad\mathcal{O}(N)~~~$
+    \State Convergence Test
+    \State $\rho = M\bs{r}$ 												\Comment V-cycle $\quad\mathcal{O}(Ng_p)$
+    \State $\beta = (\rho, \bs{r}) / \rho_r$				\Comment $~~\quad\quad\quad\quad\mathcal{O}(N)~~~$
+    \State $\bs{p} = \rho + \beta\bs{p}$						\Comment $~~\quad\quad\quad\quad\mathcal{O}(N)~~~$
+    \EndWhile
+  \end{algorithmic}
 \end{algorithm}
 
 
@@ -764,7 +785,7 @@ computational cost of the high oder multigrid approaches from
 Section~\ref{sec:approaches}. We denote by $s_\text{pre}$ and
 $s_\text{post}$ the number of pre- and post-smoothing steps on the
 finest multigrid level, respectively. Note that smoothers such as
-Jacobi, SSOR and Chebyshev accelerated Jacobi also require a
+Jacobi, SSOR and Chebyshev-accelerated Jacobi also require a
 matrix-vector product, and we denote by $m$ the number of such
 products per smoothing step.  Jacobi smoothing and
 Chebyshev-accelerated Jacobi require $m=1$ matrix-vector
@@ -800,43 +821,18 @@ comparison of the performance of the multigrid variants discussed
 in this paper for these test problems.
 
 \subsection{Description of test problems}\label{subsec:tests}
-\gsnote{I think that either here or earlier in the paper it might be a
-  good idea to introduce the matrix problem to be solved; could be a
-  very compact representation but we should briefly describe the
-  restriction, prolongation operators etc---what do you think, Hari?}
-Our numerical tests are for the solution of the Poisson problem with
-homogeneous Dirichlet boundary conditions on a domain
-$\Omega\subset\mathbb R^d$ ($d=2$ or $d=3$), with boundary $\partial
-\Omega$, i.e., for the solution $u(\bs x)$ of:
-\begin{equation}\label{eq:Poisson}
-  \begin{aligned}
-    -\nabla\cdot\left(\mu(\bs x)\nabla u(\bs x)\right) &= f(\bs x) \quad &&\text{ for } \bs x\in \Omega,\\
-    \quad u(\bs x)& = 0  \quad &&\text{ for } \bs x\in \partial\Omega.
-  \end{aligned}
-\end{equation}
-Here, $\mu(\bs x)\ge \mu_0>0$ is a spatially varying coefficient that
-is bounded away from zero, and $f(x)$ is a given right hand side. We
-discretize \eqref{eq:Poisson} with hexahedral finite elements with
-different polynomial orders, and solve the resulting discrete system
-using the multigrid variants discussed in this paper. The two and
+ The two and
 three dimensional domains $\Omega$ used in our experiments can be seen
 in Figures~\ref{fig:mesh2d} and \ref{fig:mesh3d}, respectively.
 %
 \begin{figure}
-	\includegraphics[width=0.48\textwidth]{figs/box}
+%	\includegraphics[width=0.48\textwidth]{figs/box}
 	\includegraphics[width=0.48\textwidth]{figs/fan}
-	\caption{\label{fig:mesh2d} The two dimensional meshes used in
-          our tests. The color corresponds to the value of the
-          coefficient $\mu(\bs x)$.}
-\end{figure}
-\begin{figure}
-	\includegraphics[width=0.48\textwidth]{figs/box3a}
 	\includegraphics[width=0.48\textwidth]{figs/fan3a}
-	\caption{\label{fig:mesh3d} The three dimensional meshes used
-          in our tests. The color corresponds to the value of the
-          coefficient $\mu(\bs x)$.}
+	\caption{\label{fig:mesh} Two and three dimensional warped
+          meshes used in our numerical experiments. The color
+          illustrates the value of the coefficient $\mu(\bs x)$.}
 \end{figure}
-
 
 
 
