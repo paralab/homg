@@ -368,7 +368,9 @@ different approaches.
 		\caption{\label{fig:approaches} Different approaches
                   for high-order multigrid: high-order $h$-multigrid
                   (left), $p$-multigrid (middle) and low-order
-                  preconditioned multigrid.}
+                  multigrid based on the nodes of the nodes of the
+                  high-order discretization, which can be used to
+                  precondition the high-order system.}
 \end{figure}
 
 \subsubsection{$h$-multigrid}\label{subsec:h}
@@ -442,13 +444,11 @@ assembled efficiently.
 % points (which can be challenging) or replaces them by evenly spaced
 % points---we experiment with the latter option in
 % Section~\ref{sec:numerics}.
-
+%
 In principle, defect correction only requires computation of the
 residual for the high-order discretized operator. Smoothing on the
 finest level uses the low-order discretized operator, and either the
 high-order or the low-order residual can be used in the smoother.
-
-
 
 
 
@@ -482,8 +482,8 @@ smoothers in Section~\ref{subsec:schwarz}.
 
 
 \subsubsection{Point smoothers}\label{subsec:ptsmoothers}
-In our numerical tests, we compare the Jacobi and the
-symmetric successive over relaxation (SSOR) smoothers, as well as a
+In our numerical tests, we compare the Jacobi and the symmetric
+successive over relaxation (SSOR) smoothers, as well as a
 Chebyshev-accelerated Jacobi smoother~\cite{Brandt77}. All of these
 smoothers require the diagonal of the system matrix; if matrices are
 not assembled (i.e., in a matrix-free approach), these diagonal
@@ -491,20 +491,25 @@ entries must be precomputed in a setup step.  Note that the
 parallelization of Gauss-Seidel smoothers (such as SSOR) requires
 coloring of unknowns at parallel boundaries, and, compared to Jacobi
 smoothing, more complex communication in a distributed memory
-implementation. In parallel, the Chebyshev-accelerated Jacobi method
-is an attractive alternative to SSOR; it can significantly improve
-over Jacobi smoothing, while being as simple to
+implementation. Thus, the Chebyshev-accelerated Jacobi method is an
+attractive alternative to SSOR; it can significantly improve over
+Jacobi smoothing, while being as simple to
 implement~\cite{AdamsBrezinaHuEtAl03}. However, the acceleration of
 Jacobi smoothing with Chebyshev polynomials requires estimation of the
 maximum eigenvalues of the system matrix, which has to be done in a
-setup step using, for instance, a power method.
+setup step using, for instance, a power method.  In
+Figures~\ref{fig:smoothers2} and~\ref{fig:smoothers-var}, we compare
+the efficiency of these point smoothers for different polynomial
+orders. The results for the constant coefficient unit square
+(Figure~\ref{fig:smoothers2}) show that the smoother
+
 
 \begin{figure}
 	\centering
 	\begin{subfigure}[b]{0.49\textwidth}
 		\centering
 		\begin{tikzpicture}[scale=0.8]
-		\begin{semilogyaxis}[ymajorgrids,ymin=1e-6,ymax=2,xmin=0,xmax=961]
+		\begin{semilogyaxis}[ymajorgrids,ymin=1e-5,ymax=2,xmin=0,xmax=961]
 		\addplot[color=black]  table[x=dof, y=u]{data/smoother-const-box.dat};
 		\addplot[color=blue!70, opacity=0.5,only marks, mark=*,mark size=1pt]   table[x=dof, y=jacobi1]{data/smoother-const-box.dat};
 		\addplot[color=red!70!black, opacity=0.5,only marks, mark=*,mark size=1pt] table[x=dof, y=chebyshev1]{data/smoother-const-box.dat};
@@ -516,7 +521,7 @@ setup step using, for instance, a power method.
 	\begin{subfigure}[b]{0.49\textwidth}
 		\centering
 		\begin{tikzpicture}[scale=0.8]
-		\begin{semilogyaxis}[ymajorgrids,ymin=1e-6,ymax=2,xmin=0,xmax=961,yticklabels={,,}]
+		\begin{semilogyaxis}[ymajorgrids,ymin=1e-5,ymax=2,xmin=0,xmax=961,yticklabels={,,}]
 		\addplot[color=black]  table[x=dof, y=u]{data/vcycle-const-box.dat};
 		\addplot[color=blue!70,opacity=0.5,only marks, mark=*,mark size=1pt]   table[x=dof, y=jacobi1]{data/vcycle-const-box.dat};
 		\addplot[color=red!70!black,opacity=0.5,only marks, mark=*,mark size=1pt] table[x=dof, y=chebyshev1]{data/vcycle-const-box.dat};
@@ -529,7 +534,7 @@ setup step using, for instance, a power method.
 	\begin{subfigure}[b]{0.49\textwidth}
 		\centering
 		\begin{tikzpicture}[scale=0.8]
-		\begin{semilogyaxis}[ymajorgrids,ymin=1e-6,ymax=2,xmin=0,xmax=961]
+		\begin{semilogyaxis}[ymajorgrids,ymin=1e-5,ymax=2,xmin=0,xmax=961]
 		\addplot[color=black]  table[x=dof, y=u]{data/smoother-const-box.dat};
 		\addplot[color=blue!70,opacity=0.5,only marks, mark=*,mark size=1pt]   table[x=dof, y=jacobi4]{data/smoother-const-box.dat};
 		\addplot[color=red!70!black,opacity=0.5,only marks, mark=*,mark size=1pt] table[x=dof, y=chebyshev4]{data/smoother-const-box.dat};
@@ -541,7 +546,7 @@ setup step using, for instance, a power method.
 	\begin{subfigure}[b]{0.49\textwidth}
 		\centering
 		\begin{tikzpicture}[scale=0.8]
-		\begin{semilogyaxis}[ymajorgrids,ymin=1e-6,ymax=2,xmin=0,xmax=961,yticklabels={,,}]
+		\begin{semilogyaxis}[ymajorgrids,ymin=1e-5,ymax=2,xmin=0,xmax=961,yticklabels={,,}]
 		\addplot[color=black]  table[x=dof, y=u]{data/vcycle-const-box.dat};
 		\addplot[color=blue!70,only marks,opacity=0.5, mark=*,mark size=1pt]   table[x=dof, y=jacobi4]{data/vcycle-const-box.dat};
 		\addplot[color=red!70!black,only marks,opacity=0.5, mark=*,mark size=1pt] table[x=dof, y=chebyshev4]{data/vcycle-const-box.dat};
@@ -554,7 +559,7 @@ setup step using, for instance, a power method.
 	\begin{subfigure}[b]{0.49\textwidth}
 		\centering
 		\begin{tikzpicture}[scale=0.8]
-		\begin{semilogyaxis}[ymajorgrids,ymin=1e-6,ymax=2,xmin=0,xmax=961]
+		\begin{semilogyaxis}[ymajorgrids,ymin=1e-5,ymax=2,xmin=0,xmax=961]
 		\addplot[color=black]  table[x=dof, y=u]{data/smoother-const-box.dat};
 		\addplot[color=blue!70,opacity=0.5,only marks, mark=*,mark size=1pt]   table[x=dof, y=jacobi16]{data/smoother-const-box.dat};
 		\addplot[color=red!70!black,opacity=0.5,only marks, mark=*,mark size=1pt] table[x=dof, y=chebyshev16]{data/smoother-const-box.dat};
@@ -566,7 +571,7 @@ setup step using, for instance, a power method.
 	\begin{subfigure}[b]{0.49\textwidth}
 		\centering
 		\begin{tikzpicture}[scale=0.8]
-		\begin{semilogyaxis}[ymajorgrids,ymin=1e-6,ymax=2,xmin=0,xmax=961,yticklabels={,,}]
+		\begin{semilogyaxis}[ymajorgrids,ymin=1e-5,ymax=2,xmin=0,xmax=961,yticklabels={,,}]
 		\addplot[color=black]  table[x=dof, y=u]{data/vcycle-const-box.dat};
 		\addplot[color=blue!70,opacity=0.5,only marks, mark=square*,mark size=1pt]   table[x=dof, y=jacobi16]{data/vcycle-const-box.dat};
 		\addplot[color=red!70!black,opacity=0.4,only marks, mark=*,mark size=1pt] table[x=dof, y=chebyshev16]{data/vcycle-const-box.dat};
@@ -575,7 +580,17 @@ setup step using, for instance, a power method.
 		\end{tikzpicture}
 		\caption{$p=16$, single v-cycle}
 	\end{subfigure}
-	\caption{\label{fig:smoothers2} The smoothing properties of the smoothers for constant coefficient 2D box.}
+	\caption{\label{fig:smoothers2} Error decay for different
+          point smoothers when used as solver (a,c,e) and when used
+          within a single multigrid v-cycle (b,d,f) for a
+          two-dimensional, constant coefficient Laplace problem on a
+          unit square. Plotted are the coefficients of the error
+          expanded in the eigenvectors of the discretized Laplace
+          operator. The order of the eigenvectors is such that the
+          corresponding eigenvalues are descending; thus, the
+          smoothness of the eigenvectors decays from left to right.
+          The initial error is chosen to have all unit coefficients in
+          the eigenvector expansion.}
 \end{figure}
 
 %% Variable Coefficients ----- SHELL
@@ -656,8 +671,10 @@ setup step using, for instance, a power method.
 		\end{tikzpicture}
 		\caption{$p=16$, single v-cycle}
 	\end{subfigure}
-	\caption{\label{fig:smoothers-var} The smoothing properties of the smoothers for  two-dimensional warped geometry with varying coefficient $\mu(x,y) = 1 + 10^6(\cos^2(2\pi x) + \cos^2(2\pi y))$.
-	}
+	\caption{\label{fig:smoothers-var} Same as
+          Figure~\ref{fig:smoother2}, but for two-dimensional warped
+          geometry shown in Figure~\todo{X} with varying coefficient
+          $\mu(x,y) = 1 + 10^6(\cos(2\pi x)^2 + \cos(2\pi y)^2)$.}
 \end{figure}
 
 
