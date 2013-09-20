@@ -565,8 +565,8 @@ method still retains a satisfactory convergence rate.
 		\addplot[color=red!70!black, opacity=0.5,only marks, mark=*,mark size=1pt] table[x=dof, y=chebyshev1]{data/smoother-const-box.dat};
 		\addplot[color=green!70!black,only marks, opacity=0.5,mark=*,mark size=1pt]  table[x=dof, y=ssor1]{data/smoother-const-box.dat};
 		\end{semilogyaxis}
-		\draw[black, thick, fill=white, rounded corners] (4.0, 3.7) rectangle +(2.85,2);
-		\draw[black] (4.0, 5.375) -- (6.85,5.375);
+		\draw[black, fill=white] (4.0, 3.7) rectangle +(2.85,2);
+		% \draw[black] (4.0, 5.375) -- (6.85,5.375);
 		\node at (5.35, 5.53) {\bf \small{smooth, $p=1$}}; 
 		\node[fill=blue!70, draw, circle,minimum width=0.1cm] at (4.3, 5.0) {}; 
 		\node[fill=red!70!black, draw, circle,minimum width=0.1cm] at (4.3, 4.5) {};
@@ -582,7 +582,7 @@ method still retains a satisfactory convergence rate.
 		\addplot[color=red!70!black,opacity=0.5,only marks, mark=*,mark size=1pt] table[x=dof, y=chebyshev1]{data/vcycle-const-box.dat};
 		\addplot[color=green!70!black,opacity=0.5,only marks, mark=*,mark size=1pt]  table[x=dof, y=ssor1]{data/vcycle-const-box.dat};
 		\end{semilogyaxis}
-		\draw[black, thick, fill=white] (3.7, 3.7) rectangle +(3.15,2);
+		\draw[black, fill=white] (3.7, 3.7) rectangle +(3.15,2);
 		%\draw[black] (4.0, 5.375) -- (6.85,5.375);
 		\node at (5.35, 5.53) {\bf \small{v-cycle, $p=1$}}; 
 		\node[fill=blue!70, draw, circle,minimum width=0.1cm] at (4.0, 5.0) {}; 
@@ -600,6 +600,8 @@ method still retains a satisfactory convergence rate.
 		\addplot[color=red!70!black,opacity=0.5,only marks, mark=*,mark size=1pt] table[x=dof, y=chebyshev4]{data/smoother-const-box.dat};
 		\addplot[color=green!70!black,opacity=0.5,only marks, mark=*,mark size=1pt]  table[x=dof, y=ssor4]{data/smoother-const-box.dat};
 		\end{semilogyaxis}
+		\draw[black, fill=white] (4.0, 5.375) rectangle +(2.85,0.325);
+		\node at (5.35, 5.53) {\bf \small{smooth, $p=4$}};
 		\end{tikzpicture}
 		\begin{tikzpicture}[scale=0.8]
 		\begin{semilogyaxis}[ymajorgrids,ymin=1e-5,ymax=2,xmin=0,xmax=961,yticklabels={,,}]
@@ -608,6 +610,8 @@ method still retains a satisfactory convergence rate.
 		\addplot[color=red!70!black,only marks,opacity=0.5, mark=*,mark size=1pt] table[x=dof, y=chebyshev4]{data/vcycle-const-box.dat};
 		\addplot[color=green!70!black,only marks,opacity=0.5, mark=*,mark size=1pt]  table[x=dof, y=ssor4]{data/vcycle-const-box.dat};
 		\end{semilogyaxis}
+			\draw[black, fill=white] (4.0, 5.375) rectangle +(2.85,0.325);
+			\node at (5.35, 5.53) {\bf \small{v-cycle, $p=4$}};
 		\end{tikzpicture}
 	\\
 		\begin{tikzpicture}[scale=0.8]
@@ -617,6 +621,8 @@ method still retains a satisfactory convergence rate.
 		\addplot[color=red!70!black,opacity=0.5,only marks, mark=*,mark size=1pt] table[x=dof, y=chebyshev16]{data/smoother-const-box.dat};
 		\addplot[color=green!70!black,opacity=0.5,only marks, mark=*,mark size=1pt]  table[x=dof, y=ssor16]{data/smoother-const-box.dat};
 		\end{semilogyaxis}
+		\draw[black, fill=white] (3.9, 5.375) rectangle +(2.95,0.325);
+		\node at (5.35, 5.53) {\bf \small{smooth, $p=16$}};
 		\end{tikzpicture}
 		\begin{tikzpicture}[scale=0.8]
 		\begin{semilogyaxis}[ymajorgrids,ymin=1e-5,ymax=2,xmin=0,xmax=961,yticklabels={,,}]
@@ -625,6 +631,8 @@ method still retains a satisfactory convergence rate.
 		\addplot[color=red!70!black,opacity=0.4,only marks, mark=*,mark size=1pt] table[x=dof, y=chebyshev16]{data/vcycle-const-box.dat};
 		\addplot[color=green!70!black,opacity=0.6,only marks, mark=diamond*,mark size=1pt]  table[x=dof, y=ssor16]{data/vcycle-const-box.dat};
 		\end{semilogyaxis}
+		\draw[black, fill=white] (3.95, 5.375) rectangle +(2.9,0.325);
+		\node at (5.35, 5.53) {\bf \small{v-cycle, $p=16$}};
 		\end{tikzpicture}
 		\caption{$p=16$, single v-cycle}
 	\caption{\label{fig:smoothers2} Error decay for different
@@ -655,6 +663,14 @@ method still retains a satisfactory convergence rate.
 		\addplot[color=red!70!black, opacity=0.5,only marks, mark=*,mark size=1pt] table[x=dof, y=chebyshev1]{data/smoother-var-shell.dat};
 		\addplot[color=green!70!black,only marks, opacity=0.5,mark=*,mark size=1pt]  table[x=dof, y=ssor1]{data/smoother-var-shell.dat};
 		\end{semilogyaxis}
+		\draw[black, fill=white] (4.0, 3.7) rectangle +(2.85,2);
+		\node at (5.35, 5.53) {\bf \small{smooth, $p=1$}}; 
+		\node[fill=blue!70, draw, circle,minimum width=0.1cm] at (4.3, 5.0) {}; 
+		\node[fill=red!70!black, draw, circle,minimum width=0.1cm] at (4.3, 4.5) {};
+		\node[fill=green!70!black, draw, circle,minimum width=0.1cm] at (4.3, 4.0) {};
+		\node[text width=1.9cm] at (5.75, 5.0) {\small jacobi $(6)$};
+		\node[text width=1.9cm] at (5.75, 4.5) {\small chebyshev $(6)$};
+		\node[text width=1.9cm] at (5.75, 4.0) {\small ssor $(3)$};
 		\end{tikzpicture}
 		\begin{tikzpicture}[scale=0.8]
 		\begin{semilogyaxis}[ymajorgrids,ymin=1e-5,ymax=2,xmin=0,xmax=961,yticklabels={,,}]
@@ -663,6 +679,14 @@ method still retains a satisfactory convergence rate.
 		\addplot[color=red!70!black,opacity=0.5,only marks, mark=*,mark size=1pt] table[x=dof, y=chebyshev1]{data/vcycle-var-shell.dat};
 		\addplot[color=green!70!black,opacity=0.5,only marks, mark=*,mark size=1pt]  table[x=dof, y=ssor1]{data/vcycle-var-shell.dat};
 		\end{semilogyaxis}
+		\draw[black, fill=white] (3.7, 3.7) rectangle +(3.15,2);
+		\node at (5.35, 5.53) {\bf \small{v-cycle, $p=1$}}; 
+		\node[fill=blue!70, draw, circle,minimum width=0.1cm] at (4.0, 5.0) {}; 
+		\node[fill=red!70!black, draw, circle,minimum width=0.1cm] at (4.0, 4.5) {};
+		\node[fill=green!70!black, draw, circle,minimum width=0.1cm] at (4.0, 4.0) {};
+		\node[text width=2.1cm] at (5.55, 5.0) {\small jacobi $(3,3)$};
+		\node[text width=2.1cm] at (5.55, 4.5) {\small chebyshev $(3,3)$};
+		\node[text width=2.1cm] at (5.55, 4.0) {\small ssor $(2,1)$};
 		\end{tikzpicture}
 	\\
 		\begin{tikzpicture}[scale=0.8]
@@ -672,6 +696,8 @@ method still retains a satisfactory convergence rate.
 		\addplot[color=red!70!black,opacity=0.5,only marks, mark=*,mark size=1pt] table[x=dof, y=chebyshev4]{data/smoother-var-shell.dat};
 		\addplot[color=green!70!black,opacity=0.5,only marks, mark=*,mark size=1pt]  table[x=dof, y=ssor4]{data/smoother-var-shell.dat};
 		\end{semilogyaxis}
+		\draw[black, fill=white] (4.0, 5.375) rectangle +(2.85,0.325);
+		\node at (5.35, 5.53) {\bf \small{smooth, $p=4$}};
 		\end{tikzpicture}
 		\begin{tikzpicture}[scale=0.8]
 		\begin{semilogyaxis}[ymajorgrids,ymin=1e-5,ymax=2,xmin=0,xmax=961,yticklabels={,,}]
@@ -680,6 +706,8 @@ method still retains a satisfactory convergence rate.
 		\addplot[color=red!70!black,only marks, mark=*,opacity=0.5,mark size=1pt] table[x=dof, y=chebyshev4]{data/vcycle-var-shell.dat};
 		\addplot[color=green!70!black,only marks, mark=*,opacity=0.5,mark size=1pt]  table[x=dof, y=ssor4]{data/vcycle-var-shell.dat};
 		\end{semilogyaxis}
+		\draw[black, fill=white] (4.0, 5.375) rectangle +(2.85,0.325);
+		\node at (5.35, 5.53) {\bf \small{v-cycle, $p=4$}};
 		\end{tikzpicture}
 	\\
 		\begin{tikzpicture}[scale=0.8]
@@ -689,6 +717,8 @@ method still retains a satisfactory convergence rate.
 		\addplot[color=red!70!black,opacity=0.5,only marks, mark=*,mark size=1pt] table[x=dof, y=chebyshev16]{data/smoother-var-shell.dat};
 		\addplot[color=green!70!black,opacity=0.5,only marks, mark=*,mark size=1pt]  table[x=dof, y=ssor16]{data/smoother-var-shell.dat};
 		\end{semilogyaxis}
+		\draw[black, fill=white] (3.9, 5.375) rectangle +(2.95,0.325);
+		\node at (5.35, 5.53) {\bf \small{smooth, $p=16$}};
 		\end{tikzpicture}
 		\begin{tikzpicture}[scale=0.8]
 		\begin{semilogyaxis}[ymajorgrids,ymin=1e-5,ymax=2,xmin=0,xmax=961,yticklabels={,,}]
@@ -697,6 +727,8 @@ method still retains a satisfactory convergence rate.
 		\addplot[color=red!70!black,opacity=0.5,only marks, mark=*,mark size=1pt] table[x=dof, y=chebyshev16]{data/vcycle-var-shell.dat};
 		\addplot[color=green!70!black,opacity=0.5,only marks, mark=diamond*,mark size=1pt]  table[x=dof, y=ssor16]{data/vcycle-var-shell.dat};
 		\end{semilogyaxis}
+		\draw[black, fill=white] (3.95, 5.375) rectangle +(2.9,0.325);
+		\node at (5.35, 5.53) {\bf \small{v-cycle, $p=16$}};
 		\end{tikzpicture}
 		\caption{$p=16$, single v-cycle}
 	\caption{\label{fig:smoothers-var} Same as
@@ -919,7 +951,7 @@ level. \gsnote{It's interesting that with 3 smoothing steps this
     \!\!\! order \!\!\!\! &  \multicolumn{2}{c|}{\!\scriptsize  Jacobi(3)\!} &  \multicolumn{2}{c|}{\!\scriptsize Cheb(3)\!} & \multicolumn{2}{c||}{\!\scriptsize  SSOR(2)\!} & \multicolumn{2}{c|}{\!\scriptsize Jacobi(3)\!} &  \multicolumn{2}{c|}{\!\scriptsize Cheb(3)\!} & \multicolumn{2}{c||}{\!\scriptsize SSOR(2)\!} & \multicolumn{3}{c|}{pCG}\\
 \hline
  & $h$ & $p$ & $h$ & $p$& $h$ & $p$& $h$ & $p$& $h$ & $p$& $h$ & $p$& 0 & 1 & 3\\
- \cline{2-15}
+ \cline{2-16}
 1 & 6 & & 5 & & 5 & & 5 & & 4 & & 4 & & - & - & - \\
 2 & 7 & 7 & 5 & 6 & 5 & 5 & 5 & 5 & 4 & 4 & 4 & 4 & 14 & 9 & 4 \\
 3 & 8 & & 6 & & 5 & & 6 & & 5 & & 4 & & 16 & 9 & 4 \\
@@ -970,7 +1002,7 @@ $p>4$.
     \!\!\! order \!\!\!\! &  \multicolumn{2}{c|}{\!\scriptsize  Jacobi(3)\!} &  \multicolumn{2}{c|}{\!\scriptsize Cheb(3)\!} & \multicolumn{2}{c||}{\!\scriptsize  SSOR(2)\!} & \multicolumn{2}{c|}{\!\scriptsize Jacobi(3)\!} &  \multicolumn{2}{c|}{\!\scriptsize Cheb(3)\!} & \multicolumn{2}{c||}{\!\scriptsize SSOR(2)\!} & \multicolumn{3}{c|}{pCG}\\
 \hline
  & $h$ & $p$ & $h$ & $p$& $h$ & $p$& $h$ & $p$& $h$ & $p$& $h$ & $p$& 0 & 1 & 3\\
- \cline{2-15}
+ \cline{2-16}
 1 & 14 & & 11 & & 6 & & 8 & & 7 & & 5 & & - & - & - \\
 2 & 20 & 19 & 15 & 15 & 7 & 8 & 10 & 10 & 8 & 8 & 5 & 6 & 16 & 9 & 5 \\
 3 & 20 & & 16 & & 8 & & 10 & & 9 & & 6 & & 18 & 9 & 6 \\
@@ -985,36 +1017,28 @@ $p>4$.
 \end{table}
 
 
-% 2: 25 & 14 & 5
-% 3: 27 & 13 & 5
-% 4: 28 & 15 & 6
-% 5: 29 & 16 & 6
-
-
-
-
 \begin{table}
   \caption{\label{tab:3d-box} Results for three-dimensional cube
     geometry with constant coefficient $\mu(\bs x) \equiv 1$. For a
     detailed description of the different experiments reported in this
     table we refer to Section~\ref{subsec:measures}.}  \centering
-  \begin{tabular}{|r|c c|c c|c c||c c|c c|c c||c c|} 
-    \hline
-    & \multicolumn{6}{c||}{MG as solver} & \multicolumn{6}{c||}{MG with pCG} & \multicolumn{2}{r|}{linearized} \\
-    \cline{2-13}
-    \!\!\! order \!\!\!\! &  \multicolumn{2}{c|}{\!\scriptsize  Jacobi(3)\!} &  \multicolumn{2}{c|}{\!\scriptsize Cheb(3)\!} & \multicolumn{2}{c||}{\!\scriptsize  SSOR(2)\!} & \multicolumn{2}{c|}{\!\scriptsize Jacobi(3)\!} &  \multicolumn{2}{c|}{\!\scriptsize Cheb(3)\!} & \multicolumn{2}{c||}{\!\scriptsize SSOR(2)\!} & \multicolumn{2}{r|}{pCG}\\
-\hline
- & $h$ & $p$ & $h$ & $p$& $h$ & $p$& $h$ & $p$& $h$ & $p$& $h$ & $p$& GLL & unif.\\
- \cline{2-15}
-1 & 6 & & 4 & & 4 & & 5 & & 4 & & 3 & & 1 & 1  \\
-2 & 8 & 8 & 4 & 5 & 4 & 5 & 6 & 6 & 4 & 4 & 4 & 4 & 26 & 26 \\
-3 & 10 & & 7 & & 5 & & 6 & & 5 & & 5 & & 29 & 33  \\
-4 & 11 & 10 & 8 & 7 & 6 & 5 & 7 & 7 & 6 & 5 & 5 & 4 & 33 & 42 \\
-5 & 14 & & 10 & & 7 & & 8 & & 7 & & 5 & & 37 & 54  \\
-6 & 16 & & 11 & & 7 & & 9 & & 7 & & 6 & & 43 & 67  \\
-7 & 20 & & 15 & & 9 & & 10 & & 9 & & 6 & & 47 & 83  \\
-8 & 22 & 19 & 17 & 15 & 9 & 8 & 10 & 10 & 9 & 8 & 6 & 6 & 52 & 100 \\
-16 & 47 & 42 & 38 & 34 & 17 & 15 & 16 & 14 & 14 & 13 & 9 & 9 & 44 & 118 \\
+	  \begin{tabular}{|r|c c|c c|c c||c c|c c|c c||c c c|} 
+	    \hline
+	    & \multicolumn{6}{c||}{MG as solver} & \multicolumn{6}{c||}{MG with pCG} & \multicolumn{3}{r|}{linearized} \\
+	    \cline{2-13}
+	    \!\!\! order \!\!\!\! &  \multicolumn{2}{c|}{\!\scriptsize  Jacobi(3)\!} &  \multicolumn{2}{c|}{\!\scriptsize Cheb(3)\!} & \multicolumn{2}{c||}{\!\scriptsize  SSOR(2)\!} & \multicolumn{2}{c|}{\!\scriptsize Jacobi(3)\!} &  \multicolumn{2}{c|}{\!\scriptsize Cheb(3)\!} & \multicolumn{2}{c||}{\!\scriptsize SSOR(2)\!} & \multicolumn{3}{c|}{pCG}\\
+	\hline
+	 & $h$ & $p$ & $h$ & $p$& $h$ & $p$& $h$ & $p$& $h$ & $p$& $h$ & $p$& 0 & 1 & 3\\
+	 \cline{2-16}
+1 & 6 & & 4 & & 4 & & 5 & & 4 & & 3 & & - & - & - \\
+2 & 8 & 8 & 4 & 5 & 4 & 5 & 6 & 6 & 4 & 4 & 4 & 4 &  25 & 14 & 5 \\
+3 & 10 & & 7 & & 5 & & 6 & & 5 & & 5 & & 27 & 13 & 5  \\
+4 & 11 & 10 & 8 & 7 & 6 & 5 & 7 & 7 & 6 & 5 & 5 & 4 & 28 & 15 & 6 \\
+5 & 14 & & 10 & & 7 & & 8 & & 7 & & 5 & & 29 & 16 & 6 \\
+6 & 16 & & 11 & & 7 & & 9 & & 7 & & 6 & & 32 & 18 & 6 \\
+7 & 20 & & 15 & & 9 & & 10 & & 9 & & 6 & &  \\
+8 & 22 & 19 & 17 & 15 & 9 & 8 & 10 & 10 & 9 & 8 & 6 & 6 & \\
+16 & 47 & 42 & 38 & 34 & 17 & 15 & 16 & 14 & 14 & 13 & 9 & 9 &  \\
 \hline 
  \end{tabular}
 \end{table}
@@ -1025,23 +1049,23 @@ $p>4$.
     10^6(\cos^2(2\pi x) + \cos^2(2\pi y) + \cos^2(2\pi z))$. For a
     detailed description of the different experiments reported in this
     table we refer to Section~\ref{subsec:measures}.}  \centering
-  \begin{tabular}{|r|c c|c c|c c||c c|c c|c c||c c|} 
-    \hline
-    & \multicolumn{6}{c||}{MG as solver} & \multicolumn{6}{c||}{MG with pCG} & \multicolumn{2}{r|}{linearized} \\
-    \cline{2-13}
-    \!\!\! order \!\!\!\! &  \multicolumn{2}{c|}{\!\scriptsize  Jacobi(3)\!} &  \multicolumn{2}{c|}{\!\scriptsize Cheb(3)\!} & \multicolumn{2}{c||}{\!\scriptsize  SSOR(2)\!} & \multicolumn{2}{c|}{\!\scriptsize Jacobi(3)\!} &  \multicolumn{2}{c|}{\!\scriptsize Cheb(3)\!} & \multicolumn{2}{c||}{\!\scriptsize SSOR(2)\!} & \multicolumn{2}{r|}{pCG}\\
-\hline
- & $h$ & $p$ & $h$ & $p$& $h$ & $p$& $h$ & $p$& $h$ & $p$& $h$ & $p$& GLL & unif.\\
- \cline{2-15}
-1 & 13 & & 7 & & 5 & & 7 & & 5 & & 4 & & 1 & 1  \\
-2 & 17 & 18 & 13 & 13 & 7 & 7 & 9 & 9 & 8 & 8 & 5 & 5 & 26 & 26 \\
-3 & 20 & & 16 & & 8 & & 10 & & 9 & & 6 & & 30 & 32  \\
-4 & 23 & 22 & 18 & 18 & 9 & 9 & 11 & 11 & 9 & 9 & 7 & 6 & 32 & 41 \\
-5 & 26 & & 21 & & 10 & & 12 & & 10 & & 7 & & 33 & 48  \\
-6 & 30 & & 27 & & 12 & & 13 & & 12 & & 8 & & 35 & 58  \\
-7 & 35 & & 34 & & 14 & & 14 & & 14 & & 8 & & 37 & 66  \\
-8 & - & - & 40 & 38 & 16 & 15 & 18 & 17 & 15 & 14 & 9 & 9 & 39 & 77 \\
-16 & - & - & 117 & 110 & 32 & 29 & 67 & 60 & 27 & 26 & 13 & 13 & 48 & 133 \\
+	  \begin{tabular}{|r|c c|c c|c c||c c|c c|c c||c c c|} 
+	    \hline
+	    & \multicolumn{6}{c||}{MG as solver} & \multicolumn{6}{c||}{MG with pCG} & \multicolumn{3}{r|}{linearized} \\
+	    \cline{2-13}
+	    \!\!\! order \!\!\!\! &  \multicolumn{2}{c|}{\!\scriptsize  Jacobi(3)\!} &  \multicolumn{2}{c|}{\!\scriptsize Cheb(3)\!} & \multicolumn{2}{c||}{\!\scriptsize  SSOR(2)\!} & \multicolumn{2}{c|}{\!\scriptsize Jacobi(3)\!} &  \multicolumn{2}{c|}{\!\scriptsize Cheb(3)\!} & \multicolumn{2}{c||}{\!\scriptsize SSOR(2)\!} & \multicolumn{3}{c|}{pCG}\\
+	\hline
+	 & $h$ & $p$ & $h$ & $p$& $h$ & $p$& $h$ & $p$& $h$ & $p$& $h$ & $p$& 0 & 1 & 3\\
+	 \cline{2-16}
+1 & 13 & & 7 & & 5 & & 7 & & 5 & & 4 & &   \\
+2 & 17 & 18 & 13 & 13 & 7 & 7 & 9 & 9 & 8 & 8 & 5 & 5 &  \\
+3 & 20 & & 16 & & 8 & & 10 & & 9 & & 6 & &  \\
+4 & 23 & 22 & 18 & 18 & 9 & 9 & 11 & 11 & 9 & 9 & 7 & 6 & \\
+5 & 26 & & 21 & & 10 & & 12 & & 10 & & 7 & &   \\
+6 & 30 & & 27 & & 12 & & 13 & & 12 & & 8 & &  \\
+7 & 35 & & 34 & & 14 & & 14 & & 14 & & 8 & &   \\
+8 & - & - & 40 & 38 & 16 & 15 & 18 & 17 & 15 & 14 & 9 & 9 &  \\
+16 & - & - & 117 & 110 & 32 & 29 & 67 & 60 & 27 & 26 & 13 & 13 &  \\
 \hline
   \end{tabular}
 \end{table}
