@@ -857,38 +857,46 @@ particular, these tables report the following.
       distributed memory environments.}. The SSOR smoother is based on 
 			a lexicographic ordering of  the unknowns. 
   \end{itemize}
-  Note that for each of the smoothers we report results for
+  Note that for each smoother we report results for
   $h$-multigrid (columns marked by \emph{h}; see
   Section~\ref{subsec:h}) as well as for $p$-multigrid (columns marked
   by \emph{p}; see Section~\ref{subsec:p}). For $p$-multigrid, we
-  restrict ourselves to reporting orders that are powers of 2. After
-  coarsening in $p$ as till $p=1$, and then coarsen in $h$. \todo{how
+  restrict ourselves to orders that are powers of 2. After
+  coarsening in $p$ till $p=1$, we coarsen in $h$. \todo{how
     many levels? what size meshes?}
-\item[$\bullet$] The columns entitled with \emph{MG with pCG} presents
-  our results obtained when multigrid is uses as preconditioner in a
-  CG algorithm. The sub-columns are as described above.
+\item[$\bullet$] The columns entitled \emph{MG with pCG} presents our
+  results obtained when multigrid is uses as preconditioner in a CG
+  algorithm. The sub-columns again correspond to different smoothers,
+  as described above.
 \item[$\bullet$] The columns headed by \emph{linearized pCG} present
   the number of CG iterations needed to solve the high-order system
   preconditioned with the low-order operator based on the high-order
   node points (see Section~\ref{subsec:low}). While in practice one
-  usually uses an algebraic multigrid cycle to approximately solve the
-  linearized system, for simplicity we use a direct factorization
+  would most likely use an algebraic multigrid cycle to approximately
+  solve the linearized system, here we use a direct factorization
   method as solver for the low-order system. The different columns
-  correspond to different to different numbers of Chebyshev smoothing
-  steps on the finest mesh, where these smoothing steps use the
-  high-order residual but the diagonal from the low-order system. Note
-  that in this case Chebyshev requires an estimate of the largest
-  eigenvalue of the high-order matrix preconditioned with the diagonal
-  of the low-order operator.
+  correspond to different numbers of Chebyshev-accelerated Jacobi
+  smoothing steps on the finest mesh. These smoothing steps use the
+  high-order residual but the diagonal from the low-order system. As a
+  consequence, the Chebyshev smoother requires an estimate of the
+  largest eigenvalue of the high-order matrix preconditioned with the
+  diagonal of the low-order operator, which is computed using
+  \todo{XX} steps of the Lanzos algorithm.
 \end{itemize}
+In the next section, we summarize our numerical comparisons.
+
+\subsection{Summary of numerical results}
+The Tables \ref{tab:box} and \ref{tab:fan} present the results for our
+two dimensional test problems.
 
 
-\begin{table}
+\begin{table}[ht]
   \caption{\label{tab:box} Results for two-dimensional unit square
     with constant coefficient $\mu\equiv 1$.  A total of 3 grids were
     used, the finest grid was $32\times 32$, and the coarsest was
-    $8\times 8$.}
-  \centering
+    $8\times 8$. For a detailed description of the different
+    experiments resported in this table we refer to
+    Section~\ref{subsec:measures}.}  \centering
   \begin{tabular}{|r|c c|c c|c c||c c|c c|c c||c c c|} 
     \hline
     & \multicolumn{6}{c||}{MG as solver} & \multicolumn{6}{c||}{MG with pCG} & \multicolumn{3}{r|}{linearized} \\
