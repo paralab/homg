@@ -905,15 +905,7 @@ level. \gsnote{It's interesting that with 3 smoothing steps this
   smoother---the computational work is comparable; but I think this
   might be caused by the direct solves on the coarse level.}
 
-Let us now contrast these observations with the results for the
-variable coefficient case summarized in Table~\ref{tab:2d-fan}. First,
-note that all variants perform reasonably for discretizations up to
-order $p=4$. When used as a solver, multigrid either diverges or
-converges very slowly for orders $p>4$. Convergence is reestablished
-when multigrid is combined with CG.
-
-
-\begin{table}[ht]
+\begin{table}
   \caption{\label{tab:box} Results for two-dimensional unit square
     with constant coefficient $\mu\equiv 1$.  A total of 3 grids were
     used, the finest grid was $32\times 32$, and the coarsest was
@@ -942,7 +934,29 @@ when multigrid is combined with CG.
 \end{table}
 
 
-\begin{table}[h]
+Let us now contrast these observations with the results for the
+variable coefficient case summarized in Table~\ref{tab:2d-fan}. First,
+note that all variants perform reasonably for discretizations up to
+order $p=4$. When used as a solver, multigrid either diverges or
+converges very slowly for orders $p>4$. Convergence is reestablished
+when multigrid is combined with CG.
+
+Next, we turn to the three dimensional results reported in
+Tables~\ref{tab:3d-box} and \ref{tab:3d-fan}. All of our
+multigrid/smoother variants converge for the Laplace equation on the
+unit cube, as shown in Table~\ref{tab:3d-box}. The benefit of using
+multigrid as preconditioner rather than as solver is even more evident
+in three dimensions than for the two dimensional unit square
+problem. \todo{Say something about the linearized preconditioner.}
+
+Our results for varying coefficient problem on the three-dimensional
+geometry shown in Figure~\ref{fig:mesh} are summarized in
+Table~\ref{tab:3d-fan}. As in two dimensions, the performance of
+multigrid when used as a solver degrades significantly for orders
+$p>4$.
+
+
+\begin{table}
   \caption{\label{tab:2d-fan} Results for two-dimensional warped
     geometry with varying coefficient $\mu(x,y) = 1 + 10^6(\cos^2(2\pi
     x) + \cos^2(2\pi y))$.  A total of 3 grids were used, the finest
@@ -977,7 +991,9 @@ when multigrid is combined with CG.
 % 5: 29 & 16 & 6
 
 
-\begin{table}[h]
+
+
+\begin{table}
   \caption{\label{tab:3d-box} Results for three-dimensional cube
     geometry with constant coefficient $\mu(\bs x) \equiv 1$. For a
     detailed description of the different experiments reported in this
@@ -1003,7 +1019,7 @@ when multigrid is combined with CG.
  \end{tabular}
 \end{table}
 
-\begin{table}[h]
+\begin{table}
   \caption{\label{tab:3d-fan} Results for three-dimensional warped
     geometry with varying coefficient $\mu(x,y,z) = 1 +
     10^6(\cos^2(2\pi x) + \cos^2(2\pi y) + \cos^2(2\pi z))$. For a
