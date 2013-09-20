@@ -48,7 +48,7 @@ T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 
 \titlerunning{Comparison of high-order geometric multigrid methods}
 
-\title{Comparison of Geometric Multigrid Algorithms for High-order Finite Element Discretizations}
+\title{Comparison of Geometric Multigrid Algorithms for High-order Continuous Finite Element Discretizations}
 
 \author{Hari Sundar, Georg Stadler, Omar Ghattas and George Biros}
 
@@ -815,7 +815,9 @@ polynomial order as the finite element functions. The Jacobians for
 this transformation are computed at every quadrature point. The
 coefficient $\mu$ at the coarse grid quadrature points is computed as
 the linear interpolation of the coefficient at the fine grid
-quadrature points.
+quadrature points. In our tests, change the polynomial degree of the
+finite element functions but keep the same mesh; this results in an
+increasing number of unknowns as $p$ increases.
 
 \begin{figure}
 	\includegraphics[width=0.48\textwidth]{figs/fan}
@@ -886,8 +888,16 @@ particular, these tables report the following.
 In the next section, we summarize our numerical comparisons.
 
 \subsection{Summary of numerical results}
-The Tables \ref{tab:box} and \ref{tab:fan} present the results for our
-two dimensional test problems.
+The Tables \ref{tab:box} and \ref{tab:2d-fan} present our results for
+the two dimensional test problems. As can be seen in
+Table~\ref{tab:box}, for the Laplace problem on the unit square all
+methods converge for all polynomial orders in a relatively small
+number of iterations. However, the number of iterations increases with
+the polynomial orders $p$, in particular when multigrid is used as a
+solver. Using multigrid as a preconditioner in CG results in a
+reduction of multigrid v-cycles, in some cases even by a factor or
+two. Also, we observe that SSOR smoothing outperforms the Jacobi-based
+smoothers.
 
 
 \begin{table}[ht]
