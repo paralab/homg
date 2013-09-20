@@ -69,13 +69,15 @@ T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 %
 \begin{abstract}
 We present a comprehensive comparison of different multigrid
-approaches for solving systems arising from high order continuous
-finite element discretizations of variable-coefficient elliptic
-partial differential equations on arbitrary geometries. For polynomial
-orders up to 16, we compare the computational cost and the performance
-of different point smoothers and of different multigrid approaches:
-geometric
-
+approaches for solving systems arising from high-order continuous
+finite element discretizations of elliptic partial differential
+equations on complex geometries. For polynomial orders up to 16, we
+compare the computational cost and the performance of different point
+smoothers (Jacobi, Chebyshev-accelerated Jacobi and SSOR smoothing)
+and of different variants of multigrid, namely high-order geometric
+multigrid, $p$-multigrid, and using a low-order operator based on the
+high-order nodes as preconditioner, which is often used in combination
+with algebraic for problems on unstructured meshes.
 %High order discretizations offer several
 %advantages over low-order discretizations. Besides the faster
 %convergence per unknown for sufficiently smooth problems, high order
