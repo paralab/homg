@@ -48,7 +48,8 @@ T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 
 \titlerunning{Comparison of high-order geometric multigrid methods}
 
-\title{Comparison of Geometric Multigrid Algorithms for High-order Continuous Finite Element Discretizations}
+\title{Comparison of Multigrid Algorithms for High-order
+  Continuous Finite Element Discretizations}
 
 \author{Hari Sundar, Georg Stadler, Omar Ghattas and George Biros}
 
@@ -58,30 +59,32 @@ T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 %\corraddr{\texttt{hari@ices.utexas.edu}}
 \maketitle
 
-\begin{abstract}
-We are interested in asymptotically
-optimal---$\mathcal{O}(N)$---complexity solvers for approximating the
-solution of elliptic partial differential equations (PDEs), where $N$
-is the number of unknowns.  Multigrid is such a solver. In practice
-however, multigrid performs best for low-order uniform discretizations
-with smooth coefficients.
+
+%We are interested in asymptotically
+%optimal---$\mathcal{O}(N)$---complexity solvers for approximating the
+%solution of elliptic partial differential equations (PDEs), where $N$
+%is the number of unknowns.  Multigrid is such a solver. In practice
+%however, multigrid performs best for low-order uniform discretizations
+%with smooth coefficients.
 %
-Our goal is to compare different geometric multigrid approaches for
-solving systems arising from high order discretizations of
-variable-coefficient elliptic partial differential equations on
-arbitrary geometries. High order discretizations offer several
-advantages over low-order discretizations. Besides the faster
-convergence per unknown for sufficiently smooth problems, high order
-discretizations can often make better use of modern hardware due to
-their locality, resulting in improved efficiency of the calculations.
-%  According to standard isoparametric polynomial
-%approximation theory, by using a finite element basis of at least
-%degree $p$, we can achieve very fast $\mathcal{O}(N^{-(p+1)})$
-%convergence for sufficiently smooth problems while improving the
-%locality and thus the CPU efficiency of the calculations.
+\begin{abstract}
+We present a comprehensive comparison of different multigrid
+approaches for solving systems arising from high order continuous
+finite element discretizations of variable-coefficient elliptic
+partial differential equations on arbitrary geometries. For polynomial
+orders up to 16, we compare the computational cost and the performance
+of different point smoothers and of different multigrid approaches:
+geometric
+
+%High order discretizations offer several
+%advantages over low-order discretizations. Besides the faster
+%convergence per unknown for sufficiently smooth problems, high order
+%discretizations can often make better use of modern hardware due to
+%their locality, resulting in improved efficiency of the calculations.
 \end{abstract}
 
-\keywords{geometric multigrid, high-order finite elements, spectral method, $p$-multigrid}
+\keywords{high-order, multigrid, continuous finite elements, spectral
+  elements, preconditioning}
 
 
 
