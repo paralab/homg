@@ -897,7 +897,20 @@ the polynomial orders $p$, in particular when multigrid is used as a
 solver. Using multigrid as a preconditioner in CG results in a
 reduction of multigrid v-cycles, in some cases even by a factor or
 two. Also, we observe that SSOR smoothing outperforms the Jacobi-based
-smoothers.
+smoothers. We find the linear order operator based on the high-order
+nodes to be a good preconditioner for the high-order system. The
+convergence can be accelerated using smoothing steps on the finest
+level. \gsnote{It's interesting that with 3 smoothing steps this
+  performs better than the high-order multigrid with Chebyshev
+  smoother---the computational work is comparable; but I think this
+  might be caused by the direct solves on the coarse level.}
+
+Let us now contrast these observations with the results for the
+variable coefficient case summarized in Table~\ref{tab:2d-fan}. First,
+note that all variants perform reasonably for discretizations up to
+order $p=4$. When used as a solver, multigrid either diverges or
+converges very slowly for orders $p>4$. Convergence is reestablished
+when multigrid is combined with CG.
 
 
 \begin{table}[ht]
@@ -905,7 +918,7 @@ smoothers.
     with constant coefficient $\mu\equiv 1$.  A total of 3 grids were
     used, the finest grid was $32\times 32$, and the coarsest was
     $8\times 8$. For a detailed description of the different
-    experiments resported in this table we refer to
+    experiments reported in this table we refer to
     Section~\ref{subsec:measures}.}  \centering
   \begin{tabular}{|r|c c|c c|c c||c c|c c|c c||c c c|} 
     \hline
@@ -929,12 +942,13 @@ smoothers.
 \end{table}
 
 
-\begin{table}
-  \caption{\label{tab:2d-fan} Results for two-dimensional warped geometry
-    with varying coefficient $\mu(x,y) = 1 + 10^6(\cos^2(2\pi x) + \cos^2(2\pi y))$. 
-		A total of 3 grids were used, the finest grid was $32\times 32$, and the coarsest was
-    $8\times 8$.}
-  \centering
+\begin{table}[h]
+  \caption{\label{tab:2d-fan} Results for two-dimensional warped
+    geometry with varying coefficient $\mu(x,y) = 1 + 10^6(\cos^2(2\pi
+    x) + \cos^2(2\pi y))$.  A total of 3 grids were used, the finest
+    grid was $32\times 32$, and the coarsest was $8\times 8$. For a
+    detailed description of the different experiments reported in this
+    table we refer to Section~\ref{subsec:measures}.}  \centering
   \begin{tabular}{|r|c c|c c|c c||c c|c c|c c||c c c|} 
     \hline
     & \multicolumn{6}{c||}{MG as solver} & \multicolumn{6}{c||}{MG with pCG} & \multicolumn{3}{r|}{linearized} \\
@@ -963,10 +977,11 @@ smoothers.
 % 5: 29 & 16 & 6
 
 
-\begin{table}
-  \caption{\label{tab:3d-box} Results for three-dimensional cube geometry
-    with constant coefficient $\mu(\bs x) \equiv 1$.}
-  \centering
+\begin{table}[h]
+  \caption{\label{tab:3d-box} Results for three-dimensional cube
+    geometry with constant coefficient $\mu(\bs x) \equiv 1$. For a
+    detailed description of the different experiments reported in this
+    table we refer to Section~\ref{subsec:measures}.}  \centering
   \begin{tabular}{|r|c c|c c|c c||c c|c c|c c||c c|} 
     \hline
     & \multicolumn{6}{c||}{MG as solver} & \multicolumn{6}{c||}{MG with pCG} & \multicolumn{2}{r|}{linearized} \\
@@ -988,10 +1003,12 @@ smoothers.
  \end{tabular}
 \end{table}
 
-\begin{table}
-  \caption{\label{tab:3d-fan} Results for three-dimensional warped geometry
-    with varying coefficient $\mu(x,y,z) = 1 + 10^6(\cos^2(2\pi x) + \cos^2(2\pi y) + \cos^2(2\pi z))$.}
-  \centering
+\begin{table}[h]
+  \caption{\label{tab:3d-fan} Results for three-dimensional warped
+    geometry with varying coefficient $\mu(x,y,z) = 1 +
+    10^6(\cos^2(2\pi x) + \cos^2(2\pi y) + \cos^2(2\pi z))$. For a
+    detailed description of the different experiments reported in this
+    table we refer to Section~\ref{subsec:measures}.}  \centering
   \begin{tabular}{|r|c c|c c|c c||c c|c c|c c||c c|} 
     \hline
     & \multicolumn{6}{c||}{MG as solver} & \multicolumn{6}{c||}{MG with pCG} & \multicolumn{2}{r|}{linearized} \\
