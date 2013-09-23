@@ -100,6 +100,8 @@ it_gll 				= it1;
 it_smooth_1 	= it2;
 it_smooth_3 	= it3;
 
+disp( [ num2str(order) ': ' num2str(it1) ' & ' num2str(it2) ' & ' num2str(it3)] );
+
 %semilogy(rv1/norm(rhs),'r-o');
 %hold off;
 
