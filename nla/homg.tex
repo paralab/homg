@@ -371,21 +371,24 @@ multigrid for high-order/spectral finite element
 discretizations. These approaches can either be directly used as
 solvers or can serve as preconditioners within a Krylov method. We
 first summarize different approaches for the construction of
-multilevel hierarchies in Section~\ref{subsec:hierarchy}, and then
-discuss smoothers in Section~\ref{subsec:smoothers}.
+multilevel hierarchies in Section~\ref{subsec:hierarchy}, then discuss
+smoothers in Section~\ref{subsec:smoothers}, and compare the
+computational cost of the different approaches in
+Section~\ref{subsec:complexity}.
 
 \subsection{Hierarchy construction}\label{subsec:hierarchy}
 Several approaches to building a multilevel hierarchy for high-order
 discretized problems are possible; see the overview shown in
 Figure~\ref{fig:approaches}. One option is the construction of a
 geometric mesh hierarchy while keeping the polynomial order unchanged;
-below we refer to this approach as \emph{$h$-multigrid}. An
+below, we refer to this approach as \emph{$h$-multigrid}. An
 alternative is to construct coarse problems by reducing the polynomial
-degree, possibly followed by standard geometric multigrid; this is
+degree of the finite element basis functions, possibly followed by
+standard geometric multigrid; this is
 commonly referred to as \emph{$p$-multigrid}. For unstructured
 high-order element discretizations, where geometric coarsening is
-challenging, using an algebraic multigrid hierarchy of a low-oder
-approximation to the high-order operator as a preconditioner has been
+challenging, using an algebraic multigrid hierarchy of a \emph{low-oder
+approximation to the high-order operator} as a preconditioner has been
 proven efficient and flexible. We next discuss details of these
 different approaches.
 
@@ -501,7 +504,7 @@ different approaches.
 A direct approach to high-order multigrid is to use high-order
 restriction and prolongation operators, and use the high-order
 discretization of the operator for the residual computation on each
-multigrid level.
+multigrid level. \todo{refer to previous section and/or give expressions}
 %A potential difficulty in this approach is that it
 %requires smoothers for matrices arising from high-order
 %discretization, which usually have less favorable properties compared
@@ -520,12 +523,13 @@ e.g.~\cite{DevilleFischerMund02}.
 
 \subsubsection{$p$-multigrid}\label{subsec:p}
 In the $p$-multigrid approach to high-order multigrid, one (initially)
-does not coarsen the mesh geometrically, but coarsens the system by
+does not coarsen the mesh geometrically, but coarsens the finite
+element system by
 reducing the polynomial order. Starting from an order-$p$ polynomial
 basis (for simplicity, we assume here that $p$ is a power of 2), the
 coarser grids correspond to polynomials of order $p/2, p/4,\ldots,1$,
 followed by geometric coarsening of the $p=1$ grid (i.e., the standard
-low order geometric multigrid). Decreasing the polynomial order is an
+low-order geometric multigrid). Decreasing the polynomial order is an
 element-local operation and is particularly simple for discretizations
 with nonconforming meshes. \gsnote{Is that actually true?}. As for
 high-order $h$-multigrid, devising smoothers can be a challenge for
@@ -534,31 +538,40 @@ convergence factor on the order of the polynomial basis
 \cite{MadayMunoz89}.
 
 \subsubsection{Preconditioning using AMG hierarchy of lower-order operator} \label{subsec:low}
-In a defect correction approach (see
+In this defect correction approach (see
 \cite{TrottenbergOosterleeSchuller01, Hackbusch85}), the high-order
-defect is iteratively corrected using a low order operator obtained by
-overlaying the high-order nodes with a low order (typically linear)
-finite element mesh.  This construction of a low-order preconditioner
-based on the nodes of the high-order discretization
-%, combined with
-%setting up an algebraic multigrid hierarchy for the low-order operator
-is used, for instance in~\cite{Brown10, Kim07, DevilleMund90,
-  HeysManteuffelMcCormickEtAl05}.
+defect/residual is iteratively corrected using a low order operator
+obtained by overlaying the high-order nodes with a low order
+(typically linear) finite element mesh. While the resulting low-order
+operator has the same number of degrees of freedom as the high-order
+operator, it is much sparser and can thus be assembled efficiently and
+then provided as input to an algebraic multigrid method, which
+computes a grid hierarchy through algebraic point aggregation.  This
+construction of a low-order preconditioner based on the nodes of the
+high-order discretization is used, for instance in~\cite{Brown10,
+  Kim07, DevilleMund90, HeysManteuffelMcCormickEtAl05}.  Due to the
+black-box nature of algebraic multigrid, it is particularly attractive
+for high-order discretizations on unstructured meshes.  Even for
+structured meshes, the solution of the low-order system with a
+geometric multigrid method is not straightforward due to the non
+evenly spaced node points inherited from the high-order
+discretization.  In principle, this approach only requires computation
+of the residual for the high-order discretized operator. Smoothing on
+the finest level uses the low-order discretized operator, and either
+the high-order or the low-order residual can be used in the
+smoother. Using the high-order residual in the smoother requires an
+additional high-order residual computation per smoothing step.
+
+
 % The resulting method is nearly independent of $p$, but this low-order
 % preconditioning is not work optimal and the convergence factors can be
 % lower than when multigrid is applied directly to the high-order
 % operator. \gsnote{Reference or remove statement.} 
-%
-Due to the non evenly spaced node points inherited from the high-order
-discretization, the solution of the low order system with a low-order
-geometric multigrid method is not straightforward, and one usually
-% One possible approach to solve the low order system
-relies on algebraic multigrid, e.g.,~\cite{Brown10,
-  HeysManteuffelMcCormickEtAl05}. Algebraic multigrid for the
-low-order system is particularly attractive for high-order
-discretizations on unstructured meshes due to its flexibility and the
-fact that the low-order system matrix is sparse and can thus be
-assembled efficiently.
+
+
+% and the
+%fact that the low-order system matrix is sparse and can thus be
+%assembled efficiently.
 %, where the construction of a
 %grid hierarchy from geometric coarsening can be very difficult.
 % For structured grids such as the ones used for
@@ -567,13 +580,6 @@ assembled efficiently.
 % points (which can be challenging) or replaces them by evenly spaced
 % points---we experiment with the latter option in
 % Section~\ref{sec:numerics}.
-%
-In principle, defect correction only requires computation of the
-residual for the high-order discretized operator. Smoothing on the
-finest level uses the low-order discretized operator, and either the
-high-order or the low-order residual can be used in the smoother.
-
-
 
 % multigrid cycles are faster compared to high
 %order $h$-multigrid or $p$-multigrid discussed in
@@ -584,7 +590,6 @@ high-order or the low-order residual can be used in the smoother.
 %smoothers.
 %  Thus, the speedup for a full multigrid cycle when using the
 %low order operator is limited.
-
 
 %The advantages of doing
 %this are mainly in the simplicity of the approach and the availability
@@ -856,7 +861,7 @@ for spectral element discretizations with orders up to \todo{XX}. However,
 the coarse-grid solves can become fairly expensive; moreover, it is
 not straightforward to achieve good parallel scalability.
 
-\subsection{Comparing computational complexity}
+\subsection{Comparing computational complexity}\label{subsec:complexity}
 To compare the computational cost of the different methods, we focus
 on matrix-vector multiplications on the finest multigrid level, which
 dominate the overall computation. Denoting the number of unknowns on
