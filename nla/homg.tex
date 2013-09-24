@@ -383,7 +383,7 @@ Several approaches to building a multilevel hierarchy for high-order
 discretized problems are possible; see the overview shown in
 Figure~\ref{fig:approaches}. One option is the construction of a
 geometric mesh hierarchy while keeping the polynomial order unchanged;
-below, we refer to this approach as \emph{$h$-multigrid}. An
+we refer to this approach as \emph{$h$-multigrid}. An
 alternative is to construct coarse problems by reducing the polynomial
 degree of the finite element basis functions, possibly followed by
 standard geometric multigrid; this is
@@ -506,7 +506,7 @@ different approaches.
 A direct approach to high-order multigrid is to use high-order
 restriction and prolongation operators, and use the high-order
 discretization of the operator for the residual computation on each
-multigrid level. \todo{refer to previous section and/or give expressions}
+multigrid level (\S\ref{sub:restriction_&_prolongation}).
 %A potential difficulty in this approach is that it
 %requires smoothers for matrices arising from high-order
 %discretization, which usually have less favorable properties compared
@@ -531,10 +531,9 @@ reducing the polynomial order. Starting from an order-$p$ polynomial
 basis (for simplicity, we assume here that $p$ is a power of 2), the
 coarser grids correspond to polynomials of order $p/2, p/4,\ldots,1$,
 followed by geometric coarsening of the $p=1$ grid (i.e., the standard
-low-order geometric multigrid). Decreasing the polynomial order is an
-element-local operation and is particularly simple for discretizations
-with nonconforming meshes. \gsnote{Is that actually true?}. As for
-high-order $h$-multigrid, devising smoothers can be a challenge for
+low-order geometric multigrid). 
+%Decreasing the polynomial order is an element-local operation and is particularly simple for discretizations with nonconforming meshes. \gsnote{Is that actually true?}. 
+As for high-order $h$-multigrid, devising smoothers can be a challenge for
 $p$-multigrid.  Moreover, one often finds dependence of the
 convergence factor on the order of the polynomial basis
 \cite{MadayMunoz89}.
@@ -627,7 +626,7 @@ Jacobi smoothing, while being as simple to
 implement~\cite{AdamsBrezinaHuEtAl03}. The acceleration of Jacobi
 smoothing with Chebyshev polynomials requires estimation of the
 maximum eigenvalues of the system matrix, which has to be done in a
-setup step using.
+setup step using \todo{details ...}.
 
 In Figures~\ref{fig:smoothers2} and~\ref{fig:smoothers-var}, we
 compare the efficiency of these point smoothers for different
@@ -645,10 +644,10 @@ smoother uses a lexicographic ordering of the unknowns, and we use 2
 pre and 1 post smoothing steps, which again amounts to overall 6
 smoothing steps on the finest grid. The Chebyshev smoother targets the
 part of the spectrum given by
-$[\lambda_\text{max}/6,\lambda_\text{max}]$, where
+$[\lambda_\text{max}/4,\lambda_\text{max}]$, where
 $\lambda_\text{max}$ is the maximum eigenvalue of the system
-matrix. \todo{Hari, is the last sentence correct and is there a better
-  way to say that?}
+matrix. 
+% \todo{Hari, is the last sentence correct and is there a better way to say that?}
 
 
 The results for the constant coefficient Laplacian operator on the
