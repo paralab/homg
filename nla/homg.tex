@@ -875,7 +875,7 @@ coarse-grid solves can become fairly expensive. Moreover, depending on
 how much overlap between the domains is used, it is not
 straightforward to achieve good parallel scalability.
 
-\subsection{Comparing computational complexity}\label{subsec:complexity}
+\subsection{Comparing computational cost}\label{subsec:complexity}
 To compare the computational cost of the different methods, we focus
 on matrix-vector multiplications on the finest multigrid level, which
 dominate the overall computation. Denoting the number of unknowns on
@@ -884,18 +884,78 @@ $Ng_p$, where $g_p>0$ is the cost per unknown for the application of
 an operator originating from a discretization with polynomial order
 $p$. Since high-order discretizations result in less sparse operators,
 we have $g_1\le g_2\le \ldots$. The actual value of $g_p$ depends
-strongly on the implementation and on the system architecture. To
-illustrate this, consider an elemental matrix for a hexahedral mesh in
-three dimensions, which is dense and of size $(p+1)^3\times
-(p+1)^3$. Its naive application to a vector amounts to $\mathcal
-O((p+1)^6)$ operations; for tensor bases, as common in spectral
-element methods, this can be reduced to $\mathcal O((p+1)^4)$
-operations \cite{DevilleFischerMund02}. In addition, high-order
-implementations allow more memory locality, which, compared to low
-order methods, results in higher performance. When considering 
-the steps in multigrid preconditioned CG, we see that most steps
-are $\mathcal{O}(N)$ (see Algorithm~\ref{alg:pcg}). 
+strongly on the implementation and on the system architecture.
+% To
+%illustrate this, consider an elemental matrix for a hexahedral mesh in
+%three dimensions, which is dense and of size $(p+1)^3\times
+%(p+1)^3$. Its naive application to a vector amounts to $\mathcal
+%O((p+1)^6)$ operations; for tensor bases, as common in spectral
+%element methods, this can be reduced to $\mathcal O((p+1)^4)$
+%operations \cite{DevilleFischerMund02}.
+In general, high-order implementations allow more memory locality,
+which often results in higher performance compared to low order
+methods.
 
+The dominant computational cost per iteration of the high-order
+multigrid approaches discussed in Section~\ref{sec:approaches} can
+thus be summarized as
+\begin{equation}\label{eq:compcost}
+  g_p(1+m(s_\text{pre}+s_\text{post})).
+\end{equation}
+Here, we denote by $s_\text{pre}$ and $s_\text{post}$ the number of
+pre and post smoothing steps on the finest multigrid level,
+respectively. Moreover, $m$ denotes the number of necessary residual
+computations (and thus matrix-vector computations) per smoothing step.
+Jacobi smoothing and Chebyshev-accelerated Jacobi require $m=1$
+matrix-vector multiplication per smoothing step, while SSOR requires
+$m=2$ matrix-vector operations. If, in the approach discussed in
+Section~\ref{subsec:low}, the linear-order residual is used in the
+smoother, then the cost \eqref{eq:compcost} reduces to
+\begin{equation}\label{eq:compcost}
+  g_p+g_1m(s_\text{pre}+s_\text{post})).
+\end{equation}
+However, since the overall number of iterations increases (see
+Section~\ref{subsec:results}), this usually does not decrease the
+solution time.
+
+% note that  Jacobi, SSOR and
+%Chebyshev-accelerated Jacobi require a matrix-vector product, and we
+%denote by $m$ the number of such products per smoothing step.
+
+
+%\begin{itemize}
+%\item {\em high-order $h$-multigrid:} On the finest grid level, the
+%  residual and the smoothing steps are all based on the order $p$
+%  discretization. Thus, the cost based on the matrix-vector products
+%  on the finest multigrid level is
+%  $g_p(1+m(s_\text{pre}+s_\text{post}))$.
+%
+%\item {\em $p$-multigrid:} As for high-order $h$-multigrid, an
+%  estimate for the computational cost on the finest level is
+%  $g_p(1+m(s_\text{pre}+s_\text{post}))$.
+%
+%\item {\em high-order defect correction with linear-order operator:}
+%  high-order defect correction requires the computation of the
+%  high-order residual, but uses smoothing based on the low-order
+%  operator. Using linear elements, the computational cost on the
+%  finest grid level is thus
+%  $g_p(1+m(s_\text{pre}+s_\text{post}))$.
+%\end{itemize}
+
+
+If the overall number of unknowns $N$ is kept fixed and the problem
+solution is smooth, it is well known that the accuracy increases for
+high-order discretizations. Due to the decreased sparsity of the
+discretized operators, this does not automatically translate into more
+accuracy per computation time; see, e.g.~\cite{Brown10}. However, note
+that the complexity of most computations in a multigrid preconditioned
+conjugate gradient algorithm, for instance, are of complexity
+$\mathcal{O}(N)$ (see Algorithm~\ref{alg:pcg}) and thus independent of
+$g_p$. Thus, the computational cost of these steps does not depend on
+the order of the discretization. Even if these $\mathcal{O}(N)$ steps
+do not dominate the computation, they contribute to making high-order
+discretizations favorable not only in terms of accuracy per unknown,
+but also in terms of accuracy per computation time.
 
 \begin{algorithm}[ht] 
   % v-cycle 
@@ -918,36 +978,6 @@ are $\mathcal{O}(N)$ (see Algorithm~\ref{alg:pcg}).
 \end{algorithm}
 
 
-Based on this simple performance model, we next summarize the
-computational cost of the high oder multigrid approaches from
-Section~\ref{sec:approaches}. We denote by $s_\text{pre}$ and
-$s_\text{post}$ the number of pre- and post-smoothing steps on the
-finest multigrid level, respectively. Note that smoothers such as
-Jacobi, SSOR and Chebyshev-accelerated Jacobi also require a
-matrix-vector product, and we denote by $m$ the number of such
-products per smoothing step.  Jacobi smoothing and
-Chebyshev-accelerated Jacobi require $m=1$ matrix-vector
-multiplication per smoothing step, while SSOR requires $m=2$
-matrix-vector operations.
-
-\begin{itemize}
-\item {\em high-order $h$-multigrid:} On the finest grid level, the
-  residual and the smoothing steps are all based on the order $p$
-  discretization. Thus, the cost based on the matrix-vector products
-  on the finest multigrid level is
-  $g_p(1+m(s_\text{pre}+s_\text{post}))$.
-
-\item {\em $p$-multigrid:} As for high-order $h$-multigrid, an
-  estimate for the computational cost on the finest level is
-  $g_p(1+m(s_\text{pre}+s_\text{post}))$.
-
-\item {\em high-order defect correction with linear-order operator:}
-  high-order defect correction requires the computation of the
-  high-order residual, but uses smoothing based on the low-order
-  operator. Using linear elements, the computational cost on the
-  finest grid level is thus
-  $g_p+g_1m(s_\text{pre}+s_\text{post})$.
-\end{itemize}
 
 
 % **************************************************
