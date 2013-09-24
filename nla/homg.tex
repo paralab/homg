@@ -180,13 +180,15 @@ direct application of algebraic multigrid to the high-order operator.  In our
 test problems, we compare the performance of this low-order preconditioning
 approach to the performance obtained with $h$-multigrid and $p$-multigrid.
 
-{\em Organization of this paper:} In \S\ref{sec:problem} we describe the test 
-problem, as well as discretization approach used in evaluating the different 
-multigrid schemes. In \S\ref{sec:approaches}, we describe in detail the 
-different approaches for solving the resulting high-order systems. In \S\ref{sec:numerics},
-we presents numerical results from the comparison of different approaches to
-test problems in 2D and 3D. Finally, in \S\ref{sec:discuss} our findings with
-regards to parallel implementations on high performance computing platforms. 
+{\em Organization of this paper:} In \S\ref{sec:problem} we describe
+the test problem, as well as discretization approach for the different
+multigrid schemes. In \S\ref{sec:approaches}, we describe in detail
+the different multilevel approaches for solving the resulting
+high-order systems. In \S\ref{sec:numerics}, we presents a
+comprehensive comparison of different approaches using test problems
+in 2D and 3D. Finally, in \S\ref{sec:discuss} we draw conclusions and
+discuss our findings with a particular emphasis on parallel
+implementations on high performance computing platforms.
 
 %\gsnote{Unify notion of mesh/grid etc}\\
 % \gsnote{Unify use of high-order vs.\ higher order}\\
@@ -373,10 +375,10 @@ multigrid for high-order/spectral finite element
 discretizations. These approaches can either be directly used as
 solvers or can serve as preconditioners within a Krylov method. We
 first summarize different approaches for the construction of
-multilevel hierarchies in Section~\ref{subsec:hierarchy}, then discuss
-smoothers in Section~\ref{subsec:smoothers}, and compare the
+multilevel hierarchies in \S\ref{subsec:hierarchy}, then discuss
+smoothers in \S\ref{subsec:smoothers}, and compare the
 computational cost of the different approaches in
-Section~\ref{subsec:complexity}.
+\S\ref{subsec:complexity}.
 
 \subsection{Hierarchy construction}\label{subsec:hierarchy}
 Several approaches to building a multilevel hierarchy for high-order
@@ -605,9 +607,9 @@ additional high-order residual computation per smoothing step.
 \subsection{Smoothers}\label{subsec:smoothers}
 Next, we summarize different smoothing approaches. In our numerical
 comparisons, we restrict ourselves to the point smoothers reviewed in
-Section~\ref{subsec:ptsmoothers}. For completeness of the
+\S\ref{subsec:ptsmoothers}. For completeness of the
 presentation, we briefly describe Schwarz-type smoothers in
-Section~\ref{subsec:schwarz}.
+\S\ref{subsec:schwarz}.
 
 
 \subsubsection{Point smoothers}\label{subsec:ptsmoothers}
@@ -896,7 +898,7 @@ which often results in higher performance compared to low order
 methods.
 
 The dominant computational cost per iteration of the high-order
-multigrid approaches discussed in Section~\ref{sec:approaches} can
+multigrid approaches discussed in \S\ref{sec:approaches} can
 thus be summarized as
 \begin{equation}\label{eq:compcost}
   g_p(1+m(s_\text{pre}+s_\text{post})).
@@ -908,13 +910,13 @@ computations (and thus matrix-vector computations) per smoothing step.
 Jacobi smoothing and Chebyshev-accelerated Jacobi require $m=1$
 matrix-vector multiplication per smoothing step, while SSOR requires
 $m=2$ matrix-vector operations. If, in the approach discussed in
-Section~\ref{subsec:low}, the linear-order residual is used in the
+\S\ref{subsec:low}, the linear-order residual is used in the
 smoother, then the cost \eqref{eq:compcost} reduces to
 \begin{equation}\label{eq:compcost}
   g_p+g_1m(s_\text{pre}+s_\text{post})).
 \end{equation}
 However, since the overall number of iterations increases (see
-Section~\ref{subsec:results}), this usually does not decrease the
+\S\ref{subsec:results}), this usually does not decrease the
 solution time.
 
 % note that  Jacobi, SSOR and
@@ -985,10 +987,10 @@ but also in terms of accuracy per computation time.
 In this section we present a comprehensive comparison of our
 algorithms for the solution of high-order discretizations of
 \eqref{eq:Poisson}.  After introducing our test problems in
-Section~\ref{subsec:tests}, in Section~\ref{subsec:measures} we
+\S\ref{subsec:tests}, in \S\ref{subsec:measures} we
 describe how we compare our methods for high-order multigrid. The
 results for our test problem are then presented and discussed
-Section~\ref{subsec:results}.
+\S\ref{subsec:results}.
 
 
 \subsection{Presentation of test problems}\label{subsec:tests}
@@ -1049,8 +1051,8 @@ particular, these tables report the following.
   \end{itemize}
   Note that for each smoother we report results for
   $h$-multigrid (columns marked by \emph{h}; see
-  Section~\ref{subsec:h}) as well as for $p$-multigrid (columns marked
-  by \emph{p}; see Section~\ref{subsec:p}). For $p$-multigrid, we
+  \S\ref{subsec:h}) as well as for $p$-multigrid (columns marked
+  by \emph{p}; see \S\ref{subsec:p}). For $p$-multigrid, we
   restrict ourselves to orders that are powers of 2. After
   coarsening in $p$ till $p=1$, we coarsen in $h$. \todo{how
     many levels? what size meshes?}
@@ -1061,7 +1063,7 @@ particular, these tables report the following.
 \item[$\bullet$] The columns headed by \emph{linearized pCG} present
   the number of CG iterations needed to solve the high-order system
   preconditioned with the low-order operator based on the high-order
-  node points (see Section~\ref{subsec:low}). While in practice one
+  node points (see \S\ref{subsec:low}). While in practice one
   would most likely use an algebraic multigrid cycle to approximately
   solve the linearized system, here we use a direct factorization
   method as solver for the low-order system. The different columns
@@ -1110,7 +1112,7 @@ based on an algebraic multigrid method.
     used, the finest grid was $32\times 32$, and the coarsest was
     $8\times 8$. For a detailed description of the different
     experiments reported in this table we refer to
-    Section~\ref{subsec:measures}.}  \centering
+    \S\ref{subsec:measures}.}  \centering
   \begin{tabular}{|r|c c|c c|c c||c c|c c|c c||c c c|} 
     \hline
     & \multicolumn{6}{c||}{MG as solver} & \multicolumn{6}{c||}{MG with pCG} & \multicolumn{3}{r|}{linearized} \\
@@ -1161,7 +1163,7 @@ $p>4$.
     x) + \cos^2(2\pi y))$.  A total of 3 grids were used, the finest
     grid was $32\times 32$, and the coarsest was $8\times 8$. For a
     detailed description of the different experiments reported in this
-    table we refer to Section~\ref{subsec:measures}.}  \centering
+    table we refer to \S\ref{subsec:measures}.}  \centering
   \begin{tabular}{|r|c c|c c|c c||c c|c c|c c||c c c|} 
     \hline
     & \multicolumn{6}{c||}{MG as solver} & \multicolumn{6}{c||}{MG with pCG} & \multicolumn{3}{r|}{linearized} \\
@@ -1188,7 +1190,7 @@ $p>4$.
   \caption{\label{tab:3d-box} Results for three-dimensional cube
     geometry with constant coefficient $\mu(\bs x) \equiv 1$. For a
     detailed description of the different experiments reported in this
-    table we refer to Section~\ref{subsec:measures}.}  \centering
+    table we refer to \S\ref{subsec:measures}.}  \centering
 	  \begin{tabular}{|r|c c|c c|c c||c c|c c|c c||c c c|} 
 	    \hline
 	    & \multicolumn{6}{c||}{MG as solver} & \multicolumn{6}{c||}{MG with pCG} & \multicolumn{3}{r|}{linearized} \\
@@ -1215,7 +1217,7 @@ $p>4$.
     geometry with varying coefficient $\mu(x,y,z) = 1 +
     10^6(\cos^2(2\pi x) + \cos^2(2\pi y) + \cos^2(2\pi z))$. For a
     detailed description of the different experiments reported in this
-    table we refer to Section~\ref{subsec:measures}.}  \centering
+    table we refer to \S\ref{subsec:measures}.}  \centering
 	  \begin{tabular}{|r|c c|c c|c c||c c|c c|c c||c c c|} 
 	    \hline
 	    & \multicolumn{6}{c||}{MG as solver} & \multicolumn{6}{c||}{MG with pCG} & \multicolumn{3}{r|}{linearized} \\
