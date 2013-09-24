@@ -613,31 +613,39 @@ Jacobi smoothing, while being as simple to
 implement~\cite{AdamsBrezinaHuEtAl03}. The acceleration of Jacobi
 smoothing with Chebyshev polynomials requires estimation of the
 maximum eigenvalues of the system matrix, which has to be done in a
-setup step using, for instance, a power method.  In
-Figures~\ref{fig:smoothers2} and~\ref{fig:smoothers-var}, we compare
-the efficiency of these point smoothers for different polynomial
-orders. The results for the constant coefficient unit square
-(Figure~\ref{fig:smoothers2}) show that the smoother
+setup step using, for instance, a power method. 
 
 
 In Figures~\ref{fig:smoothers2} and~\ref{fig:smoothers-var}, we
 compare the efficiency of these point smoothers for different
-polynomial orders. The results for the constant coefficient Laplacian
-operator on the unit square (Figure~\ref{fig:smoothers2}) show that
-all point smoothers decrease the error components in the upper half of
-the spectrum, but that this damping factor is smaller for high-order
+polynomial orders. In our tests, we compute the eigenvectors of the
+system matrix, choose a zero right hand side and an initialization
+that has all unit coefficients in the basis given by these
+eigenvectors. For the polynomial orders $p=1,4,16$, we compare the
+performance of point smoothers with and without a multigrid iteration.
+We depict the coefficients after 6 smoothing steps on the left, and
+the results obtained for a two-grid method\footnote{For simplicity, we
+  chose two grids in our tests; the results for a multigrid v-cycle
+  are very similar.} with 3 pre and 3 post smoothing steps (and thus
+overall 6 smoothing steps on the finest grid) on the left. The SSOR
+smoother uses a lexicographic ordering of the unknowns, and we use 2
+pre and 1 smoothing steps which also amounts to overall 6 smoothing
+steps on the finest grid.
+
+The results for the constant coefficient Laplacian operator on the
+unit square (Figure~\ref{fig:smoothers2}) show that all point
+smoothers decrease the error compoments in the upper half of the
+spectrum, but that this damping factor is smaller for high-order
 elements. Note that Chebyshev accelerated Jacobi smoothing results in
-a uniform damping of a larger party of the spectrum. Both, Chebyshev
-and SSOR smoothing outperform Jacobi smoothing, in particular for
-higher orders. Combining the smoothers with a two-grid
-cycle\footnote{For simplicity, we chose two grids for this test; the
-  results for a multigrid v-cycle are similar.}, all error components
-are decreased for all smoothers, but the error decreases slower for
+a uniform damping of a larger part of the spectrum than Jacobi
+smoothing.  Both, Chebyshev and SSOR outperform Jacobi smoothing, in
+particular for higher orders. Combining the smoothers with a two-grid
+cycle, all error components are decreased for all smoothers (and thus
+the resulting algorithm converges), but the error decreases slower for
 higher polynomial degrees. For high polynomial order, a two-grid
 iteration with SSOR smooters results in a significantly better error
-reduction compared to Jacobi or Chebyshev smoothing. \todo{Need to say
-  something about which of these cases converge and which not; say
-  that SSOR is based on lexicographic ordering.}
+reduction than Jacobi or Chebyshev smoothing.
+
 
 In Figure~\ref{fig:smoothers-var}, we study the case with deformed
 geometry and varying coefficient. Note that, comparing with the
@@ -646,7 +654,7 @@ worse, both when used as a solver and as a smoother. In particular,
 for $p=16$ Jacobi smoothing does not lead to a converging two-grid
 algorithm. In particular, SSOR smoothing combined with the two-grid
 method still retains a satisfactory convergence rate.
-
+\todo{Mention non-convergence.}
 
 \begin{figure}
 	\centering
