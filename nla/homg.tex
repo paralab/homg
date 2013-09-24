@@ -68,16 +68,16 @@ T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 %with smooth coefficients.
 %
 \begin{abstract}
-We present a comprehensive comparison of different multigrid
-approaches for solving systems arising from high-order continuous
-finite element discretizations of elliptic partial differential
-equations on complex geometries. For polynomial orders up to 16, we
-compare the computational cost and the performance of different point
-smoothers (Jacobi, Chebyshev-accelerated Jacobi and SSOR smoothing)
-and of different variants of multigrid, namely high-order geometric
-multigrid, $p$-multigrid, and using a low-order operator based on the
-high-order nodes as preconditioner, which is often used in combination
-with algebraic for problems on unstructured meshes.
+We present a comprehensive comparison of different multigrid approaches for
+solving systems arising from high-order continuous finite element
+discretizations of elliptic partial differential equations on complex
+geometries in two and three dimensions.  For polynomial orders up to 16, we
+compare the computational cost and the performance of different point smoothers
+(Jacobi, Chebyshev-accelerated Jacobi and SSOR smoothing) and of different
+variants of multigrid, namely high-order geometric multigrid, $p$-multigrid,
+and using a low-order operator based on the high-order nodes as preconditioner,
+which is often used in combination with algebraic multigrid for problems on
+unstructured meshes.
 %High order discretizations offer several
 %advantages over low-order discretizations. Besides the faster
 %convergence per unknown for sufficiently smooth problems, high order
@@ -88,29 +88,25 @@ with algebraic for problems on unstructured meshes.
 \keywords{high-order, multigrid, continuous finite elements, spectral
   elements, preconditioning}
 
-
-
 \section{Introduction}
 
-This paper presents a systematic comparison of geometric multigrid
-methods for the solution of systems arising from high-order (we
-target polynomial orders up to 16) discretizations of elliptic partial
-differential equations. Our particular interest is to compare the
-efficiency of different high-order multigrid methods for problems with
-varying coefficients and complex geometry.
+This paper presents a systematic comparison of geometric multigrid methods for
+the solution of systems arising from high-order (we target polynomial orders up
+to 16) discretizations of elliptic partial differential equations. Our
+particular interest is to compare the efficiency of different high-order
+multigrid methods for problems with varying coefficients and complex geometry.
 % High-order discretization
-High-order spatial discretizations can have significant advantages
-over low-order methods, especially when the solution is smooth and
-high accuracy is desired. However, the sparsity of finite element (or
-finite difference) operators decreases as the order of the polynomial approximation
-increases, which makes the application of high-order operators
-to vectors computationally significantly more expensive. This is also
-true if matrix-free methods are used, i.e., system matrices are never
-assembled, but their application on vectors is implemented through
-elemental loops.  Besides the loss of sparsity, another challenge in
-high-order discretizations is due to the fact that the discretization
-matrices loose structural properties such as the M-matrix property,
-which often allows to prove convergence of iterative solvers.
+High-order spatial discretizations can have significant advantages over
+low-order methods, especially when the solution is smooth and high accuracy is
+desired. However, the sparsity of finite element (or finite difference)
+operators decreases as the order of the polynomial approximation increases,
+which makes the application of high-order operators to vectors computationally
+more expensive. This is also true if matrix-free methods are used, i.e., system
+matrices are never assembled, but their application on vectors is implemented
+through elemental loops.  Besides the loss of sparsity, another challenge in
+high-order discretizations is due to the fact that the discretization matrices
+loose structural properties such as the M-matrix property, which often allows
+to prove convergence of iterative solvers. \todo{citation}
 
 We use high-order discretizations based on Legende-Gauss-Lobotto (LGL)
 nodal basis functions. For different polynomial orders $1\le p\le 16$,
