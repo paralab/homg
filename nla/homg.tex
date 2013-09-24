@@ -759,19 +759,19 @@ convergence rate. \todo{Hari, Chebyshev-based multigrid also seems to
 		\end{tikzpicture}
 		\caption{$p=16$, single v-cycle}
 	\caption{\label{fig:smoothers2} Error decay for different
-          point smoothers when used as solver (a,c,e) and when used
-          within a single two-grid step (b,d,f) for a two-dimensional,
-          constant coefficient Laplace problem on a unit square
-          discretized. To keep the number of unknowns the same for
+          point smoothers when used as solver (left column) and when used
+          within a single two-grid step (right column) for a two-dimensional,
+          constant coefficient Laplace problem on a unit square. To
+          keep the number of unknowns the same for
           different polynomial orders, meshes of $32\times 32$,
           $8\times 8$ and $2\times 2$ elements are used for polynomial
           orders $p=1$, $p=4$ and $p=16$, respectively.
           Plotted are the coefficients of the error
-          expanded in the eigenvectors of the discretized Laplace
-          operator. The order of the eigenvectors is such that the
+          expanded in the eigenvectors of the system matrix $A_k$.
+          The order of the eigenvectors is such that the
           corresponding eigenvalues are descending; thus, the
           smoothness of the eigenvectors decays from left to right.
-          The initial error is chosen to have all unit coefficients in
+          The initialization is chosen to have all unit coefficients in
           the eigenvector expansion.}
 \end{figure}
 
@@ -855,22 +855,25 @@ convergence rate. \todo{Hari, Chebyshev-based multigrid also seems to
 		\end{tikzpicture}
 		\caption{$p=16$, single v-cycle}
 	\caption{\label{fig:smoothers-var} Same as
-          Figure~\ref{fig:smoothers2}, but for two-dimensional warped
-          geometry shown in Figure~\todo{X} with varying coefficient
-          $\mu(x,y) = 1 + 10^6(\cos(2\pi x)^2 + \cos(2\pi y)^2)$.}
+          Figure~\ref{fig:smoothers2}, but for the two-dimensional warped
+          geometry shown in Figure~\ref{fig:mesh} with varying coefficient
+          $\mu(x,y) = 1 + 10^6(\cos^2(2\pi x) + \cos^2(2\pi y))$.}
 \end{figure}
 
 
 \subsubsection{Schwarz-based smoothers}\label{subsec:schwarz}
 An alternative smoothing approach for high-order discretizations is
-based on local block solves.  The main challenge with these approaches
-is that they require the solution of dense local systems.  This is
-either done by using direct methods or approximations that allow for a
-fast iterative solution \cite{LottesFischer05,
-  FischerLottes05}. Schwarz-type smoothers have been used successfully
-for spectral element discretizations with orders up to \todo{XX}. However,
-the coarse-grid solves can become fairly expensive; moreover, it is
-not straightforward to achieve good parallel scalability.
+based on local block solves.  Schwarz-type domain decomposition
+smoothers have successfully been used for spectral element
+discretizations with orders significantly higher than 8. They are more
+stable for anisotropic meshes or anisotropic problems than point
+smoothers. A main challenge of Schwarz-type smoothers is that they
+require the solution of dense local systems.  This is either done by
+using direct methods or approximations that allow for a fast iterative
+solution \cite{LottesFischer05, FischerLottes05}. However, the
+coarse-grid solves can become fairly expensive. Moreover, depending on
+how much overlap between the domains is used, it is not
+straightforward to achieve good parallel scalability.
 
 \subsection{Comparing computational complexity}\label{subsec:complexity}
 To compare the computational cost of the different methods, we focus
