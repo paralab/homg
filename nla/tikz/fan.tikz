@@ -37,7 +37,7 @@ point meta max=2000001
 surf,
 colormap={traffic}{color(0cm)=(green); color(1cm)=(yellow); color(2cm)=(red)},
 shader=faceted,
-draw=black,
+draw=gray,ultra thin,
 z buffer=sort,
 point meta=explicit,
 mesh/rows=33]
@@ -1133,7 +1133,7 @@ table[row sep=crcr,meta index=3,header=false] {
 0.707106781186548 0.707106781186548 0 141784.814331181\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -1173,7 +1173,7 @@ table[row sep=crcr]{
 0.565685424949238 0.565685424949238\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -1213,7 +1213,7 @@ table[row sep=crcr]{
 0.569643868447089 0.569643868447089\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -1253,7 +1253,7 @@ table[row sep=crcr]{
 0.573630011571331 0.573630011571331\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -1293,7 +1293,7 @@ table[row sep=crcr]{
 0.577644048153023 0.577644048153023\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -1333,7 +1333,7 @@ table[row sep=crcr]{
 0.581686173379582 0.581686173379582\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -1373,7 +1373,7 @@ table[row sep=crcr]{
 0.585756583804264 0.585756583804264\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -1413,7 +1413,7 @@ table[row sep=crcr]{
 0.589855477355731 0.589855477355731\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -1453,7 +1453,7 @@ table[row sep=crcr]{
 0.59398305334767 0.59398305334767\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -1493,7 +1493,7 @@ table[row sep=crcr]{
 0.598139512488488 0.598139512488488\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -1533,7 +1533,7 @@ table[row sep=crcr]{
 0.602325056891069 0.602325056891069\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -1573,7 +1573,7 @@ table[row sep=crcr]{
 0.606539890082603 0.606539890082603\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -1613,7 +1613,7 @@ table[row sep=crcr]{
 0.610784217014484 0.610784217014484\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -1653,7 +1653,7 @@ table[row sep=crcr]{
 0.615058244072275 0.615058244072275\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -1693,7 +1693,7 @@ table[row sep=crcr]{
 0.619362179085743 0.619362179085743\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -1733,7 +1733,7 @@ table[row sep=crcr]{
 0.623696231338966 0.623696231338966\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -1773,7 +1773,7 @@ table[row sep=crcr]{
 0.62806061158051 0.62806061158051\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -1813,7 +1813,7 @@ table[row sep=crcr]{
 0.632455532033676 0.632455532033676\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -1853,7 +1853,7 @@ table[row sep=crcr]{
 0.636881206406819 0.636881206406819\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -1893,7 +1893,7 @@ table[row sep=crcr]{
 0.641337849903743 0.641337849903743\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -1933,7 +1933,7 @@ table[row sep=crcr]{
 0.645825679234161 0.645825679234161\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -1973,7 +1973,7 @@ table[row sep=crcr]{
 0.650344912624237 0.650344912624237\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -2013,7 +2013,7 @@ table[row sep=crcr]{
 0.654895769827193 0.654895769827193\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -2053,7 +2053,7 @@ table[row sep=crcr]{
 0.659478472134001 0.659478472134001\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -2093,7 +2093,7 @@ table[row sep=crcr]{
 0.664093242384137 0.664093242384138\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -2133,7 +2133,7 @@ table[row sep=crcr]{
 0.668740304976422 0.668740304976422\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -2173,7 +2173,7 @@ table[row sep=crcr]{
 0.673419885879929 0.673419885879929\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -2213,7 +2213,7 @@ table[row sep=crcr]{
 0.678132212644976 0.678132212644976\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -2253,7 +2253,7 @@ table[row sep=crcr]{
 0.682877514414185 0.682877514414185\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -2293,7 +2293,7 @@ table[row sep=crcr]{
 0.687656021933632 0.687656021933632\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -2333,7 +2333,7 @@ table[row sep=crcr]{
 0.69246796756406 0.69246796756406\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -2373,7 +2373,7 @@ table[row sep=crcr]{
 0.697313585292182 0.697313585292182\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -2413,7 +2413,7 @@ table[row sep=crcr]{
 0.702193110742056 0.702193110742056\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -2453,7 +2453,7 @@ table[row sep=crcr]{
 0.707106781186548 0.707106781186548\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -2493,7 +2493,7 @@ table[row sep=crcr]{
 0 1\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -2533,7 +2533,7 @@ table[row sep=crcr]{
 0.0245412285229123 0.999698818696204\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -2573,7 +2573,7 @@ table[row sep=crcr]{
 0.049067674327418 0.998795456205173\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -2613,7 +2613,7 @@ table[row sep=crcr]{
 0.0735645635996674 0.997290456678691\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -2653,7 +2653,7 @@ table[row sep=crcr]{
 0.0980171403295606 0.995184726672197\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -2693,7 +2693,7 @@ table[row sep=crcr]{
 0.122410675199216 0.99247953459871\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -2733,7 +2733,7 @@ table[row sep=crcr]{
 0.146730474455362 0.989176509964781\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -2773,7 +2773,7 @@ table[row sep=crcr]{
 0.170961888760301 0.985277642388941\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -2813,7 +2813,7 @@ table[row sep=crcr]{
 0.195090322016128 0.980785280403231\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -2853,7 +2853,7 @@ table[row sep=crcr]{
 0.21910124015687 0.975702130038529\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -2893,7 +2893,7 @@ table[row sep=crcr]{
 0.242980179903264 0.970031253194544\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -2933,7 +2933,7 @@ table[row sep=crcr]{
 0.266712757474898 0.96377606579544\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -2973,7 +2973,7 @@ table[row sep=crcr]{
 0.290284677254462 0.956940335732209\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -3013,7 +3013,7 @@ table[row sep=crcr]{
 0.313681740398892 0.949528180593037\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -3053,7 +3053,7 @@ table[row sep=crcr]{
 0.33688985339222 0.941544065183021\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -3093,7 +3093,7 @@ table[row sep=crcr]{
 0.359895036534988 0.932992798834739\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -3133,7 +3133,7 @@ table[row sep=crcr]{
 0.38268343236509 0.923879532511287\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -3173,7 +3173,7 @@ table[row sep=crcr]{
 0.40524131400499 0.914209755703531\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -3213,7 +3213,7 @@ table[row sep=crcr]{
 0.427555093430282 0.903989293123444\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -3253,7 +3253,7 @@ table[row sep=crcr]{
 0.449611329654607 0.893224301195516\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -3293,7 +3293,7 @@ table[row sep=crcr]{
 0.471396736825998 0.881921264348355\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -3333,7 +3333,7 @@ table[row sep=crcr]{
 0.492898192229784 0.870086991108712\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -3373,7 +3373,7 @@ table[row sep=crcr]{
 0.514102744193222 0.857728610000272\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -3413,7 +3413,7 @@ table[row sep=crcr]{
 0.534997619887097 0.844853565249707\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -3453,7 +3453,7 @@ table[row sep=crcr]{
 0.555570233019602 0.831469612302545\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -3493,7 +3493,7 @@ table[row sep=crcr]{
 0.575808191417845 0.817584813151584\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -3533,7 +3533,7 @@ table[row sep=crcr]{
 0.595699304492433 0.803207531480645\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -3573,7 +3573,7 @@ table[row sep=crcr]{
 0.615231590580627 0.788346427626606\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -3613,7 +3613,7 @@ table[row sep=crcr]{
 0.634393284163646 0.773010453362737\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -3653,7 +3653,7 @@ table[row sep=crcr]{
 0.653172842953777 0.757208846506485\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -3693,7 +3693,7 @@ table[row sep=crcr]{
 0.671558954847019 0.740951125354959\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -3733,7 +3733,7 @@ table[row sep=crcr]{
 0.689540544737067 0.724247082951467\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -3777,7 +3777,7 @@ table[row sep=crcr]{
 surf,
 colormap={traffic}{color(0cm)=(green); color(1cm)=(yellow); color(2cm)=(red)},
 shader=faceted,
-draw=black,
+draw=gray,ultra thin,
 z buffer=sort,
 point meta=explicit,
 mesh/rows=33]
@@ -4873,7 +4873,7 @@ table[row sep=crcr,meta index=3,header=false] {
 0.707106781186548 0.707106781186548 0 141784.814331181\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -4913,7 +4913,7 @@ table[row sep=crcr]{
 0.565685424949238 0.565685424949238\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -4953,7 +4953,7 @@ table[row sep=crcr]{
 0.569643868447089 0.569643868447089\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -4993,7 +4993,7 @@ table[row sep=crcr]{
 0.573630011571331 0.573630011571331\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -5033,7 +5033,7 @@ table[row sep=crcr]{
 0.577644048153023 0.577644048153023\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -5073,7 +5073,7 @@ table[row sep=crcr]{
 0.581686173379582 0.581686173379582\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -5113,7 +5113,7 @@ table[row sep=crcr]{
 0.585756583804264 0.585756583804264\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -5153,7 +5153,7 @@ table[row sep=crcr]{
 0.589855477355731 0.589855477355731\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -5193,7 +5193,7 @@ table[row sep=crcr]{
 0.59398305334767 0.59398305334767\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -5233,7 +5233,7 @@ table[row sep=crcr]{
 0.598139512488488 0.598139512488488\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -5273,7 +5273,7 @@ table[row sep=crcr]{
 0.602325056891069 0.602325056891069\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -5313,7 +5313,7 @@ table[row sep=crcr]{
 0.606539890082603 0.606539890082603\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -5353,7 +5353,7 @@ table[row sep=crcr]{
 0.610784217014484 0.610784217014484\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -5393,7 +5393,7 @@ table[row sep=crcr]{
 0.615058244072275 0.615058244072275\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -5433,7 +5433,7 @@ table[row sep=crcr]{
 0.619362179085743 0.619362179085743\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -5473,7 +5473,7 @@ table[row sep=crcr]{
 0.623696231338966 0.623696231338966\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -5513,7 +5513,7 @@ table[row sep=crcr]{
 0.62806061158051 0.62806061158051\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -5553,7 +5553,7 @@ table[row sep=crcr]{
 0.632455532033676 0.632455532033676\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -5593,7 +5593,7 @@ table[row sep=crcr]{
 0.636881206406819 0.636881206406819\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -5633,7 +5633,7 @@ table[row sep=crcr]{
 0.641337849903743 0.641337849903743\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -5673,7 +5673,7 @@ table[row sep=crcr]{
 0.645825679234161 0.645825679234161\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -5713,7 +5713,7 @@ table[row sep=crcr]{
 0.650344912624237 0.650344912624237\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -5753,7 +5753,7 @@ table[row sep=crcr]{
 0.654895769827193 0.654895769827193\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -5793,7 +5793,7 @@ table[row sep=crcr]{
 0.659478472134001 0.659478472134001\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -5833,7 +5833,7 @@ table[row sep=crcr]{
 0.664093242384137 0.664093242384138\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -5873,7 +5873,7 @@ table[row sep=crcr]{
 0.668740304976422 0.668740304976422\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -5913,7 +5913,7 @@ table[row sep=crcr]{
 0.673419885879929 0.673419885879929\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -5953,7 +5953,7 @@ table[row sep=crcr]{
 0.678132212644976 0.678132212644976\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -5993,7 +5993,7 @@ table[row sep=crcr]{
 0.682877514414185 0.682877514414185\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -6033,7 +6033,7 @@ table[row sep=crcr]{
 0.687656021933632 0.687656021933632\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -6073,7 +6073,7 @@ table[row sep=crcr]{
 0.69246796756406 0.69246796756406\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -6113,7 +6113,7 @@ table[row sep=crcr]{
 0.697313585292182 0.697313585292182\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -6153,7 +6153,7 @@ table[row sep=crcr]{
 0.702193110742056 0.702193110742056\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -6193,7 +6193,7 @@ table[row sep=crcr]{
 0.707106781186548 0.707106781186548\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -6233,7 +6233,7 @@ table[row sep=crcr]{
 0 1\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -6273,7 +6273,7 @@ table[row sep=crcr]{
 0.0245412285229123 0.999698818696204\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -6313,7 +6313,7 @@ table[row sep=crcr]{
 0.049067674327418 0.998795456205173\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -6353,7 +6353,7 @@ table[row sep=crcr]{
 0.0735645635996674 0.997290456678691\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -6393,7 +6393,7 @@ table[row sep=crcr]{
 0.0980171403295606 0.995184726672197\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -6433,7 +6433,7 @@ table[row sep=crcr]{
 0.122410675199216 0.99247953459871\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -6473,7 +6473,7 @@ table[row sep=crcr]{
 0.146730474455362 0.989176509964781\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -6513,7 +6513,7 @@ table[row sep=crcr]{
 0.170961888760301 0.985277642388941\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -6553,7 +6553,7 @@ table[row sep=crcr]{
 0.195090322016128 0.980785280403231\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -6593,7 +6593,7 @@ table[row sep=crcr]{
 0.21910124015687 0.975702130038529\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -6633,7 +6633,7 @@ table[row sep=crcr]{
 0.242980179903264 0.970031253194544\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -6673,7 +6673,7 @@ table[row sep=crcr]{
 0.266712757474898 0.96377606579544\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -6713,7 +6713,7 @@ table[row sep=crcr]{
 0.290284677254462 0.956940335732209\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -6753,7 +6753,7 @@ table[row sep=crcr]{
 0.313681740398892 0.949528180593037\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -6793,7 +6793,7 @@ table[row sep=crcr]{
 0.33688985339222 0.941544065183021\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -6833,7 +6833,7 @@ table[row sep=crcr]{
 0.359895036534988 0.932992798834739\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -6873,7 +6873,7 @@ table[row sep=crcr]{
 0.38268343236509 0.923879532511287\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -6913,7 +6913,7 @@ table[row sep=crcr]{
 0.40524131400499 0.914209755703531\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -6953,7 +6953,7 @@ table[row sep=crcr]{
 0.427555093430282 0.903989293123444\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -6993,7 +6993,7 @@ table[row sep=crcr]{
 0.449611329654607 0.893224301195516\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -7033,7 +7033,7 @@ table[row sep=crcr]{
 0.471396736825998 0.881921264348355\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -7073,7 +7073,7 @@ table[row sep=crcr]{
 0.492898192229784 0.870086991108712\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -7113,7 +7113,7 @@ table[row sep=crcr]{
 0.514102744193222 0.857728610000272\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -7153,7 +7153,7 @@ table[row sep=crcr]{
 0.534997619887097 0.844853565249707\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -7193,7 +7193,7 @@ table[row sep=crcr]{
 0.555570233019602 0.831469612302545\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -7233,7 +7233,7 @@ table[row sep=crcr]{
 0.575808191417845 0.817584813151584\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -7273,7 +7273,7 @@ table[row sep=crcr]{
 0.595699304492433 0.803207531480645\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -7313,7 +7313,7 @@ table[row sep=crcr]{
 0.615231590580627 0.788346427626606\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -7353,7 +7353,7 @@ table[row sep=crcr]{
 0.634393284163646 0.773010453362737\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -7393,7 +7393,7 @@ table[row sep=crcr]{
 0.653172842953777 0.757208846506485\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -7433,7 +7433,7 @@ table[row sep=crcr]{
 0.671558954847019 0.740951125354959\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
@@ -7473,7 +7473,7 @@ table[row sep=crcr]{
 0.689540544737067 0.724247082951467\\
 };
 \addplot [
-color=black,
+color=gray,ultra thin,
 solid,
 forget plot
 ]
