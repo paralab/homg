@@ -990,16 +990,19 @@ We compare our algorithms for the solution of~\eqref{eq:Poisson} on a
 unit square and a unit cube with constant coefficient $\mu\equiv 1$,
 as well as on the warped two and three dimensional domains shown in
 Figure~\ref{fig:mesh}, where we use a varying coefficient $\mu(\bs
-x)$. \todo{How anisotropic is the 2d-fan mesh? Probably we also have
-  to update the mesh plots.}  We use isoparametric elements for these
+x)$. 
+% \todo{How anisotropic is the 2d-fan mesh? Probably we also have to update the mesh plots.}  
+We use isoparametric elements for these
 deformed geometries, i.e., the geometry transformation is approximated
 using the same polynomial order as the finite element functions. The
 Jacobians for this transformation are computed at every quadrature
 point. The coefficient $\mu$ at the coarse grid quadrature points is
 computed as the linear interpolation of the coefficient at the fine
-grid quadrature points. In our tests, change the polynomial degree of
+grid quadrature points. In our tests, we change the polynomial degree of
 the finite element functions but keep the same mesh; this results in
-an increasing number of unknowns as $p$ increases.
+an increasing number of unknowns as $p$ increases. It is important to 
+point out that mesh independence is acheived for all $p$, therefore
+the results are similar for larger mesh sizes as well.
 
 \begin{figure}
 	% \includegraphics[width=0.48\textwidth]{figs/fan}
@@ -1029,8 +1032,7 @@ particular, these tables report the following.
   \item \emph{Cheb(3,3)} indicates that Chebyshev-accelerated Jacobi
     smoothing is used, again with 3 pre-smoothing and 3
     post-smoothing steps. The maximal eigenvalue required by the
-    Chebyshev method is estimated using \todo{XX iterations of
-      Lanczos}.
+    Chebyshev method is estimated using 10 Arnoldi iterations.
   \item \emph{SSOR(2,1)} denotes that a symmetric successive
     over-relaxation method is employed, where 2 pre-smoothing and 1
     post-smoothing step are employed. Note that each SSOR smoothing
@@ -1042,17 +1044,23 @@ particular, these tables report the following.
       distributed memory environments.}. The SSOR smoother is based on 
 			a lexicographic ordering of  the unknowns. 
   \end{itemize}
+  \item For the 2D meshes, Tables~\ref{tab:box}-\ref{tab:2d-fan}, we use 
+  three $h$-grids of sizes $32\times32$, $16\times16$ and $8\times8$. For 
+  the 3D meshes, Tables~\ref{tab:3d-box}-\ref{tab:3d-fan}, we use grids of 
+  sizes $8\times8\times8$, $4\times4\times4$ and $2\times2\times2$.
   Note that for each smoother we report results for
   $h$-multigrid (columns marked by \emph{h}; see
   \S\ref{subsec:h}) as well as for $p$-multigrid (columns marked
   by \emph{p}; see \S\ref{subsec:p}). For $p$-multigrid, we
   restrict ourselves to orders that are powers of 2. After
-  coarsening in $p$ till $p=1$, we coarsen in $h$. \todo{how
-    many levels? what size meshes?}
+  coarsening in $p$ till $p=1$, we coarsen in $h$. For example in the 2D case, 
+  for $p=16$, we will have a total of 7 grids; the first 5 shall be grids of 
+  size $32\times32\times32$ with $p=16,8,4,2,1$, respectively, followed by 
+  two additional coarse grids of size $16\times16$ and $8\times8$ and $p=1$.
 \item[$\bullet$] The columns entitled \emph{MG with pCG} presents our
   results obtained when multigrid is uses as preconditioner in a CG
-  algorithm. The sub-columns again correspond to different smoothers,
-  as described above.
+  algorithm. A single multigrid v-cycle is used per CG iteration. The sub-columns 
+  again correspond to different smoothers, as described above.
 \item[$\bullet$] The columns headed by \emph{linearized pCG} present
   the number of CG iterations needed to solve the high-order system
   preconditioned with the low-order operator based on the high-order
@@ -1066,7 +1074,7 @@ particular, these tables report the following.
   consequence, the Chebyshev smoother requires an estimate of the
   largest eigenvalue of the high-order matrix preconditioned with the
   diagonal of the low-order operator, which is computed using
-  \todo{XX} steps of the Lanzos algorithm.
+  10 iterations of the Arnoldi algorithm.
 \end{itemize}
 In the next section, we summarize our numerical comparisons.
 
