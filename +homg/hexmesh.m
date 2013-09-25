@@ -68,6 +68,154 @@ classdef hexmesh < handle
       % title(['Hex Mesh ', num2str(numx,3),'x',num2str(numy,3),'x',num2str(numz,3)])
     end
     
+    function plot_fx(self, fx)
+      % display the mesh. Needs X.
+      hFig = figure(1);
+      set(gcf,'PaperPositionMode','auto')
+      set(hFig, 'Position', [200 200 800 800])
+      
+      if (self.dim == 2 )
+        [x,y] = ndgrid(0:1/self.nelems(1):1.0, 0:1/self.nelems(2):1.0);
+        pts = [x(:) y(:)];
+        coords = self.Xf(pts);
+        
+        ci = arrayfun( fx, coords(:,1), coords(:,2) );
+        surf(reshape(coords(:,1), size(x)), ... 
+             reshape(coords(:,2), size(x)), ...
+             zeros(size(x)), reshape(ci, size(x)) ...
+            );
+        hold on;
+        x = reshape(coords(:,1), self.nelems(1)+1, self.nelems(2)+1);
+        y = reshape(coords(:,2), self.nelems(1)+1, self.nelems(2)+1);
+        plot(x,y, 'k-'); 
+        plot(x',y', 'k-'); 
+        
+        axis square;
+        view(0,90);
+        colorbar;
+      else
+        % will draw 6 planes ...
+        %--------------------------------------------------------------------
+        % 2 xy planes
+        [x,y] = ndgrid( 0:1/self.nelems(1):1.0, 0:1/self.nelems(2):1.0 );
+        
+        % z = 0
+        z = zeros (size(x));
+        pts = [x(:) y(:) z(:)];
+        coords = self.Xf(pts);
+        ci = arrayfun( fx, coords(:,1), coords(:,2), coords(:,3) );
+        surf(reshape(coords(:,1), size(x)), ... 
+             reshape(coords(:,2), size(x)), ...
+             reshape(coords(:,3), size(x)), ...
+             reshape(ci, size(x)) ...
+            );
+        hold on;
+        x1 = reshape(coords(:,1), self.nelems(1)+1, self.nelems(2)+1);
+        y1 = reshape(coords(:,2), self.nelems(1)+1, self.nelems(2)+1);
+        z1 = reshape(coords(:,3), self.nelems(1)+1, self.nelems(2)+1);
+        plot3(x1,y1,z1, 'k-'); 
+        plot3(x1',y1',z1', 'k-'); 
+        % z = 1
+        z = ones  (size(x));
+        pts = [x(:) y(:) z(:)];
+        coords = self.Xf(pts);
+        ci = arrayfun( fx, coords(:,1), coords(:,2), coords(:,3) );
+        surf(reshape(coords(:,1), size(x)), ... 
+             reshape(coords(:,2), size(x)), ...
+             reshape(coords(:,3), size(x)), ...
+             reshape(ci, size(x)) ...
+            );
+        hold on;
+        x1 = reshape(coords(:,1), self.nelems(1)+1, self.nelems(2)+1);
+        y1 = reshape(coords(:,2), self.nelems(1)+1, self.nelems(2)+1);
+        z1 = reshape(coords(:,3), self.nelems(1)+1, self.nelems(2)+1);
+        plot3(x1,y1,z1, 'k-'); 
+        plot3(x1',y1',z1', 'k-'); 
+        %--------------------------------------------------------------------
+        % 2 yz planes
+        [y,z] = ndgrid( 0:1/self.nelems(2):1.0, 0:1/self.nelems(3):1.0 );
+        % x = 0
+        x = zeros (size(y));
+        pts = [x(:) y(:) z(:)];
+        coords = self.Xf(pts);
+        ci = arrayfun( fx, coords(:,1), coords(:,2), coords(:,3) );
+        surf(reshape(coords(:,1), size(x)), ... 
+             reshape(coords(:,2), size(x)), ...
+             reshape(coords(:,3), size(x)), ...
+             reshape(ci, size(x)) ...
+            );
+        hold on;
+        x1 = reshape(coords(:,1), self.nelems(1)+1, self.nelems(2)+1);
+        y1 = reshape(coords(:,2), self.nelems(1)+1, self.nelems(2)+1);
+        z1 = reshape(coords(:,3), self.nelems(1)+1, self.nelems(2)+1);
+        plot3(x1,y1,z1, 'k-'); 
+        plot3(x1',y1',z1', 'k-'); 
+        % x = 1
+        x = ones (size(y));
+        pts = [x(:) y(:) z(:)];
+        coords = self.Xf(pts);
+        ci = arrayfun( fx, coords(:,1), coords(:,2), coords(:,3) );
+        surf(reshape(coords(:,1), size(x)), ... 
+             reshape(coords(:,2), size(x)), ...
+             reshape(coords(:,3), size(x)), ...
+             reshape(ci, size(x)) ...
+            );
+        hold on;
+        x1 = reshape(coords(:,1), self.nelems(1)+1, self.nelems(2)+1);
+        y1 = reshape(coords(:,2), self.nelems(1)+1, self.nelems(2)+1);
+        z1 = reshape(coords(:,3), self.nelems(1)+1, self.nelems(2)+1);
+        plot3(x1,y1,z1, 'k-'); 
+        plot3(x1',y1',z1', 'k-'); 
+        %--------------------------------------------------------------------
+        % 2 xz planes
+        [x,z] = ndgrid( 0:1/self.nelems(1):1.0, 0:1/self.nelems(3):1.0 );
+        % y = 0
+        y = zeros (size(x));
+        pts = [x(:) y(:) z(:)];
+        coords = self.Xf(pts);
+        ci = arrayfun( fx, coords(:,1), coords(:,2), coords(:,3) );
+        surf(reshape(coords(:,1), size(x)), ... 
+             reshape(coords(:,2), size(x)), ...
+             reshape(coords(:,3), size(x)), ...
+             reshape(ci, size(x)) ...
+            );
+        hold on;
+        x1 = reshape(coords(:,1), self.nelems(1)+1, self.nelems(2)+1);
+        y1 = reshape(coords(:,2), self.nelems(1)+1, self.nelems(2)+1);
+        z1 = reshape(coords(:,3), self.nelems(1)+1, self.nelems(2)+1);
+        plot3(x1,y1,z1, 'k-'); 
+        plot3(x1',y1',z1', 'k-'); 
+        % y = 1
+        y = ones (size(x));
+        pts = [x(:) y(:) z(:)];
+        coords = self.Xf(pts);
+        ci = arrayfun( fx, coords(:,1), coords(:,2), coords(:,3) );
+        surf(reshape(coords(:,1), size(x)), ... 
+             reshape(coords(:,2), size(x)), ...
+             reshape(coords(:,3), size(x)), ...
+             reshape(ci, size(x)) ...
+            );
+        hold on;
+        x1 = reshape(coords(:,1), self.nelems(1)+1, self.nelems(2)+1);
+        y1 = reshape(coords(:,2), self.nelems(1)+1, self.nelems(2)+1);
+        z1 = reshape(coords(:,3), self.nelems(1)+1, self.nelems(2)+1);
+        plot3(x1,y1,z1, 'k-'); 
+        plot3(x1',y1',z1', 'k-'); 
+        
+        % pretty views etc 
+        view(3); axis square
+        view(150,40);
+        colorbar;
+      end
+      
+      % print ('-depsc2', 'warped-2d.eps');
+      matlab2tikz (['fan-' num2str(self.dim) 'd.tikz'], 'checkForUpdates', false, 'showInfo', false);
+      set (gcf, 'renderer', 'opengl');
+      cameratoolbar('show');
+      cameratoolbar('setmode', 'orbit');
+    end
+    
+    
     function u = evaluate(self, fx, order, where)
       % evaluate a function over the domain,
       % where is a string, 'gll' or 'uniform'

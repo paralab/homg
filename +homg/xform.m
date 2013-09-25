@@ -26,7 +26,7 @@ classdef xform
     function Xout = shell (Xin)
       d = size(Xin, 2);
       R2 = 1.0; % hard coded for now.
-      R1 = 0.7; % hard coded for now.
+      R1 = 0.8; % hard coded for now.
       R2byR1 = R2 / R1;
       R1sqrbyR2 = R1 * R1 / R2;
       

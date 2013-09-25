@@ -246,20 +246,20 @@ classdef grid < handle
       % u = grid.ZeroBoundary*u;
       
       r = grid.residual(rhs, u);
-      % disp(['Initial residual is ' num2str(norm(r))]);
-      % disp('------------------------------------------');
+      disp(['Initial residual is ' num2str(norm(r))]);
+      disp('------------------------------------------');
       r0 = norm(r);
       for i=1:num_vcyc
         u = grid.vcycle(v1, v2, rhs, u);
         r = grid.residual(rhs, u);
-        % disp([num2str(i, '%03d\t') ': |res| = ' num2str(norm(r),'\t%8.4e')]);
+        disp([num2str(i, '%03d\t') ': |res| = ' num2str(norm(r),'\t%8.4e')]);
         if (norm(r)/r0 < 1e-8)
           iter = i;
           rr = norm(r)/r0;
           return;
         end
       end
-      % disp('------------------------------------------');
+      disp('------------------------------------------');
       iter = num_vcyc;
       rr = norm(r)/r0;
     end
@@ -291,10 +291,10 @@ classdef grid < handle
       
       % 2. compute residual
 			if (grid.linear_smoother && ~grid.is_finest)
-        disp('linear residual');
+        % disp('linear residual');
 				res = grid.residual_lin(rhs, u);
       else
-        disp('high-order residual');
+        % disp('high-order residual');
 				res = grid.residual(rhs, u);
 			end
 			
@@ -607,7 +607,7 @@ classdef grid < handle
 					Kc = spdiags(grid.jacobi_invdiag,0,length(D), length(D)) * grid.K;
 				end
 				opts.tol = 0.01;
-				grid.eig_max = eigs(Kc, 1, 'lm', opts)  
+				grid.eig_max = eigs(Kc, 1, 'lm', opts);  
 				% grid.eig_min = eigs(Kc, 1, 'sm');  
 			end
 
