@@ -135,6 +135,8 @@ hFig = figure(2);
 set(gcf,'PaperPositionMode','auto')
 set(hFig, 'Position', [200 200 800 800])
 
+num_v = 1;
+
 
 r = g.residual(0*g.L, u0);
 b = evec' * u0; % dot (evec, q);
@@ -142,7 +144,7 @@ semilogy(abs(b), 'k'); hold on;
 
 % jacobi 
 u1 = u0; %evec*lam;
-[u, rr, iter3] = g.solve(1, 'jacobi', 3, 3, 0*g.L, u1); 
+[u, rr, iter3] = g.solve(num_v, 'jacobi', 3, 3, 0*g.L, u1); 
 r = g.residual(0*g.L, u);
 b = evec' * u; % abs(dot (evec, q));
 % plot eigenvalues
@@ -151,7 +153,7 @@ dlmwrite(fname2,abs(b(idx))','delimiter','\t','precision',6, '-append');
 
 % chebyshev 
 u1 = u0; % evec*lam;
-[u, rr, iter3] = g.solve(1, 'chebyshev', 3, 3, 0*g.L, u1); 
+[u, rr, iter3] = g.solve(num_v, 'chebyshev', 3, 3, 0*g.L, u1); 
 %[u, rr, iter3] = g.solve(1, 'ssor', 2, g.L, u); 
 % compute projections ...
 % q = repmat(u,size(u'));
@@ -162,7 +164,7 @@ semilogy(abs(b(idx)), 'm');
 dlmwrite(fname2,abs(b(idx))','delimiter','\t','precision',6, '-append');
 % ssor 
 u1 = u0; % evec*lam;
-[u, rr, iter3] = g.solve(1, 'ssor', 2, 1, 0*g.L, u1); 
+[u, rr, iter3] = g.solve(num_v, 'ssor', 2, 1, 0*g.L, u1); 
 % compute projections ...
 r = g.residual(0*g.L, u);
 b = evec' * u; %abs(dot (evec, q));
