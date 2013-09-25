@@ -4,6 +4,10 @@
 % 
 % 
 % 
+
+% part of the specification.
+\pgfplotsset{colormap={traffic}{color(0cm)=(green); color(1cm)=(yellow); color(2cm)=(red)}}
+
 \begin{tikzpicture}
 
 \begin{axis}[%
@@ -20,7 +24,7 @@ zmax=1,
 axis x line*=bottom,
 axis y line*=left,
 axis z line*=left,
-colormap/violet,
+colormap={traffic}{color(0cm)=(green); color(1cm)=(yellow); color(2cm)=(red)},
 colorbar,
 colorbar style={
         width=0.1in
@@ -31,7 +35,7 @@ point meta max=2000001
 
 \addplot3[%
 surf,
-colormap/violet,
+colormap={traffic}{color(0cm)=(green); color(1cm)=(yellow); color(2cm)=(red)},
 shader=faceted,
 draw=black,
 z buffer=sort,
@@ -3771,7 +3775,7 @@ table[row sep=crcr]{
 
 \addplot3[%
 surf,
-colormap/violet,
+colormap={traffic}{color(0cm)=(green); color(1cm)=(yellow); color(2cm)=(red)},
 shader=faceted,
 draw=black,
 z buffer=sort,
