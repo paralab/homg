@@ -50,6 +50,7 @@ classdef hexmesh < handle
         % boundary test
         idx = self.get_boundary_node_indices(1);
         plot(coords(idx,1), coords(idx,2), 'ro');
+        title(['Quad Mesh - ' num2str(self.nelems(1)) 'x' num2str(self.nelems(2)) ])
         axis square
       else
         % 2 xy planes
@@ -95,9 +96,9 @@ classdef hexmesh < handle
              reshape(coords(:,3), size(x)) ...
             );
         hold on;
-        x1 = reshape(coords(:,1), self.nelems(1)+1, self.nelems(2)+1);
-        y1 = reshape(coords(:,2), self.nelems(1)+1, self.nelems(2)+1);
-        z1 = reshape(coords(:,3), self.nelems(1)+1, self.nelems(2)+1);
+        x1 = reshape(coords(:,1), self.nelems(2)+1, self.nelems(3)+1);
+        y1 = reshape(coords(:,2), self.nelems(2)+1, self.nelems(3)+1);
+        z1 = reshape(coords(:,3), self.nelems(2)+1, self.nelems(3)+1);
         plot3(x1,y1,z1, 'k-'); 
         plot3(x1',y1',z1', 'k-'); 
         % x = 1
@@ -109,9 +110,9 @@ classdef hexmesh < handle
              reshape(coords(:,3), size(x)) ...
             );
         hold on;
-        x1 = reshape(coords(:,1), self.nelems(1)+1, self.nelems(2)+1);
-        y1 = reshape(coords(:,2), self.nelems(1)+1, self.nelems(2)+1);
-        z1 = reshape(coords(:,3), self.nelems(1)+1, self.nelems(2)+1);
+        x1 = reshape(coords(:,1), self.nelems(2)+1, self.nelems(3)+1);
+        y1 = reshape(coords(:,2), self.nelems(2)+1, self.nelems(3)+1);
+        z1 = reshape(coords(:,3), self.nelems(2)+1, self.nelems(3)+1);
         plot3(x1,y1,z1, 'k-'); 
         plot3(x1',y1',z1', 'k-'); 
         %--------------------------------------------------------------------
@@ -126,9 +127,9 @@ classdef hexmesh < handle
              reshape(coords(:,3), size(x)) ...
             );
         hold on;
-        x1 = reshape(coords(:,1), self.nelems(1)+1, self.nelems(2)+1);
-        y1 = reshape(coords(:,2), self.nelems(1)+1, self.nelems(2)+1);
-        z1 = reshape(coords(:,3), self.nelems(1)+1, self.nelems(2)+1);
+        x1 = reshape(coords(:,1), self.nelems(1)+1, self.nelems(3)+1);
+        y1 = reshape(coords(:,2), self.nelems(1)+1, self.nelems(3)+1);
+        z1 = reshape(coords(:,3), self.nelems(1)+1, self.nelems(3)+1);
         plot3(x1,y1,z1, 'k-'); 
         plot3(x1',y1',z1', 'k-'); 
         % y = 1
@@ -140,16 +141,16 @@ classdef hexmesh < handle
              reshape(coords(:,3), size(x)) ...
             );
         hold on;
-        x1 = reshape(coords(:,1), self.nelems(1)+1, self.nelems(2)+1);
-        y1 = reshape(coords(:,2), self.nelems(1)+1, self.nelems(2)+1);
-        z1 = reshape(coords(:,3), self.nelems(1)+1, self.nelems(2)+1);
+        x1 = reshape(coords(:,1), self.nelems(1)+1, self.nelems(3)+1);
+        y1 = reshape(coords(:,2), self.nelems(1)+1, self.nelems(3)+1);
+        z1 = reshape(coords(:,3), self.nelems(1)+1, self.nelems(3)+1);
         plot3(x1,y1,z1, 'k-'); 
         plot3(x1',y1',z1', 'k-'); 
         
         % pretty views etc 
         view(3); axis equal;
+        title(['Hex Mesh ' num2str(self.nelems(1)) 'x' num2str(self.nelems(2)) 'x' num2str(self.nelems(3))])
       end
-      % title(['Hex Mesh ', num2str(numx,3),'x',num2str(numy,3),'x',num2str(numz,3)])
       set (gcf, 'renderer', 'opengl');
       cameratoolbar('show');
       cameratoolbar('setmode', 'orbit');
@@ -232,9 +233,9 @@ classdef hexmesh < handle
              reshape(ci, size(x)) ...
             );
         hold on;
-        x1 = reshape(coords(:,1), self.nelems(1)+1, self.nelems(2)+1);
-        y1 = reshape(coords(:,2), self.nelems(1)+1, self.nelems(2)+1);
-        z1 = reshape(coords(:,3), self.nelems(1)+1, self.nelems(2)+1);
+        x1 = reshape(coords(:,1), self.nelems(2)+1, self.nelems(3)+1);
+        y1 = reshape(coords(:,2), self.nelems(2)+1, self.nelems(3)+1);
+        z1 = reshape(coords(:,3), self.nelems(2)+1, self.nelems(3)+1);
         plot3(x1,y1,z1, 'k-'); 
         plot3(x1',y1',z1', 'k-'); 
         % x = 1
@@ -248,9 +249,9 @@ classdef hexmesh < handle
              reshape(ci, size(x)) ...
             );
         hold on;
-        x1 = reshape(coords(:,1), self.nelems(1)+1, self.nelems(2)+1);
-        y1 = reshape(coords(:,2), self.nelems(1)+1, self.nelems(2)+1);
-        z1 = reshape(coords(:,3), self.nelems(1)+1, self.nelems(2)+1);
+        x1 = reshape(coords(:,1), self.nelems(2)+1, self.nelems(3)+1);
+        y1 = reshape(coords(:,2), self.nelems(2)+1, self.nelems(3)+1);
+        z1 = reshape(coords(:,3), self.nelems(2)+1, self.nelems(3)+1);
         plot3(x1,y1,z1, 'k-'); 
         plot3(x1',y1',z1', 'k-'); 
         %--------------------------------------------------------------------
@@ -267,9 +268,9 @@ classdef hexmesh < handle
              reshape(ci, size(x)) ...
             );
         hold on;
-        x1 = reshape(coords(:,1), self.nelems(1)+1, self.nelems(2)+1);
-        y1 = reshape(coords(:,2), self.nelems(1)+1, self.nelems(2)+1);
-        z1 = reshape(coords(:,3), self.nelems(1)+1, self.nelems(2)+1);
+        x1 = reshape(coords(:,1), self.nelems(1)+1, self.nelems(3)+1);
+        y1 = reshape(coords(:,2), self.nelems(1)+1, self.nelems(3)+1);
+        z1 = reshape(coords(:,3), self.nelems(1)+1, self.nelems(3)+1);
         plot3(x1,y1,z1, 'k-'); 
         plot3(x1',y1',z1', 'k-'); 
         % y = 1
@@ -283,9 +284,9 @@ classdef hexmesh < handle
              reshape(ci, size(x)) ...
             );
         hold on;
-        x1 = reshape(coords(:,1), self.nelems(1)+1, self.nelems(2)+1);
-        y1 = reshape(coords(:,2), self.nelems(1)+1, self.nelems(2)+1);
-        z1 = reshape(coords(:,3), self.nelems(1)+1, self.nelems(2)+1);
+        x1 = reshape(coords(:,1), self.nelems(1)+1, self.nelems(3)+1);
+        y1 = reshape(coords(:,2), self.nelems(1)+1, self.nelems(3)+1);
+        z1 = reshape(coords(:,3), self.nelems(1)+1, self.nelems(3)+1);
         plot3(x1,y1,z1, 'k-'); 
         plot3(x1',y1',z1', 'k-'); 
         
