@@ -239,8 +239,8 @@ implementations on high performance computing platforms.
 \section{Problem statement and preliminaries}
 \label{sec:problem}
 
-We target the solution of the Poisson problem with
-homogeneous Dirichlet boundary conditions on a domain
+As our test problem, we target the solution of the Poisson problem with
+homogeneous Dirichlet boundary conditions on an bounded open domain
 $\Omega\subset\mathbb R^d$ ($d=2$ or $d=3$) with boundary $\partial
 \Omega$, i.e., we search the solution $u(\bs x)$ of:
 \begin{equation}\label{eq:Poisson}
@@ -260,34 +260,45 @@ discuss some implementation details.
 
 \subsection{Galerkin approximation} 
 
-Given a domain $\Omega \subset \mathcal{R}^3$ and a bounded, symmetric bilinear
-form\footnote{In our case, $a(u,v)=\int_\Omega \mu\nabla u \cdot \nabla v$.}
-$a(u,v)$ that is coercive
-%\footnote{$L^{2}(\Omega)=\left\{ v:\Omega\rightarrow\mathcal{R} : \int_\Omega v^2 < \infty \right\}, \quad H^{1}=(\Omega) \left\{ v \in L^{2}(\Omega) : \dfrac{\partial v}{\partial x},\dfrac{\partial v}{\partial y},\dfrac{\partial v}{\partial z} \in L^{2}(\Omega)\right\}. $} 
-on $H^{1}(\Omega)$ and $f \in L^{2}(\Omega)$, we want to find $u \in H^{1}(\Omega)$ 
-such that $u$ satisfies
+Given a bounded, symmetric bilinear form\footnote{In our case,
+  $a(u,v)=\int_\Omega \mu\nabla u \cdot \nabla v$.} $a(u,v)$ that is
+coercive\footnote{$L^{2}(\Omega)=\left\{
+  v:\Omega\rightarrow\mathcal{R} : \int_\Omega v^2 < \infty \right\},
+  \: H_0^{1}(\Omega)= \left\{ v \in L^{2}(\Omega) : \dfrac{\partial
+    v}{\partial x},\dfrac{\partial v}{\partial y},\dfrac{\partial
+    v}{\partial z} \in L^{2}(\Omega), v=0 \text{ on }
+  \partial\Omega\right\}$.} on $H_0^{1}(\Omega)$ and $f \in
+  L^{2}(\Omega)$, we want to find $u \in H_0^{1}(\Omega)$ such that
+  $u$ satisfies
 \begin{equation}
 \label{eqn:weakForm}
-a(u,v) = (f,v)_{L^2(\Omega)}, \ \ \ \forall v \in H^{1}(\Omega)
+a(u,v) = (f,v)_{L^2(\Omega)}, \ \ \ \forall v \in H_0^{1}(\Omega).
 \end{equation}
-and the appropriate boundary conditions on the boundary of the domain  $\partial \Omega$. This problem has a unique solution \cite{BrennerScott94}. 
-
-We derive a discrete set of equations that need to be
-solved to find an approximate solution for 
+%and the appropriate boundary conditions on the boundary of the domain  $\partial \Omega$.
+This problem has a unique solution \cite{BrennerScott94}. 
+%
+We derive a set of discrete equations that need to be
+solved to find approximate solutions for 
 (\ref{eqn:weakForm}). First we define a sequence of $m$ nested {\em finite}
 dimensional spaces, $V_1 \subset V_2 \subset \cdots \subset V_m \subset
-H^{1}(\Omega)$, all of which are subspaces of $H^{1}(\Omega)$. Here 
-$V_k$ corresponds to the fine mesh at the specified high-order, and $V_{k-1}$ corresponds to the
-immediately coarser mesh. The coarser meshes are obtained either via $h$-coarsening or $p$-coarsening as illustrated in Figure~\ref{fig:approaches}.
-Then the discretized problem is to find an
-approximation of $u$, $u_k \in V_k$ such that
-\begin{equation}
-\label{eqn:galerkinForm}
+H_0^{1}(\Omega)$.
+Here, $V_k$ is the finite element space corresponds to the fine mesh
+at a specified
+polynomial order, and $V_{k-1}$ corresponds to the immediately coarser
+mesh. The coarser meshes are obtained either via coarsening of the
+mesh ($h$-coarsening) or decreasing of the polynomial degree of the
+finite element basis functions ($p$-coarsening) as illustrated in
+Figure~\ref{fig:approaches}.  Then the discretized problem is to find
+$u_k \in V_k$ such that
+\begin{equation*}
+%\label{eqn:galerkinForm}
 a(u_{k},v) = (f,v)_{L^2(\Omega)}, \ \ \ \forall v \in V_k.
-\end{equation}
-The discretized problem has a unique solution, and the sequence $\{u_k\}$ converges to $u$ \cite{BrennerScott94}.
+\end{equation*}
+The discretized problem has a unique solution, and the sequence
+$\{u_k\}$ converges to $u$ \cite{BrennerScott94}.
 
-Let $(\cdot,\cdot)_{k}$ be an inner product defined on $V_k$. By using the linear operator $A_k : V_{k} \rightarrow V_{k} $ defined by
+Let $(\cdot,\cdot)_{k}$ be an inner product defined on $V_k$. By using
+the linear operator $A_k : V_{k} \rightarrow V_{k} $ defined by \gsnote{revisit}
 \begin{equation}
 \label{eqn:fematDef}
 (A_{k} v,w)_k = a(v,w),  \ \ \ \forall v,w \in V_k,
@@ -303,9 +314,9 @@ where $f_k \in V_k $ is defined by
 (f_k,v)_k = (f,v)_{L^2(\Omega)},  \ \ \ \forall v \in V_k.  
 \end{equation}
 The operator $A_k$ is a symmetric (self-adjoint) positive operator
-with respect to $(\cdot,\cdot)_k$. (In the following sections, we use italics to
+with respect to $(\cdot,\cdot)_k$. In the following sections, we use italics to
 represent an operator (or vector) in the continuous form and use boldface to represent the matrix (or vector) corresponding to its
-co-ordinate basis representation.)
+coordinate basis representation.
 
 Let $\{\phi_1^k,\phi_2^k,\ldots,\phi_{m}^k\}$ be a
 basis for $V_k$. Then we can show the following:
