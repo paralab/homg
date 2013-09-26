@@ -32,22 +32,15 @@ classdef hexmesh < handle
     end
     
     function plot(self)
-      % create coordinates ...
-      if ( self.dim == 2 )
-        [x,y] = ndgrid(0:1/self.nelems(1):1.0, 0:1/self.nelems(2):1.0);
-        pts = [x(:) y(:)];
-      else
-        [x,y,z] = ndgrid(0:1/self.nelems(1):1.0, 0:1/self.nelems(2):1.0,0:1/self.nelems(3):1.0);
-        pts = [x(:) y(:) z(:)];
-      end
-      
-      coords = self.Xf(pts);
       % display the mesh. Needs X.
       figure(1);
       c = [31/256,171/256,226/256];   % default color of grid
       lw = 1;                         % default line width of grid
       
       if (self.dim == 2 )
+        [x,y] = ndgrid(0:1/self.nelems(1):1.0, 0:1/self.nelems(2):1.0);
+        pts = [x(:) y(:)];
+        coords = self.Xf(pts);
         plot(coords(:,1), coords(:,2), 'ko');
         hold on;
         x = reshape(coords(:,1), self.nelems(1)+1, self.nelems(2)+1);
@@ -59,13 +52,107 @@ classdef hexmesh < handle
         plot(coords(idx,1), coords(idx,2), 'ro');
         axis square
       else
-        plot3(coords(:,1), coords(:,2), coords(:,3), 'bo');
+        % 2 xy planes
+        [x,y] = ndgrid( 0:1/self.nelems(1):1.0, 0:1/self.nelems(2):1.0 );
+        
+        % z = 0
+        z = zeros (size(x));
+        pts = [x(:) y(:) z(:)];
+        coords = self.Xf(pts);
+        surf(reshape(coords(:,1), size(x)), ... 
+             reshape(coords(:,2), size(x)), ...
+             reshape(coords(:,3), size(x)) ...
+            );
         hold on;
-        idx = self.get_boundary_node_indices(1);
-        plot3(coords(idx,1), coords(idx,2), coords(idx,3), 'ro');
-        view(3); axis square
+        x1 = reshape(coords(:,1), self.nelems(1)+1, self.nelems(2)+1);
+        y1 = reshape(coords(:,2), self.nelems(1)+1, self.nelems(2)+1);
+        z1 = reshape(coords(:,3), self.nelems(1)+1, self.nelems(2)+1);
+        plot3(x1,y1,z1, 'k-'); 
+        plot3(x1',y1',z1', 'k-'); 
+        % z = 1
+        z = ones  (size(x));
+        pts = [x(:) y(:) z(:)];
+        coords = self.Xf(pts);
+        surf(reshape(coords(:,1), size(x)), ... 
+             reshape(coords(:,2), size(x)), ...
+             reshape(coords(:,3), size(x)) ...
+            );
+        hold on;
+        x1 = reshape(coords(:,1), self.nelems(1)+1, self.nelems(2)+1);
+        y1 = reshape(coords(:,2), self.nelems(1)+1, self.nelems(2)+1);
+        z1 = reshape(coords(:,3), self.nelems(1)+1, self.nelems(2)+1);
+        plot3(x1,y1,z1, 'k-'); 
+        plot3(x1',y1',z1', 'k-'); 
+        %--------------------------------------------------------------------
+        % 2 yz planes
+        [y,z] = ndgrid( 0:1/self.nelems(2):1.0, 0:1/self.nelems(3):1.0 );
+        % x = 0
+        x = zeros (size(y));
+        pts = [x(:) y(:) z(:)];
+        coords = self.Xf(pts);
+        surf(reshape(coords(:,1), size(x)), ... 
+             reshape(coords(:,2), size(x)), ...
+             reshape(coords(:,3), size(x)) ...
+            );
+        hold on;
+        x1 = reshape(coords(:,1), self.nelems(1)+1, self.nelems(2)+1);
+        y1 = reshape(coords(:,2), self.nelems(1)+1, self.nelems(2)+1);
+        z1 = reshape(coords(:,3), self.nelems(1)+1, self.nelems(2)+1);
+        plot3(x1,y1,z1, 'k-'); 
+        plot3(x1',y1',z1', 'k-'); 
+        % x = 1
+        x = ones (size(y));
+        pts = [x(:) y(:) z(:)];
+        coords = self.Xf(pts);
+        surf(reshape(coords(:,1), size(x)), ... 
+             reshape(coords(:,2), size(x)), ...
+             reshape(coords(:,3), size(x)) ...
+            );
+        hold on;
+        x1 = reshape(coords(:,1), self.nelems(1)+1, self.nelems(2)+1);
+        y1 = reshape(coords(:,2), self.nelems(1)+1, self.nelems(2)+1);
+        z1 = reshape(coords(:,3), self.nelems(1)+1, self.nelems(2)+1);
+        plot3(x1,y1,z1, 'k-'); 
+        plot3(x1',y1',z1', 'k-'); 
+        %--------------------------------------------------------------------
+        % 2 xz planes
+        [x,z] = ndgrid( 0:1/self.nelems(1):1.0, 0:1/self.nelems(3):1.0 );
+        % y = 0
+        y = zeros (size(x));
+        pts = [x(:) y(:) z(:)];
+        coords = self.Xf(pts);
+        surf(reshape(coords(:,1), size(x)), ... 
+             reshape(coords(:,2), size(x)), ...
+             reshape(coords(:,3), size(x)) ...
+            );
+        hold on;
+        x1 = reshape(coords(:,1), self.nelems(1)+1, self.nelems(2)+1);
+        y1 = reshape(coords(:,2), self.nelems(1)+1, self.nelems(2)+1);
+        z1 = reshape(coords(:,3), self.nelems(1)+1, self.nelems(2)+1);
+        plot3(x1,y1,z1, 'k-'); 
+        plot3(x1',y1',z1', 'k-'); 
+        % y = 1
+        y = ones (size(x));
+        pts = [x(:) y(:) z(:)];
+        coords = self.Xf(pts);
+        surf(reshape(coords(:,1), size(x)), ... 
+             reshape(coords(:,2), size(x)), ...
+             reshape(coords(:,3), size(x)) ...
+            );
+        hold on;
+        x1 = reshape(coords(:,1), self.nelems(1)+1, self.nelems(2)+1);
+        y1 = reshape(coords(:,2), self.nelems(1)+1, self.nelems(2)+1);
+        z1 = reshape(coords(:,3), self.nelems(1)+1, self.nelems(2)+1);
+        plot3(x1,y1,z1, 'k-'); 
+        plot3(x1',y1',z1', 'k-'); 
+        
+        % pretty views etc 
+        view(3); axis equal;
       end
       % title(['Hex Mesh ', num2str(numx,3),'x',num2str(numy,3),'x',num2str(numz,3)])
+      set (gcf, 'renderer', 'opengl');
+      cameratoolbar('show');
+      cameratoolbar('setmode', 'orbit');
     end
     
     function plot_fx(self, fx)
@@ -209,7 +296,7 @@ classdef hexmesh < handle
       end
       
       % print ('-depsc2', 'warped-2d.eps');
-      matlab2tikz (['fan-' num2str(self.dim) 'd.tikz'], 'checkForUpdates', false, 'showInfo', false);
+      % matlab2tikz (['fan-' num2str(self.dim) 'd.tikz'], 'checkForUpdates', false, 'showInfo', false);
       set (gcf, 'renderer', 'opengl');
       cameratoolbar('show');
       cameratoolbar('setmode', 'orbit');
