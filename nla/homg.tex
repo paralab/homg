@@ -1047,7 +1047,9 @@ the results are similar for larger mesh sizes as well.
 	% \includegraphics[width=0.48\textwidth]{figs/fan3a}
 	\caption{\label{fig:mesh} Two and three dimensional warped
           meshes used in our numerical experiments. The color
-          illustrates the value of the coefficient $\mu(\bs x)$.}
+          illustrates the value of the coefficient $\mu(\bs x)$, which
+        varies on the element level but is plotted as constant on each
+        element for illustration purposes. \todo{Would that be hard to change?}}
 \end{figure}
 
 
@@ -1178,7 +1180,10 @@ variable coefficient case summarized in Table~\ref{tab:2d-fan}. First,
 note that all variants perform reasonably for discretizations up to
 order $p=4$. When used as a solver, multigrid either diverges or
 converges very slowly for orders $p>4$. Convergence is reestablished
-when multigrid is combined with CG.
+when multigrid is combined with CG. Using multigrid with SSOR
+smoothing as preconditioner in CG results, for orders up to $p=8$ in a
+convergence factor of at least $0.1$ in each iteration, and in a
+factor of $0.25$ for order $p=16$.
 
 Next, we turn to the three dimensional results reported in
 Tables~\ref{tab:3d-box} and \ref{tab:3d-fan}. All of our
@@ -1186,13 +1191,18 @@ multigrid/smoother variants converge for the Laplace equation on the
 unit cube, as shown in Table~\ref{tab:3d-box}. The benefit of using
 multigrid as preconditioner rather than as solver is even more evident
 in three dimensions than for the two dimensional unit square
-problem. \todo{Need to comment on linearized preconditioner.}
+problem.
 
-Our results for varying coefficient problem on the three-dimensional
-geometry shown in Figure~\ref{fig:mesh} are summarized in
-Table~\ref{tab:3d-fan}. As in two dimensions, the performance of
-multigrid when used as a solver degrades significantly for orders
-$p>4$.
+Our results for the varying coefficient problem on the
+three-dimensional geometry shown in Figure~\ref{fig:mesh} are
+summarized in Table~\ref{tab:3d-fan}. As in two dimensions, the
+performance of multigrid when used as a solver degrades significantly
+for orders $p>4$. As can be seen, the linear element matrix based on
+the high order node points represents a good preconditioner for the
+high-order system. As in two dimensions, smoothing steps based on the
+high-order residual and the diagonal of the low-order operator
+significantly reduce the number of iterations required for
+convergence.
 
 
 \begin{table}
