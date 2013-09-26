@@ -698,16 +698,21 @@ significantly better error reduction than Jacobi or Chebyshev
 smoothing.
 
 In Figure~\ref{fig:smoothers-var}, we study the solution of
-\eqref{eq:Poisson} with a smoothly (but highly) varying coefficient
-$\mu$ on a deformed geometry. Note that, comparing with the constant
-coefficient case, now Jacobi smoothing performs significantly worse,
-both, when used as a solver and as a smoother. In particular, for
-$p=16$ Jacobi smoothing does not lead to a converging two-grid
-algorithm (compare with Table~\ref{tab:2d-fan}). SSOR smoothing
-combined with the two-grid method still retains a satisfactory
-convergence rate. \todo{Hari, Chebyshev-based multigrid also seems to
-  have values larger than 1 but seems to converge in the tables in the
-  back...any idea why?}
+\eqref{eq:Poisson} with a smoothly (but strongly) varying coefficient
+$\mu$ on the deformed geometry. Note that, comparing with the constant
+coefficient case, here Jacobi smoothing performs significantly worse,
+both, when used as a solver and as a smoother. Let us focus on the
+two-grid correction for polynomial order $p=16$ and compare with the
+results for using multigrid as a solver summarized in
+Table~\ref{tab:2d-fan}.  Jacobi smoothing does not lead to a
+converging two-grid algorithm as many coefficients are amplified by
+the two-grid cycle. Although one or two coefficients appear to be
+amplified in the two-grid iteration, the multigrid v-cycle converges
+(although very slowly). This convergence can be explained by the fact
+that errors can be interchanged between different eigenvectors in the
+v-cycle.  SSOR smoothing combined with the two-grid method retains a
+significant error reduction and, as a consequence, convergens at a
+satisfactory rate.
 
 \begin{figure}
 	\centering
