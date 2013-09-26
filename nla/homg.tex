@@ -180,7 +180,7 @@ direct application of algebraic multigrid to the high-order operator.  In our
 test problems, we compare the performance of this low-order preconditioning
 approach to the performance obtained with $h$-multigrid and $p$-multigrid.
 
-\gsnote{Check if Bungartz/Wittum groups.}
+\gsnote{Check Bungartz/Wittum/Mehl groups if they have anything we should cite.}
 
 {\em Organization of this paper:} In \S\ref{sec:problem} we describe
 the test problem, as well as discretization approach for the different
@@ -242,7 +242,7 @@ implementations on high performance computing platforms.
 \label{sec:problem}
 
 As our test problem, we target the solution of the Poisson problem with
-homogeneous Dirichlet boundary conditions on an bounded open domain
+homogeneous Dirichlet boundary conditions on an open bounded domain
 $\Omega\subset\mathbb R^d$ ($d=2$ or $d=3$) with boundary $\partial
 \Omega$, i.e., we search the solution $u(\bs x)$ of:
 \begin{equation}\label{eq:Poisson}
@@ -253,40 +253,41 @@ $\Omega\subset\mathbb R^d$ ($d=2$ or $d=3$) with boundary $\partial
 \end{equation}
 Here, $\mu(\bs x)\ge \mu_0>0$ is a spatially varying coefficient that
 is bounded away from zero, and $f(x)$ is a given right hand side. We
-discretize~\eqref{eq:Poisson} using finite elements with medium to
-high-order basis functions, and solve the resulting discrete system
-using different multigrid variants. Below, we discuss the Galerkin
-approximation to~\eqref{eq:Poisson}, the setup of the inter-grid
-transfer operators to establish a multilevel hierarchy and then
-discuss some implementation details.
+discretize~\eqref{eq:Poisson} using finite elements with basis
+functions of polynomial order $p$, and solve the resulting discrete
+system using different multigrid variants. Below, in
+\S\ref{subsec:galerkin} and \S\ref{sub:restriction_&_prolongation}, we
+discuss the Galerkin approximation to~\eqref{eq:Poisson} and the setup
+of the inter-grid transfer operators to establish a multilevel
+hierarchy. In \S\ref{sub:meshing}, we discuss details of the meshes
+and implementation used for our comparisons.
 
-\subsection{Galerkin approximation} 
+\subsection{Galerkin approximation} \label{subsec:galerkin}
 
 Given a bounded, symmetric bilinear form\footnote{In our case,
   $a(u,v)=\int_\Omega \mu\nabla u \cdot \nabla v$.} $a(u,v)$ that is
 coercive
-% \footnote{$L^{2}(\Omega)=\left\{ v:\Omega\rightarrow\mathcal{R} : \int_\Omega v^2 < \infty \right\}, \: H_0^{1}(\Omega)= \left\{ v \in L^{2}(\Omega) : \dfrac{\partial v}{\partial x},\dfrac{\partial v}{\partial y},\dfrac{\partial v}{\partial z} \in L^{2}(\Omega), v=0 \text{ on } \partial\Omega\right\}$.} 
-on $H_0^{1}(\Omega)$ and $f \in L^{2}(\Omega)$, we want to find $u \in H_0^{1}(\Omega)$ such that
-  $u$ satisfies
+on $H_0^{1}(\Omega)$, and $f \in L^{2}(\Omega)$, we want to find $u
+\in H_0^{1}(\Omega)$ such that $u$ satisfies
 \begin{equation}
 \label{eqn:weakForm}
 a(u,v) = (f,v)_{L^2(\Omega)}, \ \ \ \forall v \in H_0^{1}(\Omega).
 \end{equation}
 %and the appropriate boundary conditions on the boundary of the domain  $\partial \Omega$.
-This problem has a unique solution \cite{BrennerScott94}. 
+This problem is known to have a unique solution \cite{BrennerScott94}. 
 %
-We derive a set of discrete equations that need to be
-solved to find approximate solutions for 
-(\ref{eqn:weakForm}). First we define a sequence of $m$ nested {\em finite}
+We now derive discrete equations that whose solution 
+approximate the solution of
+(\ref{eqn:weakForm}). First, we define a sequence of $m$ nested {\em finite}
 dimensional spaces, $V_1 \subset V_2 \subset \cdots \subset V_m \subset
 H_0^{1}(\Omega)$.
-Here, $V_k$ is the finite element space corresponds to the fine mesh
+Here, $V_k$ is the finite element space corresponds to a finite element mesh
 at a specified
-polynomial order, and $V_{k-1}$ corresponds to the immediately coarser
-mesh. The coarser meshes are obtained either via coarsening of the
+polynomial order, and $V_{k-1}$ corresponds to the next coarser
+problem, which is obtained either via geometric coarsening of the
 mesh ($h$-coarsening) or decreasing of the polynomial degree of the
 finite element basis functions ($p$-coarsening) as illustrated in
-Figure~\ref{fig:approaches}.  Then the discretized problem is to find
+Figure~\ref{fig:approaches}.  Then, the discretized problem is to find
 $u_k \in V_k$ such that
 \begin{equation*}
 %\label{eqn:galerkinForm}
@@ -296,13 +297,15 @@ The discretized problem has a unique solution, and the sequence
 $\{u_k\}$ converges to $u$ \cite{BrennerScott94}.
 
 Let $(\cdot,\cdot)_{k}$ be an inner product defined on $V_k$. By using
-the linear operator $A_k : V_{k} \rightarrow V_{k} $ defined by \gsnote{revisit}
-\begin{equation}
-\label{eqn:fematDef}
+the linear operator $A_k : V_{k} \rightarrow V_{k} $ defined by
+\gsnote{I think we have to distinguish beween fem basis function and
+  nodal vectors here.}
+\begin{equation*}
+%\label{eqn:fematDef}
 (A_{k} v,w)_k = a(v,w),  \ \ \ \forall v,w \in V_k,
-\end{equation}
+\end{equation*}
 the discretized problem can be restated as follows. 
-Find $u_k \in V_k$, which satisfies
+Find $u_k \in V_k$, which satisfies \gsnote{Is this a discrete equation?}
 \begin{equation}
 \label{eqn:discreteFE}
 A_k u_k = f_k,
@@ -328,7 +331,8 @@ basis for $V_k$. Then we can show the following:
 \mathbf{f_{k}}(j) &=& (f,\phi_j^k)_{L^2(\Omega)}  \ \ \ \forall j=1,2,\ldots,\#(V_k), \\
 \end{eqnarray*} 
 %\end{equation}
-where $\mathbf{M_k^k}$ is the Gram or mass matrix.
+where $\mathbf{M_k^k}$ is the Gram or mass matrix.\gsnote{Need to add
+  some discussion....what's the discrete equation?}
 
 
 % subsection matrix_assembly_&_quadrature (end)
@@ -336,16 +340,16 @@ where $\mathbf{M_k^k}$ is the Gram or mass matrix.
 \subsection{Restriction \& Prolongation} % (fold)
 \label{sub:restriction_&_prolongation}
 Since the coarse-grid vector space is a subspace of the fine-grid vector space,
-any coarse-grid vector $v$ can be expanded independently in terms of the fine
-and coarse basis vectors, 
+any coarse-grid function $v$ can be expanded in terms of the fine
+and coarse basis functions, 
 \begin{equation} 
   v = \sum_i v_{i,k-1}\phi_i^{k-1} = \sum_j v_{j,k}\phi_j^k, 
 \end{equation} 
 where, $v_{i,k}$ and $v_{i,k-1}$ are the coefficients in the basis expansion
-for $v$ on the fine and coarse grids respectively. 
+for $v$ on the fine and coarse grids, respectively. 
 
 The prolongation operator can be represented as a matrix-vector product
-({\texttt MatVec}) with the input vector as the coarse grid nodal values and
+with the input vector as the coarse grid nodal values and
 the output as the fine grid nodal values. The matrix entries are the coarse
 grid shape functions evaluated at the fine-grid vertices, $p_i$,
 \begin{equation}
@@ -366,23 +370,23 @@ prolongation operator.
 
 For the numerical comparisons in this work we consider domains that
 can smoothly be mapped to a square (in 2D) or a cube (in 3D). We
-assume given a geometry transformation, $X$, from the reference domain
+assume given a geometry transformation from the reference domain
 $S\coloneqq[0,1]^d$ to the physical domain $\Omega$. Hexahedral finite
 element meshes and tensorized nodal basis function based on
 Legende-Gauss-Lobotto (LGL) points are used.  We use isoparametric
-elements for the deformed geometries, i.e., the geometry
+elements to approximate deformed geometries, i.e., the geometry
 transformation is approximated using the same basis functions as the
 finite element approximation. The Jacobians for this transformation
 are computed at every quadrature point, and Gauss quadrature is used
-to numerically approximate integrals.  Although this comparison is
-partly motivated by our interest in fast elliptic solvers on
-adaptively refined nonconforming octree-based meshes
-\cite{SundarBirosBursteddeEtAl12, SampathBiros10}, for this comparison
-we restrict ourselves to uniform conforming meshes.
+to numerically approximate integrals.  Although this paper is partly
+motivated by our interest in fast elliptic solvers on adaptively
+refined nonconforming octree-based
+meshes~\cite{SundarBirosBursteddeEtAl12, SampathBiros10}, in this
+comparison we restrict ourselves to uniform conforming meshes.
 
 Our implementation is written in Matlab and made available from
-\todo{XXX}. While we strongly discourage matrix assembly for
-high-order discretizations in practice, we currently use sparse
+\todo{XXX}. While in paractice, matrix assembly for
+high-order discretizations is discouraged, we use sparse
 assembled operators in our prototype implementation.
 
 % Coarser meshes
