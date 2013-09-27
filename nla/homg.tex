@@ -18,6 +18,7 @@
 \usepackage{pgfplots}
 \usepgfplotslibrary{external} 
 \tikzexternalize
+\tikzset{external/system call={lualatex \tikzexternalcheckshellescape -halt-on-error -interaction=batchmode -jobname "\image" "\texsource"}}
 \usepackage{caption,subcaption}
 % \usetkzobj{all} 
 \usepackage{amsmath,amsfonts,amssymb}
@@ -1047,9 +1048,7 @@ the results are similar for larger mesh sizes as well.
 	% \includegraphics[width=0.48\textwidth]{figs/fan3a}
 	\caption{\label{fig:mesh} Two and three dimensional warped
           meshes used in our numerical experiments. The color
-          illustrates the value of the coefficient $\mu(\bs x)$, which
-        varies on the element level but is plotted as constant on each
-        element for illustration purposes. \todo{Would that be hard to change?}}
+          illustrates the value of the coefficient $\mu(\bs x)$.}
 \end{figure}
 
 
