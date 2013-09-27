@@ -26,7 +26,7 @@ axis z line*=left,
 colormap={traffic}{color(0cm)=(green); color(1cm)=(yellow); color(2cm)=(red)},
 colorbar,
 colorbar style={
-        width=0.1in
+                width=0.15in, height=1.4in
     },
 point meta min=65540.7456135163,
 point meta max=3000001
