@@ -108,7 +108,7 @@ matrices are never assembled, but their application on vectors is implemented
 through elemental loops.  Besides the loss of sparsity, another challenge in
 high-order discretizations is due to the fact that the discretization matrices
 loose structural properties such as the M-matrix property, which often allows
-to prove convergence of iterative solvers. \todo{citation}
+to prove convergence of iterative solvers.
 
 We use high-order discretizations based on Legende-Gauss-Lobotto (LGL) nodal
 basis functions. For different polynomial orders $1\le p\le 16$, we compare
@@ -1053,13 +1053,14 @@ point out that mesh independence is acheived for all $p$, therefore
 the results are similar for larger mesh sizes as well.
 
 \begin{figure}
-	% \includegraphics[width=0.48\textwidth]{figs/fan}
-	\input{tikz/fan.tikz}
-	\input{tikz/fan-3d.tikz}
-	% \includegraphics[width=0.48\textwidth]{figs/fan3a}
+	\includegraphics[width=0.48\textwidth]{figs/fan2d}
+	%\input{tikz/fan.tikz}
+	%\input{tikz/fan-3d.tikz}
+	\includegraphics[width=0.48\textwidth]{figs/fan3d}
 	\caption{\label{fig:mesh} Two and three dimensional warped
           meshes used in our numerical experiments. The color
-          illustrates the value of the coefficient $\mu(\bs x)$.}
+          illustrates the value of the coefficient $\mu(\bs x)\in [1.0,
+            d\cdot 10^6]$.}
 \end{figure}
 
 
