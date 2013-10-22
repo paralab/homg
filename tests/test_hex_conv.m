@@ -1,10 +1,13 @@
-function test_hex_conv(dim, order, nelem)
+function test_hex_conv(dim, order, nelem, k)
 % function test_convergence(dim, order, nelem)
 % nelem can be an array of grid sizes.
 % 
 % e.g.  test_convergence(2, 3, [8 16 32 64]); 
 
 syms x y z
+
+
+% k = nelem(1)/4;
 
 % disp('grid -> err');
 fprintf('.-------------------------------------------.\n');
@@ -15,9 +18,9 @@ for i=1:length(nelem)
   m = homg.hexmesh(repmat(nelem(i), 1, dim), @homg.xform.identity);
     
   if ( dim==2 )
-    fx = matlabFunction(-8*pi^2*(sin(2*pi*x) * sin(2*pi*y)));
+    fx = matlabFunction(-8*k^2*pi^2*(sin(2*pi*k*x) * sin(2*pi*k*y)));
   else  
-    fx = matlabFunction(-12*pi^2*(sin(2*pi*x) * sin(2*pi*y) * sin(2*pi*z) ));
+    fx = matlabFunction(-12*k^2*pi^2*(sin(2*pi*k*x) * sin(2*pi*k*y) * sin(2*pi*k*z) ));
   end
   
   bdy = m.get_boundary_node_indices(order);
@@ -48,13 +51,13 @@ for i=1:length(nelem)
   
   % check error
   if (dim == 2)
-    u_fx = matlabFunction( sin(2*pi*x) * sin(2*pi*y) );
+    u_fx = matlabFunction( sin(2*k*pi*x) * sin(2*k*pi*y) );
   else
-    u_fx = matlabFunction( sin(2*pi*x) * sin(2*pi*y) * sin(2*pi*z) );
+    u_fx = matlabFunction( sin(2*k*pi*x) * sin(2*k*pi*y) * sin(2*k*pi*z) );
   end % dim == 2
   u_exact = m.evaluate(u_fx, order, 'gll');
   err = u_exact - U;
-  e = sqrt(err' * M * err );
+  e = max(err)/max(u_exact); % sqrt(err' * M * err );
   if (i==1)
     fprintf('| %d\t|\t%g\t|     -     |\n', nelem(i), e);
   else

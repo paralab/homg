@@ -163,16 +163,21 @@ classdef hexmesh < handle
       set(hFig, 'Position', [200 200 800 800])
       
       if (self.dim == 2 )
-        [x,y] = ndgrid(0:1/self.nelems(1):1.0, 0:1/self.nelems(2):1.0);
+        scl=8;
+        [x,y] = ndgrid(0:1/(scl*self.nelems(1)):1.0, 0:1/(scl*self.nelems(2)):1.0);
         pts = [x(:) y(:)];
         coords = self.Xf(pts);
         
         ci = arrayfun( fx, coords(:,1), coords(:,2) );
         surf(reshape(coords(:,1), size(x)), ... 
              reshape(coords(:,2), size(x)), ...
-             zeros(size(x)), reshape(ci, size(x)) ...
+             zeros(size(x)), reshape(ci, size(x)), ...
+             'EdgeColor','none','LineStyle','none' ...
             );
         hold on;
+        [x,y] = ndgrid(0:1/self.nelems(1):1.0, 0:1/self.nelems(2):1.0);
+        pts = [x(:) y(:)];
+        coords = self.Xf(pts);
         x = reshape(coords(:,1), self.nelems(1)+1, self.nelems(2)+1);
         y = reshape(coords(:,2), self.nelems(1)+1, self.nelems(2)+1);
         plot(x,y, 'k-'); 
@@ -185,8 +190,8 @@ classdef hexmesh < handle
         % will draw 6 planes ...
         %--------------------------------------------------------------------
         % 2 xy planes
-        [x,y] = ndgrid( 0:1/self.nelems(1):1.0, 0:1/self.nelems(2):1.0 );
-        
+        scl=8;
+        [x,y] = ndgrid( 0:1/(scl*self.nelems(1)):1.0, 0:1/(scl*self.nelems(2)):1.0 );
         % z = 0
         z = zeros (size(x));
         pts = [x(:) y(:) z(:)];
@@ -196,15 +201,20 @@ classdef hexmesh < handle
              reshape(coords(:,2), size(x)), ...
              reshape(coords(:,3), size(x)), ...
              reshape(ci, size(x)), ...
-             'FaceColor', 'interp', 'FaceLighting', 'phong' ...
+             'EdgeColor','none','LineStyle','none' ...
             );
         hold on;
+        [x,y] = ndgrid( 0:1/self.nelems(1):1.0, 0:1/self.nelems(2):1.0 );
+        z = zeros (size(x));
+        pts = [x(:) y(:) z(:)];
+        coords = self.Xf(pts);
         x1 = reshape(coords(:,1), self.nelems(1)+1, self.nelems(2)+1);
         y1 = reshape(coords(:,2), self.nelems(1)+1, self.nelems(2)+1);
         z1 = reshape(coords(:,3), self.nelems(1)+1, self.nelems(2)+1);
         plot3(x1,y1,z1, 'k-'); 
         plot3(x1',y1',z1', 'k-'); 
         % z = 1
+        [x,y] = ndgrid( 0:1/(scl*self.nelems(1)):1.0, 0:1/(scl*self.nelems(2)):1.0 );
         z = ones  (size(x));
         pts = [x(:) y(:) z(:)];
         coords = self.Xf(pts);
@@ -213,9 +223,13 @@ classdef hexmesh < handle
              reshape(coords(:,2), size(x)), ...
              reshape(coords(:,3), size(x)), ...
              reshape(ci, size(x)), ...
-             'FaceColor', 'interp', 'FaceLighting', 'phong'  ...
-            );
+             'EdgeColor','none','LineStyle','none' ...
+            ); % 'FaceColor', 'interp', 'FaceLighting', 'phong' 
         hold on;
+        [x,y] = ndgrid( 0:1/self.nelems(1):1.0, 0:1/self.nelems(2):1.0 );
+        z = ones  (size(x));
+        pts = [x(:) y(:) z(:)];
+        coords = self.Xf(pts);
         x1 = reshape(coords(:,1), self.nelems(1)+1, self.nelems(2)+1);
         y1 = reshape(coords(:,2), self.nelems(1)+1, self.nelems(2)+1);
         z1 = reshape(coords(:,3), self.nelems(1)+1, self.nelems(2)+1);
@@ -223,7 +237,7 @@ classdef hexmesh < handle
         plot3(x1',y1',z1', 'k-'); 
         %--------------------------------------------------------------------
         % 2 yz planes
-        [y,z] = ndgrid( 0:1/self.nelems(2):1.0, 0:1/self.nelems(3):1.0 );
+        [y,z] = ndgrid( 0:1/(scl*self.nelems(2)):1.0, 0:1/(scl*self.nelems(3)):1.0 );
         % x = 0
         x = zeros (size(y));
         pts = [x(:) y(:) z(:)];
@@ -233,15 +247,21 @@ classdef hexmesh < handle
              reshape(coords(:,2), size(x)), ...
              reshape(coords(:,3), size(x)), ...
              reshape(ci, size(x)), ...
-             'FaceColor', 'interp', 'FaceLighting', 'phong'  ...
+             'EdgeColor','none','LineStyle','none' ...
             );
         hold on;
+        [y,z] = ndgrid( 0:1/self.nelems(2):1.0, 0:1/self.nelems(3):1.0 );
+        % x = 0
+        x = zeros (size(y));
+        pts = [x(:) y(:) z(:)];
+        coords = self.Xf(pts);
         x1 = reshape(coords(:,1), self.nelems(2)+1, self.nelems(3)+1);
         y1 = reshape(coords(:,2), self.nelems(2)+1, self.nelems(3)+1);
         z1 = reshape(coords(:,3), self.nelems(2)+1, self.nelems(3)+1);
         plot3(x1,y1,z1, 'k-'); 
         plot3(x1',y1',z1', 'k-'); 
-        % x = 1
+        x = 1
+        [y,z] = ndgrid( 0:1/(scl*self.nelems(2)):1.0, 0:1/(scl*self.nelems(3)):1.0 );
         x = ones (size(y));
         pts = [x(:) y(:) z(:)];
         coords = self.Xf(pts);
@@ -250,9 +270,13 @@ classdef hexmesh < handle
              reshape(coords(:,2), size(x)), ...
              reshape(coords(:,3), size(x)), ...
              reshape(ci, size(x)), ...
-             'FaceColor', 'interp', 'FaceLighting', 'phong'  ...
+             'EdgeColor','none','LineStyle','none' ...
             );
         hold on;
+        [y,z] = ndgrid( 0:1/self.nelems(2):1.0, 0:1/self.nelems(3):1.0 );
+        x = ones (size(y));
+        pts = [x(:) y(:) z(:)];
+        coords = self.Xf(pts);
         x1 = reshape(coords(:,1), self.nelems(2)+1, self.nelems(3)+1);
         y1 = reshape(coords(:,2), self.nelems(2)+1, self.nelems(3)+1);
         z1 = reshape(coords(:,3), self.nelems(2)+1, self.nelems(3)+1);
@@ -260,7 +284,7 @@ classdef hexmesh < handle
         plot3(x1',y1',z1', 'k-'); 
         %--------------------------------------------------------------------
         % 2 xz planes
-        [x,z] = ndgrid( 0:1/self.nelems(1):1.0, 0:1/self.nelems(3):1.0 );
+        [x,z] = ndgrid( 0:1/(scl*self.nelems(1)):1.0, 0:1/(scl*self.nelems(3)):1.0 );
         % y = 0
         y = zeros (size(x));
         pts = [x(:) y(:) z(:)];
@@ -269,16 +293,20 @@ classdef hexmesh < handle
         surf(reshape(coords(:,1), size(x)), ... 
              reshape(coords(:,2), size(x)), ...
              reshape(coords(:,3), size(x)), ...
-             reshape(ci, size(x)), ...
-             'FaceColor', 'interp', 'FaceLighting', 'phong'  ...
+             reshape(ci, size(x)) ...
             );
         hold on;
+        [x,z] = ndgrid( 0:1/self.nelems(1):1.0, 0:1/self.nelems(3):1.0 );
+        y = zeros (size(x));
+        pts = [x(:) y(:) z(:)];
+        coords = self.Xf(pts);
         x1 = reshape(coords(:,1), self.nelems(1)+1, self.nelems(3)+1);
         y1 = reshape(coords(:,2), self.nelems(1)+1, self.nelems(3)+1);
         z1 = reshape(coords(:,3), self.nelems(1)+1, self.nelems(3)+1);
         plot3(x1,y1,z1, 'k-'); 
         plot3(x1',y1',z1', 'k-'); 
         % y = 1
+        [x,z] = ndgrid( 0:1/(scl*self.nelems(1)):1.0, 0:1/(scl*self.nelems(3)):1.0 );
         y = ones (size(x));
         pts = [x(:) y(:) z(:)];
         coords = self.Xf(pts);
@@ -286,10 +314,13 @@ classdef hexmesh < handle
         surf(reshape(coords(:,1), size(x)), ... 
              reshape(coords(:,2), size(x)), ...
              reshape(coords(:,3), size(x)), ...
-             reshape(ci, size(x)), ...
-             'FaceColor', 'interp', 'FaceLighting', 'phong'  ...
+             reshape(ci, size(x)) ...
             );
         hold on;
+        [x,z] = ndgrid( 0:1/self.nelems(1):1.0, 0:1/self.nelems(3):1.0 );
+        y = ones (size(x));
+        pts = [x(:) y(:) z(:)];
+        coords = self.Xf(pts);
         x1 = reshape(coords(:,1), self.nelems(1)+1, self.nelems(3)+1);
         y1 = reshape(coords(:,2), self.nelems(1)+1, self.nelems(3)+1);
         z1 = reshape(coords(:,3), self.nelems(1)+1, self.nelems(3)+1);
@@ -303,7 +334,7 @@ classdef hexmesh < handle
       end
       
       % print ('-depsc2', 'warped-2d.eps');
-      % matlab2tikz (['fan-' num2str(self.dim) 'd.tikz'], 'checkForUpdates', false, 'showInfo', false);
+      matlab2tikz (['fan-' num2str(self.dim) 'd.tikz'], 'checkForUpdates', false, 'showInfo', false);
       set (gcf, 'renderer', 'opengl');
       cameratoolbar('show');
       cameratoolbar('setmode', 'orbit');
@@ -402,7 +433,6 @@ if (1)
       for e=1:ne
         pts = self.element_nodes(e, refel);
         detJac = self.geometric_factors(refel, pts);
-        % detJac = self.geometric_factors(e, refel);
         
         idx = self.get_node_indices (e, order);
         eM = self.element_mass(e, refel, detJac);
@@ -424,7 +454,6 @@ else
         idx = self.get_node_indices (e, order);
         pts = self.element_nodes(e, refel);
         detJac = self.geometric_factors(refel, pts);
-        % detJac = self.geometric_factors(e, refel);
         M(idx, idx) = M(idx, idx) + self.element_mass(e, refel, detJac);
       end
 end
@@ -460,13 +489,11 @@ end
         I(st:en) = ind1;
         J(st:en) = ind2;
 				
-        % [detJac, Jac] = self.geometric_factors(e, refel);
         pts = self.element_nodes(e, refel);
         [detJac, Jac] = self.geometric_factors(refel, pts);
         
 				eMat = self.element_stiffness(e, refel, detJac, Jac);
 				stiff_val(st:en) = eMat(:);
-        %K(idx, idx) = K(idx, idx) + self.element_stiffness(e, refel, detJac, Jac);
       end
     end
     
@@ -737,7 +764,6 @@ end
 		
     function Me = element_mass(self, eid, refel, J)
       % element mass matrix
-      % J = self.geometric_factors(eid, refel);
       Md = refel.W .* J ; 
       
       Me = refel.Q' * diag(Md) * refel.Q;
@@ -745,7 +771,6 @@ end
     
     function Ke = element_stiffness(self, eid, r, J, D)
       % element mass matrix
-      % [J, D] = self.geometric_factors(eid, r);
       
 %             | Qx Qy Qz || rx ry rz |     | rx sx tx || Qx |
 %    Ke =                 | sx sy sz | J W | ry sy ty || Qy |
@@ -783,6 +808,7 @@ end
         factor (:,1) = (D.rx.*D.rx + D.ry.*D.ry + D.rz.*D.rz ) .* J .* r.W .* mu ; % d2u/dx^2
         factor (:,2) = (D.sx.*D.sx + D.sy.*D.sy + D.sz.*D.sz ) .* J .* r.W .* mu ; % d2u/dy^2
         factor (:,3) = (D.tx.*D.tx + D.ty.*D.ty + D.tz.*D.tz ) .* J .* r.W .* mu ; % d2u/dz^2
+        
         factor (:,4) = (D.rx.*D.sx + D.ry.*D.sy + D.rz.*D.sz ) .* J .* r.W .* mu ; % d2u/dxdy
         factor (:,5) = (D.rx.*D.tx + D.ry.*D.ty + D.rz.*D.tz ) .* J .* r.W .* mu ; % d2u/dxdz
         factor (:,6) = (D.sx.*D.tx + D.sy.*D.ty + D.sz.*D.tz ) .* J .* r.W .* mu ; % d2u/dydz
@@ -809,14 +835,14 @@ end
         
       % change to using Qx etc ?
       if (refel.dim == 2)
-        [xr, xs] = homg.tensor.grad2 (refel.Dr, pts(:,1));
-        [yr, ys] = homg.tensor.grad2 (refel.Dr, pts(:,2));
+        [xr, xs] = homg.tensor.grad2 (refel.Dg, pts(:,1));
+        [yr, ys] = homg.tensor.grad2 (refel.Dg, pts(:,2));
       
         J = -xs.*yr + xr.*ys;
       else
-        [xr, xs, xt] = homg.tensor.grad3 (refel.Dr, pts(:,1));
-        [yr, ys, yt] = homg.tensor.grad3 (refel.Dr, pts(:,2));
-        [zr, zs, zt] = homg.tensor.grad3 (refel.Dr, pts(:,3));
+        [xr, xs, xt] = homg.tensor.grad3 (refel.Dg, pts(:,1));
+        [yr, ys, yt] = homg.tensor.grad3 (refel.Dg, pts(:,2));
+        [zr, zs, zt] = homg.tensor.grad3 (refel.Dg, pts(:,3));
         
         J = xr.*(ys.*zt-zs.*yt) - yr.*(xs.*zt-zs.*xt) + zr.*(xs.*yt-ys.*xt);
       end
