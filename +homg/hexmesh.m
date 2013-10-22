@@ -1082,8 +1082,7 @@ end
 			% cG volume nodes
 			%
 			% optionally also returns the global fid (gfid) which can be used to get
-			% the continuous face_nodes_only index via get_face_node_indices()
-			
+			% the continuous face_nodes_only index via get_face_node_indices()			
 			order = refel.N;
 			nf = self.get_num_faces();
 			if (self.dim == 2)
@@ -1128,13 +1127,13 @@ end
 					case 2	
 						[i,j,k] = ndgrid(i_high, j_low:j_high, k_low:k_high);
 					case 3   
-						[i,j,k] = ndgrid(i_low:i_high, j_low, k_low:k_high);
+						[i,j,k] = nf/3 + ndgrid(i_low:i_high, j_low, k_low:k_high);
 					case 4   
-						[i,j,k] = ndgrid(i_low:i_high, j_high, k_low:k_high);
+						[i,j,k] = nf/3 + ndgrid(i_low:i_high, j_high, k_low:k_high);
 					case 5   
-						[i,j,k] = ndgrid(i_low:i_high, j_low:j_high, k_low);
+						[i,j,k] = 2*nf/3 + ndgrid(i_low:i_high, j_low:j_high, k_low);
 					case 6   
-						[i,j,k] = ndgrid(i_low:i_high, j_low:j_high, k_high);
+						[i,j,k] = 2*nf/3 + ndgrid(i_low:i_high, j_low:j_high, k_high);
 				end
 			
         idx     = sub2ind (self.nelems*order + 1, i(:), j(:), k(:) );
