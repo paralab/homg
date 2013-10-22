@@ -470,7 +470,7 @@ end
       end
     end
     
-    function [K, M] = assemble_poisson(self, order)
+    function [K, M, iK] = assemble_poisson(self, order)
       self.set_order(order);
       % assemble the mass matrix
       refel = homg.refel ( self.dim, order );
@@ -484,8 +484,9 @@ end
       
       I = zeros(ne * NPNP, 1);
       J = zeros(ne * NPNP, 1);
-      mass_val = zeros(ne * NPNP, 1);
-      stiff_val = zeros(ne * NPNP, 1);
+      mass_val      = zeros(ne * NPNP, 1);
+      stiff_val     = zeros(ne * NPNP, 1);
+      inv_stiff_val = zeros(ne * NPNP, 1);
       
       % loop over elements
       for e=1:ne
@@ -505,7 +506,10 @@ end
         mass_val(st:en) = eMat(:);
         
         eMat = self.element_stiffness(e, refel, detJac, Jac);
-        stiff_val(st:en) = eMat(:);
+        stiff_val(st:en)     = eMat(:);
+        %% correct this ...
+        eMat = inv(eMat); 
+        inv_stiff_val(st:en) = eMat(:);
       end
       M = sparse(I,J,mass_val,dof,dof);
       % zero dirichlet bdy conditions
@@ -515,11 +519,15 @@ end
       jj = ismember(J,bdy);
       
       stiff_val = stiff_val.*(~ii).*(~jj);
+      inv_stiff_val = inv_stiff_val.*(~ii).*(~jj);
+      
       I = [I; bdy];
       J = [J; bdy];
       stiff_val = [stiff_val; ones(length(bdy), 1)];
+      inv_stiff_val = [inv_stiff_val; ones(length(bdy), 1)];
       
-      K = sparse(I,J,stiff_val,dof,dof);
+      K  = sparse(I,J,stiff_val,dof,dof);
+      iK = sparse(I,J,inv_stiff_val,dof,dof);
     end
 
 % 

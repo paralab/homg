@@ -11,6 +11,7 @@ classdef grid < handle
     k_lam
     jacobi_omega
     jacobi_invdiag
+    jacobi_inv_block_diag
     gs_G
     gs_c
     ssor_M
@@ -77,7 +78,7 @@ classdef grid < handle
 				grid.Mesh.set_coeff (mu) ;
 			end
 			% assemble for this level ... 
-      [grid.K, grid.M] = grid.Mesh.assemble_poisson(grid.Mesh.order);
+      [grid.K, grid.M, grid.jacobi_inv_block_diag] = grid.Mesh.assemble_poisson(grid.Mesh.order);
 			syms x y z
 			if ( grid.Mesh.dim == 2 )
 				fx = matlabFunction(-8*pi^2*(sin(2*pi*x) * sin(2*pi*y)));
@@ -320,6 +321,9 @@ classdef grid < handle
         case 'jacobi', 
           u = grid.smoother_jacobi(v, rhs, u); 
           return;
+        case 'blk_jac',
+          u = grid.smoother_block_jacobi(v, rhs, u); 
+          return;
         case 'gs',
           grid.sor_omega = 1.0;
           u = grid.smoother_gauss_seidel(v, rhs, u); 
@@ -391,6 +395,26 @@ classdef grid < handle
       end  
     end % jacobi
     
+    function u = smoother_block_jacobi (grid, v, rhs, u)
+      % block jacobi smoother
+      if ( isempty(grid.jacobi_inv_block_diag) )
+        error('inv block doagonal not assembled');
+        % grid.jacobi_inv_block_diag = grid.assemble_inv_block();
+      end
+      
+      for i=1:v
+				if (grid.linear_smoother)
+					res  = grid.jacobi_inv_block_diag * grid.residual_lin(rhs, u);
+				else
+					res  = grid.jacobi_inv_block_diag * grid.residual(rhs, u);
+				end
+				% res  = grid.jacobi_invdiag .* grid.residual(rhs, u);
+        u = u - grid.jacobi_omega.*res;
+        % r = norm(res);
+        % disp([grid.dbg_spaces num2str(r)]); 
+        % norm(r)
+      end  
+    end % jacobi
     
     function u = smoother_sor (grid, v, rhs, u)
       if ( isempty ( grid.sor_G ) )
