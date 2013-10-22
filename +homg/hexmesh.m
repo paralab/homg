@@ -1028,8 +1028,12 @@ end
       K = sparse(I,J,stiff_val,dof,dof);
     end
  
-    % functions for dG ... 
+    %% ~~~~~~ functions for dG ... 
+		
 		function nf = get_num_faces(self)
+			% function nf = get_num_faces(self)
+			% 
+			% returns the total number of faces in the mesh ...
 			nf = self.dim * ( prod(self.nelems) );
 			if (self.dim == 2)
 				nf = nf + sum(self.nelems);
@@ -1038,7 +1042,109 @@ end
 			end
 		end
 		
+		%    o---4---o
+		%    |       |                       1,2 --> x=0,1
+		%    1       2    face numbers ...   3,4 --> y=0,1
+		%    |       |                       5,6 --> z=0,1
+		%    o---3---o
+		function idx = get_discontinuous_face_indices(self, refel, elem, fid)
+			% function idx = get_discontinuous_face_indices(self, elem, fid)
+			%
+			% return the indices to the nodes of face fid into  
+			% dG volume nodes
+			offset = (elem-1)*(refel.Nrp^refel.dim);
+			
+			if (self.dim == 2)
+				assert (fid < 5);
+				
+				switch fid
+					case 1
+						idx = offset + 1:refel.Nrp:(refel.Nrp*refel.N+1);
+					case 2
+						idx = offset + refel.Nrp:refel.Nrp:(refel.Nrp^refel.dim);
+					case 3
+						idx = offset + 1:refel.Nrp;
+					case 4
+						idx = offset + (refel.Nrp*refel.N+1):(refel.Nrp^refel.dim);
+				end 
+				
+			else
+				% 3d case 
+				assert (fid < 7);
+			end
+			
+		end
+		
+		function [idx, gfid] = get_continuous_face_indices(self, refel, elem, fid)
+			% function [idx, gfid] = get_continuous_face_indices(self, elem, fid)
+			%
+			% return the indices to the nodes of face fid into  
+			% cG volume nodes
+			%
+			% optionally also returns the global fid (gfid) which can be used to get
+			% the continuous face_nodes_only index via get_face_node_indices()
+			
+			order = refel.N;
+			nf = self.get_num_faces();
+			if (self.dim == 2)
+				assert (fid < 5);
+				
+				[i,j] = ind2sub (self.nelems, elem);
+				
+        i_low   = (i-1)*order + 1;   i_high =  i*order + 1;
+        j_low   = (j-1)*order + 1;   j_high =  j*order + 1;
+        				
+				switch fid
+					case 1
+						gfid = sub2ind ([self.nelems(1)+1, self.nelems(2)], i, j);
+						[i,j] = ndgrid(i_low, j_low:j_high);
+					case 2
+						gfid = sub2ind ([self.nelems(1)+1, self.nelems(2)], i+1, j);
+						[i,j] = ndgrid(i_high, j_low:j_high);
+					case 3
+						gfid = nf/2 + sub2ind ([self.nelems(1), self.nelems(2)+1], i, j);
+						[i,j] = ndgrid(i_low:i_high, j_low);
+					case 4
+						gfid = nf/2 + sub2ind ([self.nelems(1), self.nelems(2)+1], i+1, j);
+						[i,j] = ndgrid(i_low:i_high, j_high);
+				end 
+        
+        idx     = sub2ind (self.nelems*order + 1, i(:), j(:));
+				
+			else
+				% 3d case 
+				assert (fid < 7);
+				
+        [i,j,k] = ind2sub (self.nelems, eid);
+        
+        i_low   = (i-1)*order + 1;   i_high =  i*order + 1;
+        j_low   = (j-1)*order + 1;   j_high =  j*order + 1;
+        k_low   = (k-1)*order + 1;   k_high =  k*order + 1;
+        
+        [i,j,k] = ndgrid(i_low:i_high, j_low:j_high, k_low:k_high);
+        switch fid
+					case 1   
+						[i,j,k] = ndgrid(i_low, j_low:j_high, k_low:k_high); 
+					case 2	
+						[i,j,k] = ndgrid(i_high, j_low:j_high, k_low:k_high);
+					case 3   
+						[i,j,k] = ndgrid(i_low:i_high, j_low, k_low:k_high);
+					case 4   
+						[i,j,k] = ndgrid(i_low:i_high, j_high, k_low:k_high);
+					case 5   
+						[i,j,k] = ndgrid(i_low:i_high, j_low:j_high, k_low);
+					case 6   
+						[i,j,k] = ndgrid(i_low:i_high, j_low:j_high, k_high);
+				end
+			
+        idx     = sub2ind (self.nelems*order + 1, i(:), j(:), k(:) );
+			end
+			
+		end
+		
     function [e1, e2] = get_face_elements (self, fid)
+			% function [e1, e2] = get_face_elements (self, fid)
+			% returns the elements sharing face fid
 			% returns -1 if on boundary
 			if (self.dim == 2)
 				% detect if its an x or y face ...
@@ -1078,8 +1184,11 @@ end
 			
     end
 
-    function idx = get_face_node_indices(self, fid, refel)
+    function idx = get_face_node_indices(self, refel, fid)
 			% gets continuous face-node indices for given face
+      % these are indexed into the number of face indices
+      % use get_continuous_face_indices to index into 
+      % continuous volume nodes
 			if (self.dim == 2)
 				num_row_x = refel.N * self.nelems(1) + 1; % just the x-face nodes
 				num_row_y = (refel.N-1)*(self.nelems(1)+1)  ; % contrib from the partial y face nodes
