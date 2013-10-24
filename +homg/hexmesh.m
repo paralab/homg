@@ -1059,13 +1059,13 @@ end
 				
 				switch fid
 					case 1
-						idx = offset + 1:refel.Nrp:(refel.Nrp*refel.N+1);
+						idx = offset + (1:refel.Nrp:(refel.Nrp*refel.N+1));
 					case 2
-						idx = offset + refel.Nrp:refel.Nrp:(refel.Nrp^refel.dim);
+						idx = offset + (refel.Nrp:refel.Nrp:(refel.Nrp^refel.dim));
 					case 3
-						idx = offset + 1:refel.Nrp;
+						idx = offset + (1:refel.Nrp);
 					case 4
-						idx = offset + (refel.Nrp*refel.N+1):(refel.Nrp^refel.dim);
+						idx = offset + ((refel.Nrp*refel.N+1):(refel.Nrp^refel.dim));
 				end 
 				
 			else
@@ -1083,15 +1083,15 @@ end
 			%
 			% optionally also returns the global fid (gfid) which can be used to get
 			% the continuous face_nodes_only index via get_face_node_indices()			
-			order = refel.N;
+			odr = refel.N;
 			nf = self.get_num_faces();
 			if (self.dim == 2)
 				assert (fid < 5);
 				
 				[i,j] = ind2sub (self.nelems, elem);
 				
-        i_low   = (i-1)*order + 1;   i_high =  i*order + 1;
-        j_low   = (j-1)*order + 1;   j_high =  j*order + 1;
+        i_low   = (i-1)*odr + 1;   i_high =  i*odr + 1;
+        j_low   = (j-1)*odr + 1;   j_high =  j*odr + 1;
         				
 				switch fid
 					case 1
@@ -1108,7 +1108,7 @@ end
 						[i,j] = ndgrid(i_low:i_high, j_high);
 				end 
         
-        idx     = sub2ind (self.nelems*order + 1, i(:), j(:));
+        idx     = sub2ind (self.nelems*odr + 1, i(:), j(:));
 				
 			else
 				% 3d case 
@@ -1116,9 +1116,9 @@ end
 				
         [i,j,k] = ind2sub (self.nelems, eid);
         
-        i_low   = (i-1)*order + 1;   i_high =  i*order + 1;
-        j_low   = (j-1)*order + 1;   j_high =  j*order + 1;
-        k_low   = (k-1)*order + 1;   k_high =  k*order + 1;
+        i_low   = (i-1)*odr + 1;   i_high =  i*odr + 1;
+        j_low   = (j-1)*odr + 1;   j_high =  j*odr + 1;
+        k_low   = (k-1)*odr + 1;   k_high =  k*odr + 1;
         
         [i,j,k] = ndgrid(i_low:i_high, j_low:j_high, k_low:k_high);
         switch fid
@@ -1136,7 +1136,7 @@ end
 						[i,j,k] = 2*nf/3 + ndgrid(i_low:i_high, j_low:j_high, k_high);
 				end
 			
-        idx     = sub2ind (self.nelems*order + 1, i(:), j(:), k(:) );
+        idx     = sub2ind (self.nelems*odr + 1, i(:), j(:), k(:) );
 			end
 			
 		end
