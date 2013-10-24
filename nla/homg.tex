@@ -1063,7 +1063,6 @@ the results are similar for larger mesh sizes as well.
             d\cdot 10^6]$.}
 \end{figure}
 
-
 \subsection{Setup of comparisons}\label{subsec:measures}
 Tables \ref{tab:box}--\ref{tab:3d-fan} present the number of multigrid
 v-cycles or of conjugate gradient (CG) iterations required to reduce
@@ -1185,6 +1184,21 @@ based on an algebraic multigrid method.
   \end{tabular}
 \end{table}
 
+\begin{table}
+\caption{\label{tab:meshInd} Mesh independence for 2D grid with variable coefficients. Coarsest grid for all cases is $2\times 2$.}
+\begin{tabular}{|c|c|c|c|c|c|c|c|}
+	\hline
+	order & 4  &  8 & 16 & 32 & 64 & 128 & 256 \\
+	\hline
+	 1    &  3 &  5 &  5 &  5 &  5 &  5  &  5  \\
+	 2    &  5 &  5 &  5 &  5 &  5 &  5  &  5  \\
+	 4    &  5 &  5 &  5 &  4 &  4 &  4  &  4  \\
+	 8    &  8 &  7 &  7 &  7 &  7 &  6  &  6  \\
+	 16   & 15 & 13 & 13 & 12 & 10 &  -  &  -  \\
+	 \hline
+\end{tabular}
+
+\end{table}
 
 Let us now contrast these observations with the results for the
 variable coefficient case summarized in Table~\ref{tab:2d-fan}. First,
