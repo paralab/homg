@@ -549,7 +549,7 @@ end
         stiff_val(st:en)     = eMat(:);
       
         eMat_inner_inv = inv(eMat(ind_inner,ind_inner));
-        eMat_inv = eMat;
+        eMat_inv = diag(diag(eMat));
         eMat_inv(ind_inner(:),ind_inner(:)) =  eMat_inner_inv;
         inv_stiff_val(st:en) = eMat_inv(:);
       end
@@ -572,7 +572,7 @@ end
       iK = sparse(I,J,inv_stiff_val,dof,dof);
       ebdy = self.get_element_boundary_node_indices(order);
       
-      iK(ebdy,ebdy);
+      diag(iK(ebdy,ebdy)) = 1./diag(iK(ebdy,ebdy));
     end
 
 % 
