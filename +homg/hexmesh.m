@@ -1141,9 +1141,9 @@ end
 			
 		end
 		
-    function [e1, e2] = get_face_elements (self, fid)
-			% function [e1, e2] = get_face_elements (self, fid)
-			% returns the elements sharing face fid
+    function [e1, f1, e2, f2] = get_face_elements (self, fid)
+			% function [e1, f1, e2, f2] = get_face_elements (self, fid)
+			% returns the elements sharing face fid, and their local fid 
 			% returns -1 if on boundary
 			if (self.dim == 2)
 				% detect if its an x or y face ...
@@ -1152,29 +1152,33 @@ end
 					% x face
 					[i,j] = ind2sub ([self.nelems(1), self.nelems(2)+1], fid-nxf);
 					if (j == 1)
-						e1 = -1;
+						e1 = -1; f1 = -1;
 					else
 						e1 = (j-2)*(self.nelems(1)) + i;
+						f1 = 4;
 					end
 					
 					if (j > self.nelems(2))
-						e2 = -1;
+						e2 = -1; f2 = -1;
 					else
 						e2 = (j-1)*self.nelems(1) + i;
+						f2 = 3;
 					end
 				else
 					% y face
 					[i,j] = ind2sub ([self.nelems(1)+1, self.nelems(2)], fid);
 					if (i == 1)
-						e1 = -1;
+						e1 = -1; f1 = -1;
 					else
 						e1 = (j-1)*self.nelems(1) + i-1;
+						f1 = 2
 					end
 					
 					if (i > self.nelems(1))
-						e2 = -1;
+						e2 = -1; f2 = -1;
 					else
 						e2 = (j-1)*self.nelems(1) + i;
+						f2 = 1;
 					end
 				end
 			else
