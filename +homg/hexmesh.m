@@ -520,13 +520,10 @@ end
       else
 	  ind_inner = ind_inner1D + (order+1) * (ind_inner1D'-1);
 	  ind_inner = repmat(ind_inner, [1,1,order-1]);
-          for i = 2:order
+          for i = 1:order-1
 	      ind_inner(:,:,i) = ind_inner(:,:,i) + i * (order+1)^2;
 	      end
       end
-      %is_inner = ismember(1:NP, ind_inner(:));
-      %is_inner1 = repmat(is_inner,NP,1);
-      %is_inner2 = reshape(repmat(is_inner',NP,1),NPNP,1);
       
       % loop over elements
       for e=1:ne
