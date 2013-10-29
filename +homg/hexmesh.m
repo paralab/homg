@@ -514,6 +514,19 @@ end
       mass_val      = zeros(ne * NPNP, 1);
       stiff_val     = zeros(ne * NPNP, 1);
       inv_stiff_val = zeros(ne * NPNP, 1);
+      ind_inner1D = repmat((2:order)', 1, order-1);
+      if self.dim == 2
+	      ind_inner = ind_inner1D + (order+1) * (ind_inner1D'-1);
+      else
+	  ind_inner = ind_inner1D + (order+1) * (ind_inner1D'-1);
+	  ind_inner = repmat(ind_inner, [1,1,order-1]);
+          for i = 2:order
+	      ind_inner(:,:,i) = ind_inner(:,:,i) + i * (order+1)^2;
+	      end
+      end
+      %is_inner = ismember(1:NP, ind_inner(:));
+      %is_inner1 = repmat(is_inner,NP,1);
+      %is_inner2 = reshape(repmat(is_inner',NP,1),NPNP,1);
       
       % loop over elements
       for e=1:ne
@@ -534,9 +547,11 @@ end
         
         eMat = self.element_stiffness(e, refel, detJac, Jac);
         stiff_val(st:en)     = eMat(:);
-        %% correct this ...
-        eMat = inv(eMat); 
-        inv_stiff_val(st:en) = eMat(:);
+      
+        eMat_inner_inv = inv(eMat(ind_inner,ind_inner));
+        eMat_inv = eMat;
+        eMat_inv(ind_inner(:),ind_inner(:)) =  eMat_inner_inv;
+        inv_stiff_val(st:en) = eMat_inv(:);
       end
       M = sparse(I,J,mass_val,dof,dof);
       % zero dirichlet bdy conditions
@@ -555,6 +570,9 @@ end
       
       K  = sparse(I,J,stiff_val,dof,dof);
       iK = sparse(I,J,inv_stiff_val,dof,dof);
+      ebdy = self.get_element_boundary_node_indices(order);
+      
+      iK(ebdy,ebdy);
     end
 
 % 
@@ -760,8 +778,30 @@ end
         
         idx = unique(idx);
       end
-		end
-		
+        end
+        
+		function idx = get_element_boundary_node_indices(self, order)
+	  % function idx = get_element_boundary_node_indices(self, order)
+      %    returns indices of element boundary nodes, for block 
+      %    Jacobi smoother       
+      if (self.dim == 2)
+        [x,y] = ndgrid(1:self.nelems(1)*order+1,1:self.nelems(2)*order+1);
+        
+        idx = [ find(mod(x,order) == 1);
+                find(mod(y,order) == 1);];
+        
+        idx = unique(idx);
+      else 
+         [x,y,z] = ndgrid(1:self.nelems(1)*order+1,1:self.nelems(2)*order+1,1:self.nelems(3)*order+1);
+         
+         idx = [ find(mod(x,order) == 1);
+                 find(mod(y,order) == 1);
+                 find(mod(z,order) == 1);];
+        
+        idx = unique(idx);
+      end
+        end
+    
     function Me = element_mass(self, eid, refel, J)
       % element mass matrix
       Md = refel.W .* J ; 
