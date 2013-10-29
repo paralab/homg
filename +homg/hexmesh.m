@@ -572,7 +572,8 @@ end
       iK = sparse(I,J,inv_stiff_val,dof,dof);
       ebdy = self.get_element_boundary_node_indices(order);
       
-      diag(iK(ebdy,ebdy)) = 1./diag(iK(ebdy,ebdy));
+      iKebdry = diag(iK(ebdy,ebdy));
+      iK(ebdy,ebdy) = diag(1./iKebdry);
     end
 
 % 
