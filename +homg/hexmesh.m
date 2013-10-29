@@ -1075,6 +1075,33 @@ end
 			
 		end
 		
+		function idx = get_skeletal_face_indices(self, refel, elem, fid) 
+			NP = (refel.Nrp)^(refel.dim - 1);
+			[i,j] = ind2sub (self.nelems, elem);
+			
+			if (self.dim == 2)
+				assert (fid < 5);
+				nxf = (self.nelems(1)+1) * self.nelems(2);
+				switch fid
+					case 1
+						gfid = sub2ind ([self.nelems(1)+1, self.nelems(2)], i, j);
+					case 2
+						gfid = sub2ind ([self.nelems(1)+1, self.nelems(2)], i+1, j);
+					case 3
+						gfid = nxf + sub2ind ([self.nelems(1), self.nelems(2)+1], i, j);
+					case 4
+						gfid = nxf + sub2ind ([self.nelems(1), self.nelems(2)+1], i+1, j);
+				end
+			
+			else
+				assert (fid < 7);
+			end
+			
+			idx = (gfid-1)*NP + (1:NP);
+		end
+		
+		
+		
 		function [idx, gfid] = get_continuous_face_indices(self, refel, elem, fid)
 			% function [idx, gfid] = get_continuous_face_indices(self, elem, fid)
 			%
@@ -1084,10 +1111,11 @@ end
 			% optionally also returns the global fid (gfid) which can be used to get
 			% the continuous face_nodes_only index via get_face_node_indices()			
 			odr = refel.N;
-			nf = self.get_num_faces();
+			% nf = self.get_num_faces();
 			if (self.dim == 2)
 				assert (fid < 5);
 				
+				nxf = (self.nelems(1)+1) * self.nelems(2);
 				[i,j] = ind2sub (self.nelems, elem);
 				
         i_low   = (i-1)*odr + 1;   i_high =  i*odr + 1;
@@ -1101,10 +1129,10 @@ end
 						gfid = sub2ind ([self.nelems(1)+1, self.nelems(2)], i+1, j);
 						[i,j] = ndgrid(i_high, j_low:j_high);
 					case 3
-						gfid = nf/2 + sub2ind ([self.nelems(1), self.nelems(2)+1], i, j);
+						gfid = nxf + sub2ind ([self.nelems(1), self.nelems(2)+1], i, j);
 						[i,j] = ndgrid(i_low:i_high, j_low);
 					case 4
-						gfid = nf/2 + sub2ind ([self.nelems(1), self.nelems(2)+1], i+1, j);
+						gfid = nxf + sub2ind ([self.nelems(1), self.nelems(2)+1], i+1, j);
 						[i,j] = ndgrid(i_low:i_high, j_high);
 				end 
         
@@ -1113,6 +1141,9 @@ end
 			else
 				% 3d case 
 				assert (fid < 7);
+				
+				% fixme ...
+				nf = (self.nelems(1)+1) * self.nelems(2);
 				
         [i,j,k] = ind2sub (self.nelems, eid);
         

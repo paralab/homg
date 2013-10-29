@@ -36,8 +36,10 @@ classdef refel < handle
         Ph      % interpolation from this element to its 4/8 children
         Pp      % interpolation from this element to its 2p version
 				
-        Mr     % exact 1D Mass matrix (Nrp x Nrp)
+        Mr     % exact 1D Mass matrix (Nrp x Nrp) at gll
         invMr  % and its inverse
+				Mg     % exact 1D Mass matrix (Nrp x Nrp) at gauss
+				invMg
     end
     
     methods
@@ -80,6 +82,7 @@ classdef refel < handle
             elem.Dg     = transpose(elem.Vr \ elem.gradVg);
             
             iVr         = elem.Vr \ eye(order+1);
+						iVg         = elem.Vg \ eye(order+1);
             
             q1d         = transpose (elem.Vr \ elem.Vg);  
             
@@ -128,6 +131,8 @@ classdef refel < handle
             
             elem.Mr     = iVr * iVr';
             elem.invMr  = elem.Mr \ eye(order+1);
+            elem.Mg     = iVg * iVg';
+            elem.invMg  = elem.Mg \ eye(order+1);
             
         end
     end
