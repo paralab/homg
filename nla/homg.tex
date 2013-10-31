@@ -1188,15 +1188,17 @@ based on an algebraic multigrid method.
 
 \begin{table}
 \caption{\label{tab:meshInd} Mesh independence for 2D grid with variable coefficients. Coarsest grid for all cases is $2\times 2$.}
-\begin{tabular}{|c|c|c|c|c|c|c|c|}
+\begin{tabular}{|c|c|c|c|c|c|c|c||c|c|c|c|c|c|c|}
 	\hline
-	order & 4  &  8 & 16 & 32 & 64 & 128 & 256 \\
-	\hline
-	 1    &  3 &  5 &  5 &  5 &  5 &  5  &  5  \\
-	 2    &  5 &  5 &  5 &  5 &  5 &  5  &  5  \\
-	 4    &  5 &  5 &  5 &  4 &  4 &  4  &  4  \\
-	 8    &  8 &  7 &  7 &  7 &  7 &  6  &  6  \\
-	 16   & 15 & 13 & 13 & 12 & 10 &  -  &  -  \\
+	 & \multicolumn{7}{c||}{unit square, constant} & \multicolumn{7}{c|}{warped square, variable} \\  
+  \hline
+	order & 4  &  8 & 16 & 32 & 64 & 128 & 256 & 4  &  8 & 16 & 32 & 64 & 128 & 256 \\
+	\hline 
+	 1    &  3 &  4 &  4 &  4 &  4 &  4  &  4  & 3  &  4 & 5  &  5 &  5 &  5  &  5  \\
+	 2    &  4 &  4 &  4 &  4 &  4 &  4  &  4  & 5  &  5 & 5  &  5 &  5 &  5  &  5  \\
+	 4    &  5 &  5 &  4 &  4 &  4 &  4  &  4  & 6  &  6 & 7  &  7 &  7 &  7  &  7  \\
+	 8    &  6 &  6 &  6 &  6 &  6 &  6  &  6  & 9  &  9 & 9  &  9 &  9 &  9  &  9  \\
+	 16   &  9 &  9 &  9 &  9 &  9 &  -  &  -  & 13 & 13 & 13 & 13 & 13 &  -  &  -  \\
 	 \hline
 \end{tabular}
 
