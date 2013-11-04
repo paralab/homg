@@ -818,29 +818,29 @@ end
       
     end
     
-    
-    function [J, D] = geometric_factors( self, refel, pts )
+    function [J, D] = geometric_factors_gll ( self, refel, pts )
       % Np =  refel.Nrp ^ mesh.dim;
       
-      % compute x,y,z for element
-      % pts = self.element_nodes(elem, refel);
-        
-      % change to using Qx etc ?
-      if (refel.dim == 2)
-        [xr, xs] = homg.tensor.grad2 (refel.Dg, pts(:,1));
-        [yr, ys] = homg.tensor.grad2 (refel.Dg, pts(:,2));
+      if (refel.dim == 1)
+        xr  = refel.Dr*pts; 
+        J = xr; 
+      elseif (refel.dim == 2)
+        [xr, xs] = homg.tensor.grad2 (refel.Dr, pts(:,1));
+        [yr, ys] = homg.tensor.grad2 (refel.Dr, pts(:,2));
       
         J = -xs.*yr + xr.*ys;
       else
-        [xr, xs, xt] = homg.tensor.grad3 (refel.Dg, pts(:,1));
-        [yr, ys, yt] = homg.tensor.grad3 (refel.Dg, pts(:,2));
-        [zr, zs, zt] = homg.tensor.grad3 (refel.Dg, pts(:,3));
+        [xr, xs, xt] = homg.tensor.grad3 (refel.Dr, pts(:,1));
+        [yr, ys, yt] = homg.tensor.grad3 (refel.Dr, pts(:,2));
+        [zr, zs, zt] = homg.tensor.grad3 (refel.Dr, pts(:,3));
         
         J = xr.*(ys.*zt-zs.*yt) - yr.*(xs.*zt-zs.*xt) + zr.*(xs.*yt-ys.*xt);
       end
       
       if (nargout > 1)
-        if (refel.dim == 2)
+        if (refel.dim == 1)
+          D.rx = 1./J;
+        elseif (refel.dim == 2)
           D.rx =  ys./J;
           D.sx = -yr./J;
           D.ry = -xs./J;
@@ -860,6 +860,70 @@ end
         end
         
       end
+    end
+    
+    function [J, D] = geometric_factors( self, refel, pts )
+      % Np =  refel.Nrp ^ mesh.dim;
+      
+      % compute x,y,z for element
+      % pts = self.element_nodes(elem, refel);
+        
+      % change to using Qx etc ?
+      if (refel.dim == 1)
+        xr  = refel.Dg*pts; 
+        J = xr; 
+      elseif (refel.dim == 2)
+        [xr, xs] = homg.tensor.grad2 (refel.Dg, pts(:,1));
+        [yr, ys] = homg.tensor.grad2 (refel.Dg, pts(:,2));
+      
+        J = -xs.*yr + xr.*ys;
+      else
+        [xr, xs, xt] = homg.tensor.grad3 (refel.Dg, pts(:,1));
+        [yr, ys, yt] = homg.tensor.grad3 (refel.Dg, pts(:,2));
+        [zr, zs, zt] = homg.tensor.grad3 (refel.Dg, pts(:,3));
+        
+        J = xr.*(ys.*zt-zs.*yt) - yr.*(xs.*zt-zs.*xt) + zr.*(xs.*yt-ys.*xt);
+      end
+      
+      if (nargout > 1)
+        if (refel.dim == 1)
+          D.rx = 1./J;
+        elseif (refel.dim == 2)
+          D.rx =  ys./J;
+          D.sx = -yr./J;
+          D.ry = -xs./J;
+          D.sy =  xr./J;
+        else
+          D.rx =  (ys.*zt - zs.*yt)./J;
+          D.ry = -(xs.*zt - zs.*xt)./J;
+          D.rz =  (xs.*yt - ys.*xt)./J;
+          
+          D.sx = -(yr.*zt - zr.*yt)./J;
+          D.sy =  (xr.*zt - zr.*xt)./J;
+          D.sz = -(xr.*yt - yr.*xt)./J;
+          
+          D.tx =  (yr.*zs - zr.*ys)./J;
+          D.ty = -(xr.*zs - zr.*xs)./J;
+          D.tz =  (xr.*ys - yr.*xs)./J;
+        end
+        
+      end
+    end
+    
+    function [J, D] = geometric_factors_face (self, refel, elid, fid)
+      ref_face = homg.refel(refel.dim - 1, refel.N);
+      % location of volume nodes ...  
+      pts = self.element_nodes(e, refel);
+      
+      idx = self.get_discontinuous_face_indices(refel, elid, fid)
+
+      if (fid < 3) 
+        pts_face = pts(idx, 2);
+      else
+        pts_face = pts(idx, 1);
+      end
+
+      [J, D] = self.geometric_factors_gll ( ref_face, pts_face )
     end
     
     function coords = linear_element_nodes(self, elem, order) 
