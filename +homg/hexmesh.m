@@ -913,9 +913,9 @@ end
     function [J, D] = geometric_factors_face (self, refel, elid, fid)
       ref_face = homg.refel(refel.dim - 1, refel.N);
       % location of volume nodes ...  
-      pts = self.element_nodes(e, refel);
+      pts = self.element_nodes(elid, refel);
       
-      idx = self.get_discontinuous_face_indices(refel, 1, fid)
+      idx = self.get_discontinuous_face_indices(refel, 1, fid);
 
       if (fid < 3) 
         pts_face = pts(idx, 2);
@@ -923,7 +923,7 @@ end
         pts_face = pts(idx, 1);
       end
 
-      [J, D] = self.geometric_factors_gll ( ref_face, pts_face )
+      [J, D] = self.geometric_factors_gll ( ref_face, pts_face );
     end
     
     function coords = linear_element_nodes(self, elem, order) 
