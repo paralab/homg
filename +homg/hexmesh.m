@@ -915,7 +915,7 @@ end
       % location of volume nodes ...  
       pts = self.element_nodes(e, refel);
       
-      idx = self.get_discontinuous_face_indices(refel, elid, fid)
+      idx = self.get_discontinuous_face_indices(refel, 1, fid)
 
       if (fid < 3) 
         pts_face = pts(idx, 2);
