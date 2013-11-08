@@ -10,8 +10,10 @@ classdef refel < handle
         r      % 1D reference coordinates of the interpolation nodes ( 1 x Nrp )
         g      % 1D reference coordinates of the gauss quadrature points
         w      % 1d weights for gauss quadrature
+        wgll   % 1d weights for gll   quadrature
         
-        W      % dim-dimensional weights 
+        W      % dim-dimensional weights (gauss) 
+        Wgll   % dim-dimensional weights (gll)
         
         Vr     % 1D Vandermonde matrix of Legendre polynomials at r 
         gradVr %     and their derivative (Nrp x Nrp)
@@ -32,6 +34,7 @@ classdef refel < handle
         Qy
         Qz
         
+        
         % Prolongation 
         Ph      % interpolation from this element to its 4/8 children
         Pp      % interpolation from this element to its 2p version
@@ -50,7 +53,7 @@ classdef refel < handle
             elem.N      = order;
             elem.Nrp    = order + 1;
             
-            elem.r      = homg.basis.gll (0, 0, elem.N);
+            [elem.r, elem.wgll]  = homg.basis.gll (0, 0, elem.N);
             
             r_hby2      = [0.5*(elem.r - 1); 0.5*(elem.r(2:end) + 1)];
             r_2p        = homg.basis.gll (0, 0, 2*elem.N);
@@ -90,7 +93,7 @@ classdef refel < handle
             p_p_1d      = transpose (elem.Vr \ Vpp);  
 						
             elem.W      = zeros(elem.Nrp^elem.dim, 1);
-            
+            elem.Wgll   = zeros(elem.Nrp^elem.dim, 1);
             if (d == 2)
               elem.Q  = kron(q1d, q1d) ;
               
@@ -103,7 +106,8 @@ classdef refel < handle
               sk = 1;
               for i=1:elem.Nrp
                 for j=1:elem.Nrp
-                  elem.W(sk) = elem.w(i) * elem.w(j);
+                  elem.W(sk)    = elem.w(i) * elem.w(j);
+                  elem.Wgll(sk) = elem.wgll(i) * elem.wgll(j);
                   sk = sk + 1;
                 end
               end
@@ -122,7 +126,8 @@ classdef refel < handle
               for i=1:elem.Nrp
                 for j=1:elem.Nrp
                   for k=1:elem.Nrp
-                    elem.W(sk) = elem.w(i) * elem.w(j) * elem.w(k);
+                    elem.W(sk)    = elem.w(i) * elem.w(j) * elem.w(k);
+                    elem.Wgll(sk) = elem.wgll(i) * elem.wgll(j) * elem.wgll(k);
                     sk = sk + 1;
                   end
                 end

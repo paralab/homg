@@ -89,7 +89,7 @@ classdef basis
                 gamma(beta+1)/gamma(alpha+beta+1);
         end
 
-        function [x] = gll(alpha,beta,N)
+        function [x,w] = gll(alpha,beta,N)
             % function [x] = basis.gll (alpha,beta,N)
             % Purpose: Compute the N'th order Gauss Lobatto quadrature
             %          points, x, associated with the Jacobi polynomial,
@@ -102,8 +102,18 @@ classdef basis
                 return 
             end
             
-            [xint,w] = homg.basis.gauss(alpha+1,beta+1,N-2);
+            [xint,wq] = homg.basis.gauss(alpha+1,beta+1,N-2);
             x = [-1, xint', 1]';
+            
+            % compute the weights
+            w = homg.basis.polynomial (x,alpha, beta, N);
+            adgammaN = (2.0*N + alpha + beta + 1.0) / (N * (alpha + beta + N + 1.0));
+
+            w = w.*w;
+            w = adgammaN./w;
+            
+            w(1)   = w(1)   * (1.0 + alpha);
+            w(end) = w(end) * (1.0 + beta); 
         end
 
         
