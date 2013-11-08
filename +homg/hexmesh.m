@@ -1266,7 +1266,7 @@ end
 						e1 = -1; f1 = -1;
 					else
 						e1 = (j-1)*self.nelems(1) + i-1;
-						f1 = 2
+						f1 = 2;
 					end
 					
 					if (i > self.nelems(1))

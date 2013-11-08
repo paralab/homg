@@ -15,6 +15,8 @@ classdef refel < handle
         W      % dim-dimensional weights (gauss) 
         Wgll   % dim-dimensional weights (gll)
         
+        Wfgll  % face weights (gll)
+        
         Vr     % 1D Vandermonde matrix of Legendre polynomials at r 
         gradVr %     and their derivative (Nrp x Nrp)
         
@@ -41,6 +43,8 @@ classdef refel < handle
 				
         Mr     % exact 1D Mass matrix (Nrp x Nrp) at gll
         invMr  % and its inverse
+        
+        
 				Mg     % exact 1D Mass matrix (Nrp x Nrp) at gauss
 				invMg
     end
@@ -112,6 +116,7 @@ classdef refel < handle
                 end
               end
               
+              Wfgll = elem.wgll;
             else
               elem.Q  = kron(kron(q1d, q1d), q1d);
 							
@@ -123,6 +128,7 @@ classdef refel < handle
               elem.Qz = kron(kron(elem.Dg, q1d), q1d);
               
               sk = 1;
+              sf = 1;
               for i=1:elem.Nrp
                 for j=1:elem.Nrp
                   for k=1:elem.Nrp
@@ -130,6 +136,8 @@ classdef refel < handle
                     elem.Wgll(sk) = elem.wgll(i) * elem.wgll(j) * elem.wgll(k);
                     sk = sk + 1;
                   end
+                  elem.Wfgll(sf) = elem.wgll(i) * elem.wgll(j);
+                  sf = sf + 1;
                 end
               end
             end
