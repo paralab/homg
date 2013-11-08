@@ -39,10 +39,15 @@ for gf=1:NF
       %% volume contributions to the residual
       pts    = m.element_nodes(e1, refel);
       [J, D] = m.geometric_factors(refel, pts);
-      Md = refel.W .* J ;   
+      [Jg, Dg] = m.geometric_factors_gll(refel, pts);
+      
+      % for now the mass matrix term is using gauss quadrature
+      Md = refel.W .* J;   
       Me = refel.Q' * diag(Md) * refel.Q;
 
-      res1x = res1x + homg.tensor.IAX(refel.Dr', u1); 
+      % these are at the gll points 
+      res1x = res1x + refel.Wgll .* Jg .* homg.tensor.IAX(refel.Dr', u1); 
+      
       res1x = res1x + Me*q1x; 
       
       % y term
