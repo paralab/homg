@@ -1131,8 +1131,12 @@ In the next section, we summarize our numerical comparisons.
 
 \subsection{Summary of numerical results}\label{subsec:results}
 
-\subsubsection{Comparison of point smoothers}
-The Tables \ref{tab:box} and \ref{tab:2d-fan} present our results for
+
+
+\subsubsection{Comparison of point smoothers}\label{subsec:num_point}
+The Tables \ref{tab:box} and \ref{tab:2d-fan} present our comparison
+of the performance of point smoothers for the
+
 the two dimensional test problems. As can be seen in
 Table~\ref{tab:box}, for the Laplace problem on the unit square all
 solver/smoothing variants converge for all polynomial orders in a
@@ -1300,8 +1304,11 @@ convergence.
   \end{tabular}
 \end{table}
 
+\subsubsection{Mesh independence of iterations}\label{subsec:num_mesh}
+
 \begin{table}
-\caption{\label{tab:meshInd} Mesh independence for 2D grid with variable coefficients. Coarsest grid for all cases is $2\times 2$.}
+\caption{\label{tab:meshInd} Mesh independence for 2D grid with
+  variable coefficients. Coarsest grid for all cases is $2\times 2$.}
 \begin{tabular}{|c|c|c|c|c|c|c|c||c|c|c|c|c|c|c|}
 	\hline
 	 & \multicolumn{7}{c||}{unit square, constant} & \multicolumn{7}{c|}{warped square, variable} \\  
@@ -1317,6 +1324,9 @@ convergence.
 \end{tabular}
 
 \end{table}
+
+\subsubsection{Performance of block Jacobi smoother}\label{subsec:num_block}
+
 
 
 \begin{table}
