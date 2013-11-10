@@ -1331,17 +1331,19 @@ convergence.
 
 \begin{table}
 	\caption{\label{tab:block-jac} Block-Jacobi smoother compared with the point-Jacobi smoother.}
+\begin{center}
 
 \begin{tabular}{|c|c|c|c|c|c|c|}
 	\hline
 	order & \multicolumn{2}{c|}{unit square, constant} & \multicolumn{2}{c|}{warped square, variable} & \multicolumn{2}{c|}{warped cube, variable} \\
 	\cline{2-7}
-	 & MG & pCG & MG & pCG & MG & pCG \\
+	 & MG & pCG  & MG & pCG & MG & pCG \\
 	\hline
-	8     & \\
-	16    & \\
+	8  & 16 & 8  &  31  & 12 & 46? & 16? \\
+	16 & 31 & 12 &  61  & 17 &  -  &  -  \\
 	\hline
 \end{tabular}
+\end{center}
 \end{table}
 
 
