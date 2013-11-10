@@ -1039,7 +1039,7 @@ results for our test problem are then presented and discussed
 \S\ref{subsec:results}.
 
 
-\subsection{Presentation of test problems}\label{subsec:tests}
+\subsection{Test problems}\label{subsec:tests}
 We compare our algorithms for the solution of~\eqref{eq:Poisson} on a
 unit square and a unit cube with constant coefficient $\mu\equiv 1$,
 as well as on the warped two and three dimensional domains shown in
@@ -1130,14 +1130,17 @@ particular, these tables report the following.
 In the next section, we summarize our numerical comparisons.
 
 \subsection{Summary of numerical results}\label{subsec:results}
-
-
+Next, in Section~\ref{subsec:num_point}, we compare the performance of
+different point smoothers for the test problems presented in
+Section~\ref{subsec:tests}. Then, in Section~\ref{subsec:num_mesh}, we
+illustrate that the number of iterations is independent of the mesh
+resolution. Finally, in Section~\ref{subsec:num_block} we study the
+performance of block Jacobi smoothing for high order discretizations.
 
 \subsubsection{Comparison of point smoothers}\label{subsec:num_point}
-The Tables \ref{tab:box} and \ref{tab:2d-fan} present our comparison
-of the performance of point smoothers for the
-
-the two dimensional test problems. As can be seen in
+Tables \ref{tab:box} and \ref{tab:2d-fan} present the number of
+iterations obtained for various point smoothers and different
+polynomial orders for the two dimensional test problems. As can be seen in
 Table~\ref{tab:box}, for the Laplace problem on the unit square all
 solver/smoothing variants converge for all polynomial orders in a
 relatively small number of iterations. However, the number of
