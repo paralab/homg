@@ -743,9 +743,9 @@ satisfactory rate.
 		\node[fill=blue!70, draw, circle,minimum width=0.1cm] at (4.3, 5.0) {}; 
 		\node[fill=red!70!black, draw, circle,minimum width=0.1cm] at (4.3, 4.5) {};
 		\node[fill=green!70!black, draw, circle,minimum width=0.1cm] at (4.3, 4.0) {};
-		\node[text width=1.9cm] at (5.75, 5.0) {\small jacobi $(6)$};
-		\node[text width=1.9cm] at (5.75, 4.5) {\small chebyshev $(6)$};
-		\node[text width=1.9cm] at (5.75, 4.0) {\small ssor $(3)$};
+		\node[text width=1.9cm] at (5.75, 5.0) {\small Jacobi$(6)$};
+		\node[text width=1.9cm] at (5.75, 4.5) {\small Chebyshev$(6)$};
+		\node[text width=1.9cm] at (5.75, 4.0) {\small SSOR$(3)$};
 		\end{tikzpicture}
 		\begin{tikzpicture}[scale=0.8]
 		\begin{semilogyaxis}[ymajorgrids,ymin=1e-5,ymax=2,xmin=0,xmax=961,yticklabels={,,}]
@@ -760,9 +760,9 @@ satisfactory rate.
 		\node[fill=blue!70, draw, circle,minimum width=0.1cm] at (4.0, 5.0) {}; 
 		\node[fill=red!70!black, draw, circle,minimum width=0.1cm] at (4.0, 4.5) {};
 		\node[fill=green!70!black, draw, circle,minimum width=0.1cm] at (4.0, 4.0) {};
-		\node[text width=2.1cm] at (5.55, 5.0) {\small jacobi $(3,3)$};
-		\node[text width=2.1cm] at (5.55, 4.5) {\small chebyshev $(3,3)$};
-		\node[text width=2.1cm] at (5.55, 4.0) {\small ssor $(2,1)$};
+		\node[text width=2.1cm] at (5.55, 5.0) {\small Jacobi$(3,3)$};
+		\node[text width=2.1cm] at (5.55, 4.5) {\small Chebyshev$(3,3)$};
+		\node[text width=2.1cm] at (5.55, 4.0) {\small SSOR$(2,1)$};
 		\end{tikzpicture}
 	\\
 		\begin{tikzpicture}[scale=0.8]
@@ -839,9 +839,9 @@ satisfactory rate.
 		\node[fill=blue!70, draw, circle,minimum width=0.1cm] at (4.3, 5.0) {}; 
 		\node[fill=red!70!black, draw, circle,minimum width=0.1cm] at (4.3, 4.5) {};
 		\node[fill=green!70!black, draw, circle,minimum width=0.1cm] at (4.3, 4.0) {};
-		\node[text width=1.9cm] at (5.75, 5.0) {\small jacobi $(6)$};
-		\node[text width=1.9cm] at (5.75, 4.5) {\small chebyshev $(6)$};
-		\node[text width=1.9cm] at (5.75, 4.0) {\small ssor $(3)$};
+		\node[text width=1.9cm] at (5.75, 5.0) {\small Jacobi$(6)$};
+		\node[text width=1.9cm] at (5.75, 4.5) {\small Chebyshev$(6)$};
+		\node[text width=1.9cm] at (5.75, 4.0) {\small SSOR$(3)$};
 		\end{tikzpicture}
 		\begin{tikzpicture}[scale=0.8]
 		\begin{semilogyaxis}[ymajorgrids,ymin=1e-5,ymax=2,xmin=0,xmax=961,yticklabels={,,}]
@@ -855,9 +855,9 @@ satisfactory rate.
 		\node[fill=blue!70, draw, circle,minimum width=0.1cm] at (4.0, 5.0) {}; 
 		\node[fill=red!70!black, draw, circle,minimum width=0.1cm] at (4.0, 4.5) {};
 		\node[fill=green!70!black, draw, circle,minimum width=0.1cm] at (4.0, 4.0) {};
-		\node[text width=2.1cm] at (5.55, 5.0) {\small jacobi $(3,3)$};
-		\node[text width=2.1cm] at (5.55, 4.5) {\small chebyshev $(3,3)$};
-		\node[text width=2.1cm] at (5.55, 4.0) {\small ssor $(2,1)$};
+		\node[text width=2.1cm] at (5.55, 5.0) {\small Jacobi$(3,3)$};
+		\node[text width=2.1cm] at (5.55, 4.5) {\small Chebyshev$(3,3)$};
+		\node[text width=2.1cm] at (5.55, 4.0) {\small SSOR$(2,1)$};
 		\end{tikzpicture}
 	\\
 		\begin{tikzpicture}[scale=0.8]
@@ -921,6 +921,8 @@ solution \cite{LottesFischer05, FischerLottes05}. However, the
 coarse-grid solves can become fairly expensive. Moreover, depending on
 how much overlap between the domains is used, it is not
 straightforward to achieve good parallel scalability.
+\todo{Needs update}
+
 
 \subsection{Comparing computational cost}\label{subsec:complexity}
 To compare the computational cost of the different methods, we focus
