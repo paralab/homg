@@ -1038,34 +1038,33 @@ In this section we present a comprehensive comparison of our
 algorithms for the solution of high-order discretizations of
 \eqref{eq:Poisson}.  After introducing our test problems in
 \S\ref{subsec:tests}, in \S\ref{subsec:measures} we
-describe how we compare our methods for high-order multigrid. The
-results for our test problem are then presented and discussed
+discuss how we compare different methods for high-order multigrid. The
+results of these comparisons are presented and discussed
 \S\ref{subsec:results}.
 
 
 \subsection{Test problems}\label{subsec:tests}
-We compare our algorithms for the solution of~\eqref{eq:Poisson} on a
-unit square and a unit cube with constant coefficient $\mu\equiv 1$,
-as well as on the warped two and three dimensional domains shown in
-Figure~\ref{fig:mesh}, where we use a varying coefficient $\mu(\bs
-x)$. 
-% \todo{How anisotropic is the 2d-fan mesh? Probably we also have to update the mesh plots.}  
-The coefficient $\mu$ at the coarse grid quadrature points is
-computed as the linear interpolation of the coefficient at the fine
-grid quadrature points. In our tests, we change the polynomial degree of
-the finite element functions but keep the same mesh; this results in
-an increasing number of unknowns as $p$ increases. It is important to 
-point out that mesh independence is acheived for all $p$, therefore
-the results are similar for larger mesh sizes as well.
+We compare our algorithms for the solution of~\eqref{eq:Poisson} with
+constant coefficient $\mu\equiv 1$ on a unit square and a unit cube,
+and, with varying coefficients $\mu(\bs x)$, on the warped two and
+three dimensional domains shown in Figure~\ref{fig:mesh}.  The
+coefficient $\mu$ at the coarse grid quadrature points is computed as
+the linear interpolation of the coefficient at the fine grid
+quadrature points. In our tests, we change the polynomial degree of
+the finite element functions, but retain the same mesh; this results
+in an increasing number of unknowns as $p$ increases. Since, as
+illustrated in \S\ref{subsec:num_mesh}, mesh independence is observed
+for all polynomial orders $p$, these results coincide with those
+obtained for larger mesh sizes.
 
 \begin{figure}
 	\includegraphics[width=0.48\textwidth]{figs/fan2d}
 	%\input{tikz/fan.tikz}
 	%\input{tikz/fan-3d.tikz}
 	\includegraphics[width=0.48\textwidth]{figs/fan3d}
-	\caption{\label{fig:mesh} Two and three dimensional warped
+	\caption{\label{fig:mesh} Two and three-dimensional warped
           meshes used in our numerical experiments. The color
-          illustrates the value of the coefficient $\mu(\bs x)\in [1.0,
+          illustrates the logarithm of the coefficient $\mu(\bs x)\in [1.0,
             d\cdot 10^6]$.}
 \end{figure}
 
@@ -1073,7 +1072,7 @@ the results are similar for larger mesh sizes as well.
 Tables \ref{tab:box}--\ref{tab:3d-fan} present the number of multigrid
 v-cycles or of conjugate gradient (CG) iterations required to reduce
 the norm of the discrete residual by a factor of $10^8$. In
-particular, these tables report the following.
+particular, these tables report the following convergence information:
 \begin{itemize}
 \item[$\bullet$] The first column gives the polynomial \emph{order}
   used in the finite element discretization.
@@ -1085,13 +1084,15 @@ particular, these tables report the following.
     post-smoothing steps of a pointwise Jacobi smoother are used on
     each level.
   \item \emph{Cheb(3,3)} indicates that Chebyshev-accelerated Jacobi
-    smoothing is used, again with 3 pre-smoothing and 3
-    post-smoothing steps. The maximal eigenvalue required by the
-    Chebyshev method is estimated using 10 Arnoldi iterations.
+    smoothing is used, again with 3 pre-smoothing and 3 post-smoothing
+    steps. An estimate of the maximal eigenvalue of the linear system,
+    as required by the Chebyshev method, is estimated using 10 Arnoldi
+    iterations.
   \item \emph{SSOR(2,1)} denotes that a symmetric successive
     over-relaxation method is employed, where 2 pre-smoothing and 1
-    post-smoothing step are employed. Note that each SSOR smoothing
-    iteration amounts to a forward and a backward v-cycle, and thus
+    post-smoothing step are used. Note that each SSOR smoothing
+    iteration amounts to a forward and a backward Gauss-Seidel
+    smoothing step, and thus roughly
     requires double the computational work compared to Jacobi
     smoothing.\footnote{This ignores aspects occurring in parallel
       environments, where Gauss-Seidel smoothing---such as SSOR---can
@@ -1099,37 +1100,47 @@ particular, these tables report the following.
       distributed memory environments.}. The SSOR smoother is based on 
 			a lexicographic ordering of  the unknowns. 
   \end{itemize}
-  \item For the 2D meshes, Tables~\ref{tab:box}-\ref{tab:2d-fan}, we use 
-  three $h$-grids of sizes $32\times32$, $16\times16$ and $8\times8$. For 
-  the 3D meshes, Tables~\ref{tab:3d-box}-\ref{tab:3d-fan}, we use grids of 
-  sizes $8\times8\times8$, $4\times4\times4$ and $2\times2\times2$.
-  Note that for each smoother we report results for
-  $h$-multigrid (columns marked by \emph{h}; see
-  \S\ref{subsec:h}) as well as for $p$-multigrid (columns marked
-  by \emph{p}; see \S\ref{subsec:p}). For $p$-multigrid, we
-  restrict ourselves to orders that are powers of 2. After
-  coarsening in $p$ till $p=1$, we coarsen in $h$. For example in the 2D case, 
-  for $p=16$, we will have a total of 7 grids; the first 5 shall be grids of 
-  size $32\times32\times32$ with $p=16,8,4,2,1$, respectively, followed by 
-  two additional coarse grids of size $16\times16$ and $8\times8$ and $p=1$.
+  \item For the 2D tests reported in
+    Tables~\ref{tab:box}-\ref{tab:2d-fan}, we use three different
+    meshes $32\times32$, $16\times16$ and $8\times8$ elements in the
+    multigrid v-cycle. For the v-cycle for the 3D tests reported in
+    Tables~\ref{tab:3d-box}-\ref{tab:3d-fan}, meshes with
+    $8\times8\times8$, $4\times4\times4$ and $2\times2\times2$
+    elements are used.  Note that for each smoother we report results
+    for $h$-multigrid (columns marked by \emph{h}; see
+    \S\ref{subsec:h}) as well as for $p$-multigrid (columns marked by
+    \emph{p}; see \S\ref{subsec:p}). For $p$-multigrid, we restrict
+    ourselves to orders that are powers of 2. After coarsening in $p$
+    till $p=1$, we coarsen in $h$. For example, in the 2D case, for
+    $p=16$, we will have a total of 7 grids; the first 5 are
+    grids of size $32\times32\times32$ with $p=16,8,4,2,1$,
+    respectively, followed by two additional coarse grids of size
+    $16\times16$ and $8\times8$, and $p=1$.
 \item[$\bullet$] The columns entitled \emph{MG with pCG} presents our
   results obtained when multigrid is uses as preconditioner in a CG
   algorithm. A single multigrid v-cycle is used per CG iteration. The sub-columns 
   again correspond to different smoothers, as described above.
-\item[$\bullet$] The columns headed by \emph{linearized pCG} present
+\item[$\bullet$] The columns headed by \emph{low-order pCG} present
   the number of CG iterations needed to solve the high-order system
   preconditioned with the low-order operator based on the high-order
-  node points (see \S\ref{subsec:low}). While in practice one
-  would most likely use an algebraic multigrid cycle to approximately
-  solve the linearized system, here we use a direct factorization
-  method as solver for the low-order system. The different columns
-  correspond to different numbers of Chebyshev-accelerated Jacobi
-  smoothing steps on the finest mesh. These smoothing steps use the
-  high-order residual but the diagonal from the low-order system. As a
-  consequence, the Chebyshev smoother requires an estimate of the
-  largest eigenvalue of the high-order matrix preconditioned with the
-  diagonal of the low-order operator, which is computed using
-  10 iterations of the Arnoldi algorithm.
+  nodal points (see \S\ref{subsec:low}). \todo{While in practice one
+    would use an algebraic multigrid cycle to approximately solve the
+    linearized system, here we use a direct factorization method as
+    solver for the low-order system. The difference between the two
+    subcolumns is the way the residual is computed in the smoother on
+    the finest mesh; the experiments reported in the column headed by
+    \emph{low} use the residual computed from the low-order system in
+    the smoother, while the column headed by \emph{high} evaluates the
+    smoother based on the high-order system matrix. Both residual
+    computations require matrix-vector products with $N$ unknowns, but
+    the low-order operator is sparser and thus, in general, faster to
+    apply.  Both cases use 3 pre and post-smoothing steps of a
+    Chebyshev-accelerate Jacobi point smoother, and the diagonal of
+    the low-order system.  For that latter case, the Chebyshev
+    smoother requires an estimate of the largest eigenvalue of the
+    high-order matrix preconditioned with the diagonal of the
+    low-order operator, which is computed using 10 iterations of the
+    Arnoldi algorithm.}
 \end{itemize}
 In the next section, we summarize our numerical comparisons.
 
