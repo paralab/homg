@@ -1355,17 +1355,18 @@ convergence.
 \end{table}
 
 \subsubsection{Mesh independence of iterations}\label{subsec:num_mesh}
-To illustrate the mesh-independence of multigrid-based solvers, we
-compare the number of v-cycles required for the solution of a problem
-discretized on different meshes. In all tests, the coarsest mesh in
-the multigrid hierarchy is kept the same and, thus, the number of
-levels in the hierarchy increases as the problem is discretized on a
-finer mesh. As can be seen in Table~\ref{tab:meshInd}, once the mesh
-is sufficiently fine, the number of iterations remains the same for
-all polynomial orders.
+To illustrate the mesh-independence of our multigrid-based solvers, we
+compare the number of v-cycles required for the solution of a problem,
+which has been discretized using different meshes. In all tests, the
+coarsest mesh in the multigrid hierarchy is kept the same and, thus,
+the number of levels in the hierarchy increases as the problem is
+discretized on a finer mesh. As can be seen in
+Table~\ref{tab:meshInd}, once the mesh is sufficiently fine, for all
+polynomial orders the number of iterations remains the same.
 \begin{table}[h]\centering
 \caption{\label{tab:meshInd} Number of v-cycles required for the
-  solution of the two-dimensional test problems for differently fine
+  solution of the two dimensional problems {\bf 2d-const} and {\bf
+    2d-var} defined in \S\ref{subsec:tests} for differently fine
   meshes and different polynomial orders. The coarsest grid for all
   cases has $2\times 2$ elements. In this comparison, multigrid with
   SSOR(2,1) smoothing is used as preconditioner in the conjugate
@@ -1373,7 +1374,8 @@ all polynomial orders.
   corresponding test due to the large size of the problem.}
 \begin{tabular}{|c|c|c|c|c|c|c|c||c|c|c|c|c|c|c|}
 	\hline
-	 & \multicolumn{7}{c||}{unit square, constant} & \multicolumn{7}{c|}{warped square, variable} \\  
+	 & \multicolumn{7}{c||}{\bf 2d-const} &
+        \multicolumn{7}{c|}{\bf 2d-var} \\  
   \hline
 	order & 4  &  8 & 16 & 32 & 64 & 128 & 256 & 4  &  8 & 16 & 32 & 64 & 128 & 256 \\
 	\hline 
@@ -1388,24 +1390,34 @@ all polynomial orders.
 \end{table}
 
 \subsubsection{Performance of block Jacobi smoother}\label{subsec:num_block}
-
-
-
-\begin{table}
-	\caption{\label{tab:block-jac} Block-Jacobi smoother compared with the point-Jacobi smoother.}
-\begin{center}
-
+Schwarz-type domain decomposition smoothers are particularly promising
+for high polynomial orders, such as order 8 or higher. Results
+obtained with an element-wise block Jacobi preconditioner for orders 8
+and 16 are summarized in Table~\ref{tab:block-jac}. For this
+comparison, we invert the element matrices exactly, which can be
+problematic with respect to computational time as well as storage in
+realistic problems, in particular for warped meshes and very high
+polynomial orders. As can be seen in Table~\ref{tab:block-jac}, the
+number of iterations is reduced compared to pointwise Jacobi
+smoothing; however, the gained efficiency reduces when multigrid is
+used as a preconditioner in CG rather than as a solver.
+\begin{table}\centering
+	\caption{\label{tab:block-jac} Comparison between block-Jacobi
+          and point-Jacobi smoothing. Shown is the number of
+          iterations for three of our test problems, obtained with 3
+          pre and 3 post-smoothing steps. Shown in brackets is the
+          number of iterations requires for point Jacobi smoothing.}
 \begin{tabular}{|c|c|c|c|c|c|c|}
 	\hline
-	order & \multicolumn{2}{c|}{unit square, constant} & \multicolumn{2}{c|}{warped square, variable} & \multicolumn{2}{c|}{warped cube, variable} \\
+	order & \multicolumn{2}{c|}{\bf 2d-const} &
+        \multicolumn{2}{c|}{\bf 2d-var} & \multicolumn{2}{c|}{\bf 3d-var} \\
 	\cline{2-7}
 	 & MG & pCG  & MG & pCG & MG & pCG \\
 	\hline
-	8  & 16 & 8  &  31  & 12 & 46? & 16? \\
-	16 & 31 & 12 &  61  & 17 &  -  &  -  \\
+	8  & 16(17) & 8(9)   &  31(-)  & 12(20) & 46?(-) & 16?(18) \\
+	16 & 31(40) & 12(14) &  61(-)  & 17(51) &  ? (-)  &  ?(67)  \\
 	\hline
 \end{tabular}
-\end{center}
 \end{table}
 
 
