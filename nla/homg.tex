@@ -1051,20 +1051,19 @@ and, with varying coefficients $\mu(\bs x)$, on the warped two and
 three dimensional domains shown in Figure~\ref{fig:mesh}. To be
 precise, we consider the following four problems:
 \begin{itemize}
-\item[] {\bf 2d-const:} The domain is the unit square, and $\mu\equiv
+\item[] {\bf 2d-const:} The domain for the problem is the unit square, and $\mu\equiv
   1$.
-\item[] {\bf 2d-var:} The two-dimensional computational domain is
-  shown on the left in Figure~\ref{fig:mesh}, and the varying coefficient
-  is $\mu(x,y) = 1 + 10^6(\cos^2(2\pi x) + \cos^2(2\pi y))$.
-\item[] {\bf 3d-const:} The domain is the unit cube, and we use the
-  constant coefficient $\mu\equiv 1$.
-\item[] {\bf 3d-var:} The three-dimensional computational domain is
-  shown on the right in Figure~\ref{fig:mesh}, and the varying
-  coefficient is $\mu(x,y,z) = 1 + 10^6(\cos^2(2\pi x) + \cos^2(2\pi
-  y) + \cos^2(2\pi z))$.
+\item[] {\bf 2d-var:} The warped two-dimensional domain for this
+  problem is shown on the left in Figure~\ref{fig:mesh}, and the
+  varying coefficient is $\mu(x,y) = 1 + 10^6(\cos^2(2\pi x) +
+  \cos^2(2\pi y))$.
+\item[] {\bf 3d-const:} The domain for this problem is the unit cube,
+  and we use the constant coefficient $\mu\equiv 1$.
+\item[] {\bf 3d-var:} The warped three-dimensional domain for this
+  problem is shown on the right of Figure~\ref{fig:mesh}, and the
+  varying coefficient is $\mu(x,y,z) = 1 + 10^6(\cos^2(2\pi x) +
+  \cos^2(2\pi y) + \cos^2(2\pi z))$.
 \end{itemize}
-
-
 
 The
 coefficient $\mu$ at the coarse grid quadrature points is computed as
@@ -1206,10 +1205,12 @@ based on an algebraic multigrid method.
 
 \begin{table}
   \caption{\label{tab:box} Results for two-dimensional unit square
-    with constant coefficient $\mu\equiv 1$.  A total of 3 grids were
-    used, the finest grid was $32\times 32$, and the coarsest was
-    $8\times 8$. For a detailed description of the different
-    experiments reported in this table we refer to
+    problem {\bf 2d-const} defined in \S\ref{subsec:tests}.
+%  A total
+%    of 3 grids were used, the finest grid was $32\times 32$, and the
+%    coarsest was $8\times 8$.
+    For a detailed description of the
+    different experiments reported in this table we refer to
     \S\ref{subsec:measures}.}  \centering
   \begin{tabular}{|r|c c|c c|c c||c c|c c|c c||c c|} 
     \hline
@@ -1265,9 +1266,12 @@ convergence.
 
 
 \begin{table}
-  \caption{\label{tab:2d-fan} Results for two-dimensional warped
-    geometry with .  A total of 3 grids were used, the finest
-    grid was $32\times 32$, and the coarsest was $8\times 8$. For a
+  \caption{\label{tab:2d-fan} Results for two-dimensional
+    warped-geometry, varying coefficient problem {\bf 2d-var} defined
+    in \S\ref{subsec:tests}.
+%  A total of 3 grids were used, the finest
+%    grid was $32\times 32$, and the coarsest was $8\times 8$.
+    For a
     detailed description of the different experiments reported in this
     table we refer to \S\ref{subsec:measures}.}  \centering
   \begin{tabular}{|r|c c|c c|c c||c c|c c|c c||c c|} 
@@ -1294,8 +1298,8 @@ convergence.
 
 
 \begin{table}
-  \caption{\label{tab:3d-box} Results for three-dimensional cube
-    geometry with constant coefficient $\mu(\bs x) \equiv 1$. For a
+  \caption{\label{tab:3d-box} Results for three-dimensional unit cube
+    problem  {\bf 3d-const} defined in \S\ref{subsec:tests}. For a
     detailed description of the different experiments reported in this
     table we refer to \S\ref{subsec:measures}.}  \centering
 	  \begin{tabular}{|r|c c|c c|c c||c c|c c|c c||c c|} 
@@ -1322,10 +1326,11 @@ convergence.
 \end{table}
 
 \begin{table}
-  \caption{\label{tab:3d-fan} Results for three-dimensional warped
-    geometry with varying coefficient For a
-    detailed description of the different experiments reported in this
-    table we refer to \S\ref{subsec:measures}.}  \centering
+  \caption{\label{tab:3d-fan} Results for three-dimensional,
+    warped-geometry, varying coefficient problem {\bf 3d-var} defined
+    in \S\ref{subsec:tests}. For a detailed description of the
+    different experiments reported in this table we refer to
+    \S\ref{subsec:measures}.}  \centering
 	  \begin{tabular}{|r|c c|c c|c c||c c|c c|c c||c c|} 
 	    \hline
 	    & \multicolumn{6}{c||}{MG as solver} &
