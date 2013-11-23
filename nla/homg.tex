@@ -1120,17 +1120,18 @@ particular, these tables report the following convergence information:
   results obtained when multigrid is uses as preconditioner in a CG
   algorithm. A single multigrid v-cycle is used per CG iteration. The sub-columns 
   again correspond to different smoothers, as described above.
-\item[$\bullet$] The columns headed by \emph{low-order pCG} present
+\item[$\bullet$] The columns headed by \emph{low-order MG pCG} present
   the number of CG iterations needed to solve the high-order system
   preconditioned with the low-order operator based on the high-order
   nodal points (see \S\ref{subsec:low}). \todo{While in practice one
     would use an algebraic multigrid cycle to approximately solve the
     linearized system, here we use a direct factorization method as
     solver for the low-order system. The difference between the two
-    subcolumns is the way the residual is computed in the smoother on
+    subcolumns is the way the residual is computed for the smoother on
     the finest mesh; the experiments reported in the column headed by
-    \emph{low} use the residual computed from the low-order system in
-    the smoother, while the column headed by \emph{high} evaluates the
+    \emph{l-res} use the residual computed from the low-order system
+    in the smoother on the finest level, while for the tests reported
+    in the column headed by \emph{h-res} we evaluate the residual in the
     smoother based on the high-order system matrix. Both residual
     computations require matrix-vector products with $N$ unknowns, but
     the low-order operator is sparser and thus, in general, faster to
@@ -1150,7 +1151,8 @@ different point smoothers for the test problems presented in
 Section~\ref{subsec:tests}. Then, in Section~\ref{subsec:num_mesh}, we
 illustrate that the number of iterations is independent of the mesh
 resolution. Finally, in Section~\ref{subsec:num_block} we study the
-performance of block Jacobi smoothing for high order discretizations.
+performance of a block Jacobi smoother for discretizations with
+polynomial orders $p=8$ and $p=16$.
 
 \subsubsection{Comparison of point smoothers}\label{subsec:num_point}
 Tables \ref{tab:box} and \ref{tab:2d-fan} present the number of
@@ -1189,23 +1191,25 @@ based on an algebraic multigrid method.
     $8\times 8$. For a detailed description of the different
     experiments reported in this table we refer to
     \S\ref{subsec:measures}.}  \centering
-  \begin{tabular}{|r|c c|c c|c c||c c|c c|c c||c c c|} 
+  \begin{tabular}{|r|c c|c c|c c||c c|c c|c c||c c|} 
     \hline
-    & \multicolumn{6}{c||}{MG as solver} & \multicolumn{6}{c||}{MG with pCG} & \multicolumn{3}{r|}{linearized} \\
+    & \multicolumn{6}{c||}{MG as solver} & \multicolumn{6}{c||}{MG
+      with pCG} & \multicolumn{2}{r|}{\!\!low-order MG\!\!} \\
     \cline{2-13}
-    \!\!\! order \!\!\!\! &  \multicolumn{2}{c|}{\!\!\scriptsize  Jacobi(3,3)\!\!} &  \multicolumn{2}{c|}{\!\!\scriptsize Cheb(3,3)\!\!} & \multicolumn{2}{c||}{\!\!\scriptsize  SSOR(2,1)\!\!} & \multicolumn{2}{c|}{\!\!\scriptsize Jacobi(3,3)\!\!} &  \multicolumn{2}{c|}{\!\!\scriptsize Cheb(3,3)\!\!} & \multicolumn{2}{c||}{\!\!\scriptsize SSOR(2,1)\!\!} & \multicolumn{3}{c|}{pCG}\\
+    \!\!\! order \!\!\!\! &  \multicolumn{2}{c|}{\!\!\scriptsize  Jacobi(3,3)\!\!} &  \multicolumn{2}{c|}{\!\!\scriptsize Cheb(3,3)\!\!} & \multicolumn{2}{c||}{\!\!\scriptsize  SSOR(2,1)\!\!} & \multicolumn{2}{c|}{\!\!\scriptsize Jacobi(3,3)\!\!} &  \multicolumn{2}{c|}{\!\!\scriptsize Cheb(3,3)\!\!} & \multicolumn{2}{c||}{\!\!\scriptsize SSOR(2,1)\!\!} & \multicolumn{2}{c|}{pCG}\\
 \hline
- & $h$ & $p$ & $h$ & $p$& $h$ & $p$& $h$ & $p$& $h$ & $p$& $h$ & $p$& 0 & 1 & 3\\
- \cline{2-16}
-1 & 6 & & 5 & & 5 & & 5 & & 4 & & 4 & & - & - & - \\
-2 & 7 & 7 & 5 & 6 & 5 & 5 & 5 & 5 & 4 & 4 & 4 & 4 & 14 & 9 & 4 \\
-3 & 8 & & 6 & & 5 & & 6 & & 5 & & 4 & & 16 & 9 & 4 \\
-4 & 9 & 8 & 6 & 6 & 5 & 5 & 6 & 5 & 5 & 5 & 4 & 4 & 16 & 10 & 4 \\
-5 & 12 & & 8 & & 7 & & 7 & & 6 & & 5 & & 17 & 10 & 4 \\
-6 & 12 & & 9 & & 7 & & 7 & & 6 & & 5 & & 18 & 11 & 5\\
-7 & 16 & & 12 & & 8 & & 8 & & 7 & & 6 & & 18 & 12 & 5 \\
-8 & 17 & 14 & 13 & 10 & 8 & 7 & 9 & 8 & 7 & 6 & 6 & 5 & 19 & 12 & 5\\
-16 & 40 & 33 & 33 & 27 & 17 & 14 & 14 & 12 & 12 & 11 & 9 & 8 & 21 & 14 & 8 \\
+ & $h$ & $p$ & $h$ & $p$& $h$ & $p$& $h$ & $p$& $h$ & $p$& $h$ & $p$&
+l-res & h-res\\
+ \cline{2-15}
+1 & 6 & & 5 & & 5 & & 5 & & 4 & & 4 & & -  & - \\
+2 & 7 & 7 & 5 & 6 & 5 & 5 & 5 & 5 & 4 & 4 & 4 & 4 & 14 & 4 \\
+3 & 8 & & 6 & & 5 & & 6 & & 5 & & 4 & & 16  & 4 \\
+4 & 9 & 8 & 6 & 6 & 5 & 5 & 6 & 5 & 5 & 5 & 4 & 4 & 16 & 4 \\
+5 & 12 & & 8 & & 7 & & 7 & & 6 & & 5 & & 17 & 4 \\
+6 & 12 & & 9 & & 7 & & 7 & & 6 & & 5 & & 18 & 5\\
+7 & 16 & & 12 & & 8 & & 8 & & 7 & & 6 & & 18 & 5 \\
+8 & 17 & 14 & 13 & 10 & 8 & 7 & 9 & 8 & 7 & 6 & 6 & 5 & 19 & 5\\
+16 & 40 & 33 & 33 & 27 & 17 & 14 & 14 & 12 & 12 & 11 & 9 & 8 & 21 & 8 \\
 \hline
   \end{tabular}
 \end{table}
@@ -1247,23 +1251,24 @@ convergence.
     grid was $32\times 32$, and the coarsest was $8\times 8$. For a
     detailed description of the different experiments reported in this
     table we refer to \S\ref{subsec:measures}.}  \centering
-  \begin{tabular}{|r|c c|c c|c c||c c|c c|c c||c c c|} 
+  \begin{tabular}{|r|c c|c c|c c||c c|c c|c c||c c|} 
     \hline
-    & \multicolumn{6}{c||}{MG as solver} & \multicolumn{6}{c||}{MG with pCG} & \multicolumn{3}{r|}{linearized} \\
+    & \multicolumn{6}{c||}{MG as solver} & \multicolumn{6}{c||}{MG
+      with pCG} & \multicolumn{2}{r|}{\!\!low-order MG\!\!} \\
     \cline{2-13}
-    \!\!\! order \!\!\!\! &  \multicolumn{2}{c|}{\!\!\scriptsize  Jacobi(3,3)\!\!} &  \multicolumn{2}{c|}{\!\!\scriptsize Cheb(3,3)\!\!} & \multicolumn{2}{c||}{\!\!\scriptsize  SSOR(2,1)\!\!} & \multicolumn{2}{c|}{\!\!\scriptsize Jacobi(3,3)\!\!} &  \multicolumn{2}{c|}{\!\!\scriptsize Cheb(3,3)\!\!} & \multicolumn{2}{c||}{\!\!\scriptsize SSOR(2,1)\!\!} & \multicolumn{3}{c|}{pCG}\\
+    \!\!\! order \!\!\!\! &  \multicolumn{2}{c|}{\!\!\scriptsize  Jacobi(3,3)\!\!} &  \multicolumn{2}{c|}{\!\!\scriptsize Cheb(3,3)\!\!} & \multicolumn{2}{c||}{\!\!\scriptsize  SSOR(2,1)\!\!} & \multicolumn{2}{c|}{\!\!\scriptsize Jacobi(3,3)\!\!} &  \multicolumn{2}{c|}{\!\!\scriptsize Cheb(3,3)\!\!} & \multicolumn{2}{c||}{\!\!\scriptsize SSOR(2,1)\!\!} & \multicolumn{2}{c|}{pCG}\\
 \hline
- & $h$ & $p$ & $h$ & $p$& $h$ & $p$& $h$ & $p$& $h$ & $p$& $h$ & $p$& 0 & 1 & 3\\
- \cline{2-16}
-1 & 14 & & 11 & & 6 & & 8 & & 7 & & 5 & & - & - & - \\
-2 & 20 & 19 & 15 & 15 & 7 & 8 & 10 & 10 & 8 & 8 & 5 & 6 & 16 & 9 & 5 \\
-3 & 20 & & 16 & & 8 & & 10 & & 9 & & 6 & & 18 & 9 & 6 \\
-4 & 22 & 21 & 21 & 19 & 10 & 9 & 11 & 10 & 10 & 10 & 7 & 6 & 19 & 11 & 7\\
-5 & -  & & 28 & & 12 & & 14 & & 12 & & 7 & & 21 & 12 & 8  \\
-6 & -  & & 35 & & 13 & & 15 & & 13 & & 8 & & 23 & 13 & 9 \\
-7 & -  & & 45 & & 16 & & 18 & & 15 & & 9 & & 24 & 14 & 9 \\
-8 & -  & - & 52 & 46 & 17 & 15 & 20 & 20 & 16 & 15 & 9 & 8 & 25 & 14 & 10 \\
-16 & - & - & 169 & 148 & 37 & 33 & 51 & 45 & 30 & 27 & 13 & 12 & 31 & 19 & 13 \\
+ & $h$ & $p$ & $h$ & $p$& $h$ & $p$& $h$ & $p$& $h$ & $p$& $h$ & $p$& l-res & h-res\\
+ \cline{2-15}
+1 & 14 & & 11 & & 6 & & 8 & & 7 & & 5 & & -  & - \\
+2 & 20 & 19 & 15 & 15 & 7 & 8 & 10 & 10 & 8 & 8 & 5 & 6 & 16  & 5 \\
+3 & 20 & & 16 & & 8 & & 10 & & 9 & & 6 & & 18 & 6 \\
+4 & 22 & 21 & 21 & 19 & 10 & 9 & 11 & 10 & 10 & 10 & 7 & 6 & 19 & 7\\
+5 & -  & & 28 & & 12 & & 14 & & 12 & & 7 & & 21 & 8  \\
+6 & -  & & 35 & & 13 & & 15 & & 13 & & 8 & & 23 &  9 \\
+7 & -  & & 45 & & 16 & & 18 & & 15 & & 9 & & 24 &  9 \\
+8 & -  & - & 52 & 46 & 17 & 15 & 20 & 20 & 16 & 15 & 9 & 8 & 25 & 10 \\
+16 & - & - & 169 & 148 & 37 & 33 & 51 & 45 & 30 & 27 & 13 & 12 & 31 & 13 \\
 \hline
   \end{tabular}
 \end{table}
@@ -1274,23 +1279,25 @@ convergence.
     geometry with constant coefficient $\mu(\bs x) \equiv 1$. For a
     detailed description of the different experiments reported in this
     table we refer to \S\ref{subsec:measures}.}  \centering
-	  \begin{tabular}{|r|c c|c c|c c||c c|c c|c c||c c c|} 
+	  \begin{tabular}{|r|c c|c c|c c||c c|c c|c c||c c|} 
 	    \hline
-	    & \multicolumn{6}{c||}{MG as solver} & \multicolumn{6}{c||}{MG with pCG} & \multicolumn{3}{r|}{linearized} \\
+	    & \multicolumn{6}{c||}{MG as solver} &
+            \multicolumn{6}{c||}{MG with pCG} &
+            \multicolumn{2}{r|}{\!\!low-order MG\!\!} \\
 	    \cline{2-13}
-	    \!\!\! order \!\!\!\! &  \multicolumn{2}{c|}{\!\!\scriptsize  Jacobi(3,3)\!\!} &  \multicolumn{2}{c|}{\!\!\scriptsize Cheb(3,3)\!\!} & \multicolumn{2}{c||}{\!\!\scriptsize  SSOR(2,1)\!\!} & \multicolumn{2}{c|}{\!\!\scriptsize Jacobi(3,3)\!\!} &  \multicolumn{2,1}{c|}{\!\!\scriptsize Cheb(3)\!\!} & \multicolumn{2}{c||}{\!\!\scriptsize SSOR(2,1)\!\!} & \multicolumn{3}{c|}{pCG}\\
+	    \!\!\! order \!\!\!\! &  \multicolumn{2}{c|}{\!\!\scriptsize  Jacobi(3,3)\!\!} &  \multicolumn{2}{c|}{\!\!\scriptsize Cheb(3,3)\!\!} & \multicolumn{2}{c||}{\!\!\scriptsize  SSOR(2,1)\!\!} & \multicolumn{2}{c|}{\!\!\scriptsize Jacobi(3,3)\!\!} &  \multicolumn{2,1}{c|}{\!\!\scriptsize Cheb(3)\!\!} & \multicolumn{2}{c||}{\!\!\scriptsize SSOR(2,1)\!\!} & \multicolumn{2}{c|}{pCG}\\
 	\hline
-	 & $h$ & $p$ & $h$ & $p$& $h$ & $p$& $h$ & $p$& $h$ & $p$& $h$ & $p$& 0 & 1 & 3\\
-	 \cline{2-16}
-1 & 6 & & 4 & & 4 & & 5 & & 4 & & 3 & & - & - & - \\
-2 & 8 & 8 & 4 & 5 & 4 & 5 & 6 & 6 & 4 & 4 & 4 & 4 &  25 & 14 & 5 \\
-3 & 10 & & 7 & & 5 & & 6 & & 5 & & 5 & & 27 & 13 & 5  \\
-4 & 11 & 10 & 8 & 7 & 6 & 5 & 7 & 7 & 6 & 5 & 5 & 4 & 28 & 15 & 6 \\
-5 & 14 & & 10 & & 7 & & 8 & & 7 & & 5 & & 29 & 16 & 6 \\
-6 & 16 & & 11 & & 7 & & 9 & & 7 & & 6 & & 32 & 18 & 6 \\
-7 & 20 & & 15 & & 9 & & 10 & & 9 & & 6 & & 34 & 19 & 7 \\
-8 & 22 & 19 & 17 & 15 & 9 & 8 & 10 & 10 & 9 & 8 & 6 & 6 & 35 & 20 & 7 \\
-16 & 47 & 42 & 38 & 34 & 17 & 15 & 16 & 14 & 14 & 13 & 9 & 9 & 39 & 22 & 11 \\
+	 & $h$ & $p$ & $h$ & $p$& $h$ & $p$& $h$ & $p$& $h$ & $p$& $h$ & $p$& l-res  & h-res\\
+	 \cline{2-15}
+1 & 6 & & 4 & & 4 & & 5 & & 4 & & 3 & & -  & - \\
+2 & 8 & 8 & 4 & 5 & 4 & 5 & 6 & 6 & 4 & 4 & 4 & 4 &  25 &  5 \\
+3 & 10 & & 7 & & 5 & & 6 & & 5 & & 5 & & 27 &  5  \\
+4 & 11 & 10 & 8 & 7 & 6 & 5 & 7 & 7 & 6 & 5 & 5 & 4 & 28 & 6 \\
+5 & 14 & & 10 & & 7 & & 8 & & 7 & & 5 & & 29  & 6 \\
+6 & 16 & & 11 & & 7 & & 9 & & 7 & & 6 & & 32  & 6 \\
+7 & 20 & & 15 & & 9 & & 10 & & 9 & & 6 & & 34 & 7 \\
+8 & 22 & 19 & 17 & 15 & 9 & 8 & 10 & 10 & 9 & 8 & 6 & 6 & 35 & 7 \\
+16 & 47 & 42 & 38 & 34 & 17 & 15 & 16 & 14 & 14 & 13 & 9 & 9 & 39 & 11 \\
 \hline 
  \end{tabular}
 \end{table}
@@ -1301,23 +1308,25 @@ convergence.
     10^6(\cos^2(2\pi x) + \cos^2(2\pi y) + \cos^2(2\pi z))$. For a
     detailed description of the different experiments reported in this
     table we refer to \S\ref{subsec:measures}.}  \centering
-	  \begin{tabular}{|r|c c|c c|c c||c c|c c|c c||c c c|} 
+	  \begin{tabular}{|r|c c|c c|c c||c c|c c|c c||c c|} 
 	    \hline
-	    & \multicolumn{6}{c||}{MG as solver} & \multicolumn{6}{c||}{MG with pCG} & \multicolumn{3}{r|}{linearized} \\
+	    & \multicolumn{6}{c||}{MG as solver} &
+            \multicolumn{6}{c||}{MG with pCG} &
+            \multicolumn{2}{r|}{\!\!low-order MG\!\!} \\
 	    \cline{2-13}
-	    \!\!\! order \!\!\!\! &  \multicolumn{2}{c|}{\!\!\scriptsize  Jacobi(3,3)\!\!} &  \multicolumn{2}{c|}{\!\!\scriptsize Cheb(3,3)\!\!} & \multicolumn{2}{c||}{\!\!\scriptsize  SSOR(2,1)\!\!} & \multicolumn{2}{c|}{\!\!\scriptsize Jacobi(3,3)\!\!} &  \multicolumn{2}{c|}{\!\!\scriptsize Cheb(3,3)\!\!} & \multicolumn{2}{c||}{\!\!\scriptsize SSOR(2,1)\!\!} & \multicolumn{3}{c|}{pCG}\\
+	    \!\!\! order \!\!\!\! &  \multicolumn{2}{c|}{\!\!\scriptsize  Jacobi(3,3)\!\!} &  \multicolumn{2}{c|}{\!\!\scriptsize Cheb(3,3)\!\!} & \multicolumn{2}{c||}{\!\!\scriptsize  SSOR(2,1)\!\!} & \multicolumn{2}{c|}{\!\!\scriptsize Jacobi(3,3)\!\!} &  \multicolumn{2}{c|}{\!\!\scriptsize Cheb(3,3)\!\!} & \multicolumn{2}{c||}{\!\!\scriptsize SSOR(2,1)\!\!} & \multicolumn{2}{c|}{pCG}\\
 	\hline
-	 & $h$ & $p$ & $h$ & $p$& $h$ & $p$& $h$ & $p$& $h$ & $p$& $h$ & $p$& 0 & 1 & 3\\
-	 \cline{2-16}
-1 & 13 & & 7 & & 5 & & 7 & & 5 & & 4 & & - & - & - \\
-2 & 17 & 18 & 13 & 13 & 7 & 7 & 9 & 9 & 8 & 8 & 5 & 5 & 26 & 14 & 7 \\
-3 & 20 & & 16 & & 8 & & 10 & & 9 & & 6 & & 29 & 14 & 8 \\
-4 & 23 & 22 & 18 & 18 & 9 & 9 & 11 & 11 & 9 & 9 & 7 & 6 & 31 & 16 & 9\\
-5 & 26 & & 21 & & 10 & & 12 & & 10 & & 7 & & 34 & 17 & 10  \\
-6 & 30 & & 27 & & 12 & & 13 & & 12 & & 8 & & 37 & 20 & 13 \\
-7 & 35 & & 34 & & 14 & & 14 & & 14 & & 8 & & 37 & 21 & 13  \\
-8 & - & - & 40 & 38 & 16 & 15 & 18 & 17 & 15 & 14 & 9 & 9 & 38 & 21 & 14 \\
-16 & - & - & 117 & 110 & 32 & 29 & 67 & 60 & 27 & 26 & 13 & 13 & 47 & 28 & 22 \\
+	 & $h$ & $p$ & $h$ & $p$& $h$ & $p$& $h$ & $p$& $h$ & $p$& $h$ & $p$& l-res  & h-res\\
+	 \cline{2-15}
+1 & 13 & & 7 & & 5 & & 7 & & 5 & & 4 & & - & - \\
+2 & 17 & 18 & 13 & 13 & 7 & 7 & 9 & 9 & 8 & 8 & 5 & 5 & 26  & 7 \\
+3 & 20 & & 16 & & 8 & & 10 & & 9 & & 6 & & 29  & 8 \\
+4 & 23 & 22 & 18 & 18 & 9 & 9 & 11 & 11 & 9 & 9 & 7 & 6 & 31 & 9\\
+5 & 26 & & 21 & & 10 & & 12 & & 10 & & 7 & & 34  & 10  \\
+6 & 30 & & 27 & & 12 & & 13 & & 12 & & 8 & & 37 & 13 \\
+7 & 35 & & 34 & & 14 & & 14 & & 14 & & 8 & & 37 & 13  \\
+8 & - & - & 40 & 38 & 16 & 15 & 18 & 17 & 15 & 14 & 9 & 9 & 38 & 14 \\
+16 & - & - & 117 & 110 & 32 & 29 & 67 & 60 & 27 & 26 & 13 & 13 & 47 & 22 \\
 \hline
   \end{tabular}
 \end{table}
