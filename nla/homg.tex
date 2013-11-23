@@ -163,9 +163,11 @@ dimensional complex geometries with varying coefficients.
 
 An alternative to high-order geometric multigrid is $p$-multigrid, which
 coarsens the polynomial degree while (at least, initially) keeping the mesh
-unchanged, see, e.g.,~\cite{HelenbrookMavriplisAtkins03}. Here, we compare the
-performance and this $p$-multigrid approach\footnote{when $p$ is a power of
-$2$.} with $h$-multigrid for different smoothers and polynomial orders.
+unchanged, see, e.g.,~\cite{HelenbrookMavriplisAtkins03}. Here, we
+compare the
+performance and $p$-multigrid
+%\footnote{when $p$ is a power of$2$.}
+with high-order $h$-multigrid for different smoothers and polynomial orders.
 
 %Even though high-order discretizations can, in principle, benefit from
 %modern hardware, the rapid loss of sparsity of the involved systems as
@@ -656,11 +658,10 @@ additional high-order residual computation per smoothing step.
 
 % **********************************************************
 \subsection{Smoothers}\label{subsec:smoothers}
-Next, we summarize different smoothing approaches. In our numerical
-comparisons, we restrict ourselves to the point smoothers reviewed in
-\S\ref{subsec:ptsmoothers}. For completeness of the
-presentation, we briefly describe Schwarz-type smoothers in
-\S\ref{subsec:schwarz}.
+Next, we summarize different smoothing approaches. Point smoothers,
+which are the main target of this paper, are reviewed in
+\S\ref{subsec:ptsmoothers}. In \S\ref{subsec:schwarz}, we discuss
+domain decomposition based smoothers.
 
 
 \subsubsection{Point smoothers}\label{subsec:ptsmoothers}
@@ -912,7 +913,7 @@ satisfactory rate.
 An alternative smoothing approach for high-order discretizations is
 based on local block solves.  Schwarz-type domain decomposition
 smoothers have successfully been used for spectral element
-discretizations with orders significantly higher than 8. They are more
+discretizations with orders significantly 8 and higher. They are more
 stable for anisotropic meshes or anisotropic problems than point
 smoothers. A main challenge of Schwarz-type smoothers is that they
 require the solution of dense local systems.  This is either done by
@@ -920,8 +921,9 @@ using direct methods or approximations that allow for a fast iterative
 solution \cite{LottesFischer05, FischerLottes05}. However, the
 coarse-grid solves can become fairly expensive. Moreover, depending on
 how much overlap between the domains is used, it is not
-straightforward to achieve good parallel scalability.
-\todo{Needs update}
+straightforward to achieve good parallel scalability. In
+Section~\ref{sec:numerics}, we compare the performance of point
+smoothers with a element-wise block Jacobi smoothing.
 
 
 \subsection{Comparing computational cost}\label{subsec:complexity}
@@ -1388,7 +1390,7 @@ is an excellent preconditioner for the low-order system, in particular
 when combined with smoothing based on the high-order residual is
 performed on the finest mesh.  When combined with algebraic multigrid
 for the low-order operator, this approach is attractive for high-order
-discretizations on unstructured meshes as also shown in
+discretizations on unstructured meshes, as also shown in
 ~\cite{Brown10, DevilleMund90, HeysManteuffelMcCormickEtAl05}.
 
 
