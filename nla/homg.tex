@@ -1429,18 +1429,19 @@ In the next section, we summarize our findings and draw conclusions.
 Despite the fact that discrete systems originating from high-order
 discretizations do not satisfy favorable matrix properties such as the
 M-matrix property, we find that point smoothers can be efficient for
-polynomial orders up to $p=16$.  For constant coefficient, two and
-three-dimensional problems, all tested point smoothers (Jacobi,
-Chebyshev-accelerated Jacobi and Gauss-Seidel SSOR smoothing) lead to
-converging multigrid methods. For highly varying coefficients on
-deformed geometries, SSOR outperforms Jacobi-based smoothing, which
-performs poorly for orders $p>4$.
+finite element discretizations with polynomial orders up to $p=16$.
+For constant coefficient, two and three-dimensional problems, all
+tested point smoothers (Jacobi, Chebyshev-accelerated Jacobi and
+Gauss-Seidel SSOR smoothing) lead to converging multigrid methods. For
+highly varying coefficients on deformed geometries, SSOR outperforms
+Jacobi-based smoothing, which performs poorly for orders $p>4$.
 
 In a parallel environment, where Gauss-Seidel smoothing is
 significantly more difficult to implement and requires more parallel
 communication, Chebyshev-accelerated Jacobi smoothing represents an
 interesting alternative since it is as simple to implement as Jacobi
-smoothing.
+smoothing and additionally only requires an estimate of the largest
+eigenvalue of the diagonally preconditioned system matrix.
 
 Using multigrid as preconditioner in a Krylov method rather than as
 solver results in significantly faster convergence, which by far
@@ -1477,7 +1478,7 @@ low-order preconditioner. Support for this work was
   funded by the U.S.~Department of Energy
   Office of Science, Advanced Scientific Computing Research and
   Biological and Environmental Research.
- \todo{Check with George and Omar; these are Diamond, DOE ice, NSF ice and NSF mantle/wave.}
+% \todo{Check with George and Omar; these are Diamond, DOE ice, NSF ice and NSF mantle/wave.}
 
 
 \bibliographystyle{siam}
