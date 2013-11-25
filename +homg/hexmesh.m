@@ -1200,7 +1200,7 @@ end
 					case 3
 						gfid = nxf + sub2ind ([self.nelems(1), self.nelems(2)+1], i, j);
 					case 4
-						gfid = nxf + sub2ind ([self.nelems(1), self.nelems(2)+1], i+1, j);
+						gfid = nxf + sub2ind ([self.nelems(1), self.nelems(2)+1], i, j+1);
 				end
 			
 			else
