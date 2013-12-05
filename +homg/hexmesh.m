@@ -907,6 +907,54 @@ end
         
       end
     end
+
+    function [Kex,Key] = element_stiffness_advection(self, eid, refel, J, D)
+      % element mass matrix
+      
+%             | Q |     | rx sx tx|| Qx |
+%    Kex =        | J W |          | Qy |
+%                                  | Qz |
+
+%             | Q |     | ry sy ty|| Qx |
+%    Key =        | J W |          | Qy |
+%                                  | Qz |
+
+%             | Q |     | rz sz tz|| Qx |
+%    Kez =        | J W |          | Qy |
+%                                  | Qz |
+
+
+     	gpts = self.element_gauss(eid, refel);
+
+			nn = length(J);
+			
+      factor = zeros(nn, 6);
+
+      %             1  4  5
+      % factor      4  2  6
+      %             5  6  3
+      
+      
+			% idx = self.get_node_indices (eid, r.N);
+			% mu = self.muvec(eid); % *nn:(eid+1)*nn);
+			
+      if (self.dim == 2 )
+        
+        factor (:,1) = D.rx .* J .* refel.W; 
+        factor (:,2) = D.sx .* J .* refel.W; 
+        factor (:,3) = D.ry .* J .* refel.W; 
+        factor (:,4) = D.sy .* J .* refel.W; 
+        
+        Kex =   refel.Q' * diag(factor(:,1)) * refel.Qx ...
+              + refel.Q' * diag(factor(:,2)) * refel.Qy;
+  
+        Key =   refel.Q' * diag(factor(:,3)) * refel.Qx ...
+              + refel.Q' * diag(factor(:,4)) * refel.Qy;
+      else
+        error('not supported for now, come back later');
+      end
+      
+    end
     
     function [J, D] = geometric_factors( self, refel, pts )
       % Np =  refel.Nrp ^ mesh.dim;
