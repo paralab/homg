@@ -2,13 +2,13 @@ clear all
 % Tan Bui and Hari Sundar, Oct 28, 2013
 % Testing HDG method for 2D Laplace equation
 
-addpath /workspace/tanbui/tanbui/WithHari/homg/
+% addpath /workspace/tanbui/tanbui/WithHari/homg/
 
 % solution order
-order = 3;
+order = 6;
 
 % number of elements in x and y directions
-nelems = [2,3];
+nelems = [6,3];
 
 % generate the hexmesh with identity transform for now
 m = homg.hexmesh(nelems,@homg.xform.identity);
@@ -18,7 +18,7 @@ m.set_order(order);
 refel = homg.refel(m.dim, order);
 
 % get total number of faces on the skeleton of the mesh
-Nsfaces =m.get_num_faces(); 
+Nsfaces =m.get_num_faces()
 
 % the number of face points
 Nfp = refel.Nrp ^ (refel.dim-1);
@@ -39,14 +39,14 @@ lam = zeros(Nfp * Nsfaces,1);
 lamRes = zeros(Nfp * Nsfaces, 1);
 
 % forcing
-forcing = @(pts) (sin(pi * pts(:,1)) .* sin(pi * pts(:,2)));
+forcing = @(pts) (sin(2.0 * pi * pts(:,1)) .* sin(pi * pts(:,2)));
 
 % exact solution
 % u = 0.5/pi^2 * forcing;
-uexact = @(pts) 0.5 / pi^2 * forcing(pts);
-qxexact = @(pts) 0.5/pi * (cos(pi * pts(:,1)) ...
+uexact = @(pts) 0.2 / pi^2 * forcing(pts);
+qxexact = @(pts) 0.4/pi * (cos(2*pi * pts(:,1)) ...
                            .* sin(pi * pts(:,2)));
-qyexact = @(pts) 0.5/pi * (sin(pi * pts(:,1)) ...
+qyexact = @(pts) 0.2/pi * (sin(2*pi * pts(:,1)) ...
                            .* cos(pi * pts(:,2)));
 
 % Number of volume unknown for a scalar
@@ -56,7 +56,7 @@ rhsu  = zeros(Nv,1);
 
 % predefined normal vector, don't like it but stick with it for now
 nx = [1, 1, 0, 0];
-ny = [0, 0, -1, -1];
+ny = [0, 0, 1, 1];
 
 % stabilization parameter
 taur = 1;
@@ -135,6 +135,7 @@ for  sf=1:Nsfaces
       % residual for qx and qy equations
       for f = 1:Nfaces %
         idxf = m.get_skeletal_face_indices(refel, e1, f);      
+        % geometrix factors at gll points on face
         Jf = m.geometric_factors_face(refel,e1,f);
 
         idxv = m.get_discontinuous_face_indices(refel, 1, f);       
@@ -178,6 +179,7 @@ for  sf=1:Nsfaces
    
       norm(u(:)-Uexact(:,e1))
       norm(qx - Qxexact(:,e1))
+      norm(qy - Qyexact(:,e1))
       keyboard
     else
       continue;

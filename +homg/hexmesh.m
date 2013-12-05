@@ -923,9 +923,6 @@ end
 %    Kez =        | J W |          | Qy |
 %                                  | Qz |
 
-
-     	gpts = self.element_gauss(eid, refel);
-
 			nn = length(J);
 			
       factor = zeros(nn, 6);
@@ -939,17 +936,17 @@ end
 			% mu = self.muvec(eid); % *nn:(eid+1)*nn);
 			
       if (self.dim == 2 )
-        
+          
         factor (:,1) = D.rx .* J .* refel.W; 
         factor (:,2) = D.sx .* J .* refel.W; 
         factor (:,3) = D.ry .* J .* refel.W; 
         factor (:,4) = D.sy .* J .* refel.W; 
         
-        Kex =   refel.Q' * diag(factor(:,1)) * refel.Qx ...
-              + refel.Q' * diag(factor(:,2)) * refel.Qy;
+        Kex =   refel.Qx' * diag(factor(:,1)) * refel.Q ...
+              + refel.Qy' * diag(factor(:,2)) * refel.Q;
   
-        Key =   refel.Q' * diag(factor(:,3)) * refel.Qx ...
-              + refel.Q' * diag(factor(:,4)) * refel.Qy;
+        Key =   refel.Qx' * diag(factor(:,3)) * refel.Q ...
+              + refel.Qy' * diag(factor(:,4)) * refel.Q;
       else
         error('not supported for now, come back later');
       end
