@@ -1,6 +1,11 @@
-function [u,qx,qy] = localSolver(m, refel, e1, lam, taur,...
-                                 forcing, LIFT, VtoF)
+function [u,qx,qy] = localSolver(HDG, e1, lam, forcing)
 % compute local solution from the trace unknowns
+
+m     = HDG.m;
+refel = HDG.refel;
+taur  = HDG.taur;
+LIFT  = HDG.LIFT;
+VtoF  = HDG.VtoF;
 
 % predefined normal vector, don't like it but stick with it for now
 nx = [-1, 1, 0, 0];

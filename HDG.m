@@ -180,12 +180,10 @@ for  sf=1:Nsfaces
     if (e1 > 0) && (e2 > 0), % interior faces
       
       % e1 solution
-      [u1,qx1,qy1] = localSolver(m, refel, e1, lam, taur,...
-                                 forcing, LIFT, VtoF);
+      [u1,qx1,qy1] = localSolver(HDGdata, e1, lam, forcing);
 
       % e2 solution
-      [u2,qx2,qy2] = localSolver(m, refel, e2, lam, taur,...
-                                 forcing, LIFT, VtoF);
+      [u2,qx2,qy2] = localSolver(HDGdata, e2, lam, forcing);
 
       keyboard
     else
