@@ -105,6 +105,47 @@ for f = 1:Nfaces
   end
 end
 
+% find boundary faces and indices
+Nbfaces = 0; Bmaps = zeros(Nfp,1); Bdata = zeros(Nfp,1);
+iindex = 0;
+for  sf=1:Nsfaces
+    [e1, f1, e2, f2]  =m.get_face_elements(sf);
+
+    if (e1 < 0) || (e2 < 0), % boundary faces
+      if e1 < 0, 
+        e = e2; f = f2;
+      else
+        e = e1; f = f1;
+      end
+      Nbfaces = Nbfaces + 1;
+      idxf = m.get_skeletal_face_indices(refel, e, f);
+      idxv = m.get_discontinuous_face_indices(refel, 1, f);
+      
+      Bmaps(iindex+1:iindex+Nfp) = idxf;
+      Bdata(iindex+1:iindex+Nfp) = Uexact(idxv,e);
+      iindex = iindex + Nfp;
+    end
+end
+
+Nifaces = Nsfaces - Nbfaces;
+SkelInterior2All = zeros(Nifaces * Nfp,1);
+SkelAll2Interior = zeros(Nsfaces * Nfp,1);
+
+% Construct the skeleton maps
+iindex = 0;
+for  sf=1:Nsfaces
+    [e1, f1, e2, f2]  =m.get_face_elements(sf);
+    
+    % interior faces
+    if (e1 > 0) && (e2 > 0), 
+      % global trace index for f1
+      idxf = m.get_skeletal_face_indices(refel, e1, f1);
+      SkelInterior2All(iindex+1:iindex+Nfp) = idxf;
+      SkelAll2Interior(idxf) = iindex+1:iindex+Nfp;
+      iindex = iindex + Nfp;
+    end
+end
+
 % loop over all faces of the mesh skeleton
 for  sf=1:Nsfaces
     [e1, f1, e2, f2]  =m.get_face_elements(sf);
