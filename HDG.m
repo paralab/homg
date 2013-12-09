@@ -4,6 +4,9 @@ clear all
 
 % addpath /workspace/tanbui/tanbui/WithHari/homg/
 
+% HDG structure
+HDGdata = [];
+
 % solution order
 order = 6;
 
@@ -13,24 +16,31 @@ nelems = [6,3];
 % generate the hexmesh with identity transform for now
 m = homg.hexmesh(nelems,@homg.xform.identity);
 m.set_order(order);
+HDGdata.m = m;
 
 % reference elements
 refel = homg.refel(m.dim, order);
+HDGdata.refel = refel;
 
 % get total number of faces on the skeleton of the mesh
 Nsfaces =m.get_num_faces();
+HDGdata.Nsfaces = Nsfaces;
 
 % the number of face points
 Nfp = refel.Nrp ^ (refel.dim-1);
+HDGdata.Nfp = Nfp;
 
 % the number of volume point
 Nv = refel.Nrp ^ (refel.dim);
+HDGdata.Nv = Nv;
 
 % number of faces
 Nfaces = refel.dim * 2;
+HDGdata.Nfaces = Nfaces;
 
 % number of elements
 K = prod(m.nelems);
+HDGdata.K = K;
 
 % Initialize lam
 lam = zeros(Nfp * Nsfaces,1);
@@ -60,6 +70,7 @@ ny = [0, 0, -1, 1];
 
 % stabilization parameter
 taur = 1;
+HDGdata.taur = taur;
 uu = zeros(Nv,Nv);
 uqx = zeros(Nv,Nv);
 uqy = zeros(Nv,Nv);
@@ -104,6 +115,8 @@ for f = 1:Nfaces
     VtoF(fp,idxv(fp),f) = 1;
   end
 end
+HDGdata.LIFT = LIFT;
+HDGdata.VtoF = VtoF;
 
 % find boundary faces and indices
 Nbfaces = 0; Bmaps = zeros(Nfp,1); Bdata = zeros(Nfp,1);
@@ -126,10 +139,14 @@ for  sf=1:Nsfaces
       iindex = iindex + Nfp;
     end
 end
+HDGdata.Nbfaces = Nbfaces;
+HDGdata.Bmaps = Bmaps;
 
 Nifaces = Nsfaces - Nbfaces;
 SkelInterior2All = zeros(Nifaces * Nfp,1);
 SkelAll2Interior = zeros(Nsfaces * Nfp,1);
+
+HDGdata.Nifaces = Nifaces;
 
 % Construct the skeleton maps
 iindex = 0;
@@ -145,6 +162,11 @@ for  sf=1:Nsfaces
       iindex = iindex + Nfp;
     end
 end
+HDGdata.SkelInterior2All = SkelInterior2All;
+HDGdata.SkelAll2Interior = SkelAll2Interior;
+
+% Form the HDG matrix and RHS
+% Quick, dirty, and expensive way
 
 % loop over all faces of the mesh skeleton
 for  sf=1:Nsfaces
