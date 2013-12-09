@@ -145,11 +145,12 @@ HDGdata.Bmaps = Bmaps;
 Nifaces = Nsfaces - Nbfaces;
 SkelInterior2All = zeros(Nifaces * Nfp,1);
 SkelAll2Interior = zeros(Nsfaces * Nfp,1);
+InteriorF2AllF   = zeros(Nifaces,1);
 
 HDGdata.Nifaces = Nifaces;
 
 % Construct the skeleton maps
-iindex = 0;
+iindex = 0; iface = 0;
 for  sf=1:Nsfaces
     [e1, f1, e2, f2]  =m.get_face_elements(sf);
     
@@ -160,10 +161,13 @@ for  sf=1:Nsfaces
       SkelInterior2All(iindex+1:iindex+Nfp) = idxf;
       SkelAll2Interior(idxf) = iindex+1:iindex+Nfp;
       iindex = iindex + Nfp;
+      iface = iface + 1;
+      InteriorF2AllF(iface) = sf;
     end
 end
 HDGdata.SkelInterior2All = SkelInterior2All;
 HDGdata.SkelAll2Interior = SkelAll2Interior;
+HDGdata.InteriorF2AllF = InteriorF2AllF;
 
 % Form the HDG matrix and RHS
 % Quick, dirty, and expensive way
