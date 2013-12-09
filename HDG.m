@@ -112,64 +112,15 @@ for  sf=1:Nsfaces
     %% Task 1
     if (e1 > 0) && (e2 > 0), % interior faces
       
-      %---- Solve for u, and q in e1-------
-      uu(:) = 0; uqx(:) = 0; uqy(:) = 0;
-      rhsqx(:) = 0; rhsqy(:) = 0; rhsu(:) = 0;
-      pts = m.element_nodes(e1, refel);
-      [Jv, Dv] = m.geometric_factors(refel, pts);
-      
-      eMat = m.element_mass(e1, refel, Jv);
-      eMatInv = inv(eMat);
+      % e1 solution
+      [u1,qx1,qy1] = localSolver(m, refel, e1, lam, taur,...
+                                 forcing, LIFT, VtoF);
 
-      % compute the forcing
-      rhsu = eMat * forcing(pts);
+      % e2 solution
+      [u2,qx2,qy2] = localSolver(m, refel, e2, lam, taur,...
+                                 forcing, LIFT, VtoF);
 
-      % advection stiffness
-      [Kex,Key] = m.element_stiffness_advection(e1, refel, Jv, Dv);
-      
-      uqx = Kex;
-      uqy = Key;
-      % residual for qx and qy equations
-      for f = 1:Nfaces %
-        idxf = m.get_skeletal_face_indices(refel, e1, f);      
-        % geometrix factors at gll points on face
-        Jf = m.geometric_factors_face(refel,e1,f);
-
-        idxv = m.get_discontinuous_face_indices(refel, 1, f);       
-        
-        % residual due to lambda
-        rhsfx = Jf .* (refel.Mr * lam(idxf)) * nx(f);
-        rhsfy = Jf .* (refel.Mr * lam(idxf)) * ny(f);
-        % lift to volume residual q equation
-        rhsqx(idxv) = rhsqx(idxv) + rhsfx;
-        rhsqy(idxv) = rhsqy(idxv) + rhsfy;
-        % lift to volume residual u equation
-        rhsu(idxv)  = rhsu(idxv) - ...
-            taur * Jf .* (refel.Mr * lam(idxf));
-        
-        % lift to volume for uu
-        bdry =  LIFT(:,:,f) * (diag(Jf) * VtoF(:,:,f));
-        bdryx = LIFT(:,:,f) * (diag(Jf) * VtoF(:,:,f)) * nx(f);
-        bdryy = LIFT(:,:,f) * (diag(Jf) * VtoF(:,:,f)) * ny(f);
-
-        uu  = uu  - taur * bdry; 
-        uqx = uqx -        bdryx;
-        uqy = uqy -        bdryy;
-      end
-      
-      qxMatrix = -eMatInv * Kex;
-      qxrhs = eMatInv * rhsqx;
-      
-      qyMatrix = -eMatInv * Key;
-      qyrhs = eMatInv * rhsqy;
-      
-      F = rhsu - uqx * qxrhs - uqy * qyrhs;
-      dF = uqx * qxMatrix + uqy * qyMatrix + uu;
-      
-      u = dF \ F;
-      qx = qxMatrix * u + qxrhs;
-      qy = qyMatrix * u + qyrhs;
-    
+      keyboard
     else
       continue;
     end
