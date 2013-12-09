@@ -8,7 +8,7 @@ clear all
 HDGdata = [];
 
 % solution order
-order = 6;
+order = 2;
 
 % number of elements in x and y directions
 nelems = [6,3];
@@ -67,6 +67,8 @@ rhsu  = zeros(Nv,1);
 % predefined normal vector, don't like it but stick with it for now
 nx = [-1, 1, 0, 0];
 ny = [0, 0, -1, 1];
+HDGdata.nx = nx;
+HDGdata.ny = ny;
 
 % stabilization parameter
 taur = 1;
@@ -144,7 +146,7 @@ HDGdata.Bmaps = Bmaps;
 
 Nifaces = Nsfaces - Nbfaces;
 SkelInterior2All = zeros(Nifaces * Nfp,1);
-SkelAll2Interior = zeros(Nsfaces * Nfp,1);
+SkelAll2Interior = zeros(Nifaces * Nfp,1);
 InteriorF2AllF   = zeros(Nifaces,1);
 
 HDGdata.Nifaces = Nifaces;
@@ -171,23 +173,5 @@ HDGdata.InteriorF2AllF = InteriorF2AllF;
 
 % Form the HDG matrix and RHS
 % Quick, dirty, and expensive way
-
-% loop over all faces of the mesh skeleton
-for  sf=1:Nsfaces
-    [e1, f1, e2, f2]  =m.get_face_elements(sf);
-
-    %% Task 1
-    if (e1 > 0) && (e2 > 0), % interior faces
-      
-      % e1 solution
-      [u1,qx1,qy1] = localSolver(HDGdata, e1, lam, forcing);
-
-      % e2 solution
-      [u2,qx2,qy2] = localSolver(HDGdata, e2, lam, forcing);
-
-      keyboard
-    else
-      continue;
-    end
-      
-end
+lamInterior = lam(HDGdata.SkelInterior2All);
+[res] = residual(lamInterior,HDGdata,forcing, Bdata);
