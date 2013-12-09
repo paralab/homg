@@ -18,7 +18,7 @@ m.set_order(order);
 refel = homg.refel(m.dim, order);
 
 % get total number of faces on the skeleton of the mesh
-Nsfaces =m.get_num_faces()
+Nsfaces =m.get_num_faces();
 
 % the number of face points
 Nfp = refel.Nrp ^ (refel.dim-1);
@@ -55,8 +55,8 @@ rhsqy = zeros(Nv,1);
 rhsu  = zeros(Nv,1);
 
 % predefined normal vector, don't like it but stick with it for now
-nx = [1, 1, 0, 0];
-ny = [0, 0, 1, 1];
+nx = [-1, 1, 0, 0];
+ny = [0, 0, -1, 1];
 
 % stabilization parameter
 taur = 1;
@@ -116,18 +116,15 @@ for  sf=1:Nsfaces
       uu(:) = 0; uqx(:) = 0; uqy(:) = 0;
       rhsqx(:) = 0; rhsqy(:) = 0; rhsu(:) = 0;
       pts = m.element_nodes(e1, refel);
-      % Hari: look at this
       [Jv, Dv] = m.geometric_factors(refel, pts);
-%      [Jvgll, Dvgll] = m.geometric_factors_gll(refel, pts);
       
-      % Hari: look at this
       eMat = m.element_mass(e1, refel, Jv);
       eMatInv = inv(eMat);
 
       % compute the forcing
       rhsu = eMat * forcing(pts);
 
-      % Hari: look at this
+      % advection stiffness
       [Kex,Key] = m.element_stiffness_advection(e1, refel, Jv, Dv);
       
       uqx = Kex;
@@ -141,11 +138,9 @@ for  sf=1:Nsfaces
         idxv = m.get_discontinuous_face_indices(refel, 1, f);       
         
         % residual due to lambda
-        % Hari: look at this, rhsfx alone
         rhsfx = Jf .* (refel.Mr * lam(idxf)) * nx(f);
         rhsfy = Jf .* (refel.Mr * lam(idxf)) * ny(f);
         % lift to volume residual q equation
-        % Hari: look at this, rhsqx alone
         rhsqx(idxv) = rhsqx(idxv) + rhsfx;
         rhsqy(idxv) = rhsqy(idxv) + rhsfy;
         % lift to volume residual u equation
@@ -172,15 +167,9 @@ for  sf=1:Nsfaces
       dF = uqx * qxMatrix + uqy * qyMatrix + uu;
       
       u = dF \ F;
-      u = Uexact(:,e1);
-      % Hari: look at this, qx alone
       qx = qxMatrix * u + qxrhs;
       qy = qyMatrix * u + qyrhs;
-   
-      norm(u(:)-Uexact(:,e1))
-      norm(qx - Qxexact(:,e1))
-      norm(qy - Qyexact(:,e1))
-      keyboard
+    
     else
       continue;
     end
