@@ -51,5 +51,4 @@ for iface = 1:Nifaces
                              taur * (uR(idxvR) - lam)));
 
   res(index) = FhatL + FhatR;
-  keyboard
 end

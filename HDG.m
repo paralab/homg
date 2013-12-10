@@ -8,10 +8,10 @@ clear all
 HDGdata = [];
 
 % solution order
-order = 2;
+order = 4;
 
 % number of elements in x and y directions
-nelems = [6,3];
+nelems = [3,3];
 
 % generate the hexmesh with identity transform for now
 m = homg.hexmesh(nelems,@homg.xform.identity);
@@ -173,5 +173,67 @@ HDGdata.InteriorF2AllF = InteriorF2AllF;
 
 % Form the HDG matrix and RHS
 % Quick, dirty, and expensive way
-lamInterior = lam(HDGdata.SkelInterior2All);
-[res] = residual(lamInterior,HDGdata,forcing, Bdata);
+
+%-------- form the RHS------------------
+lamInterior = zeros(size(HDGdata.SkelInterior2All));
+rhs = -residual(lamInterior,HDGdata,forcing, Bdata);
+%--------- end form the RHS------------
+
+%--------- Construct the HDG matrix-------
+forcingn = @(pts) zeros(size(pts,1),1);
+Bdatan = zeros(size(Bdata));
+Nh = Nfp*Nifaces;
+
+maxnnzeros = 5 * Nh;
+II = zeros(maxnnzeros,1);
+JJ = zeros(maxnnzeros,1);
+SS = zeros(maxnnzeros,1);
+
+nnzeros = 0;
+
+for n = 1:Nh
+  lamInterior(n) = 1;
+  
+  Aj = residual(lamInterior,HDGdata,forcingn, Bdatan);
+  
+  [i,j,s] = find(Aj); j(:) = n;
+  
+  ni = length(i);
+  
+  if (nnzeros + ni) > maxnnzeros,
+    maxnnzeros = 2*maxnnzeros;
+    II(maxnnzeros) = 0;
+    JJ(maxnnzeros) = 0;
+    SS(maxnnzeros) = 0;
+  end
+  
+  maxnnzeros = 2*maxnnzeros;
+  
+  II(nnzeros+1:nnzeros+ni) = i;
+  JJ(nnzeros+1:nnzeros+ni) = j;
+  SS(nnzeros+1:nnzeros+ni) = s;
+  
+  nnzeros = nnzeros + ni; 
+  
+  lamInterior(n) = 0;
+  
+end
+A = sparse(II(1:nnzeros),JJ(1:nnzeros),SS(1:nnzeros),Nh,Nh);
+
+% Now solve for lam
+lamInterior = A \ rhs;
+
+lamAll = zeros(Nsfaces * Nfp,1);
+lamAll(Bmaps) = Bdata;
+lamAll(SkelInterior2All) = lamInterior;
+
+u = zeros(Nv,K);
+qx = zeros(Nv,K);
+qy = zeros(Nv,K);
+
+for e = 1:K
+  [u(:,e),qx(:,e),qy(:,e)] = localSolver(HDGdata, e, lamAll, forcing);
+end
+[norm(u-Uexact), norm(qx - Qxexact), norm(qy - Qyexact)]
+
+
