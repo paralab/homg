@@ -8,7 +8,7 @@ clear all
 HDGdata = [];
 
 % solution order
-order = 4;
+order = 3;
 
 % number of elements in x and y directions
 nelems = [3,3];
@@ -231,9 +231,30 @@ u = zeros(Nv,K);
 qx = zeros(Nv,K);
 qy = zeros(Nv,K);
 
+L2eu = 0;
+L2eqx = 0;
+L2eqy = 0;
+
 for e = 1:K
-  [u(:,e),qx(:,e),qy(:,e)] = localSolver(HDGdata, e, lamAll, forcing);
+  [u(:,e),qx(:,e),qy(:,e)] = localSolver(HDGdata, e, lamAll, ...
+                                         forcing);
+  
+  eu = u(:,e) - Uexact(:,e);
+  eqx = qx(:,e) - Qxexact(:,e);
+  eqy = qy(:,e) - Qyexact(:,e);
+  
+  pts = m.element_nodes(e, refel);
+  [Jv, Dv] = m.geometric_factors(refel, pts);
+  eMat = m.element_mass(e, refel, Jv);
+  
+  L2eu = L2eu +  eu' * eMat * eu;
+  L2eqx = L2eqx +  eqx' * eMat * eqx;
+  L2eqy = L2eqy +  eqy' * eMat * eqy;
+  
 end
-[norm(u-Uexact), norm(qx - Qxexact), norm(qy - Qyexact)]
+fprintf('L2 norm error for u  = %1.15e \n',sqrt(L2eu));
+fprintf('L2 norm error for qx = %1.15e \n',sqrt(L2eqx));
+fprintf('L2 norm error for qy = %1.15e \n',sqrt(L2eqy));
+
 
 
