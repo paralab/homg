@@ -8,10 +8,10 @@ clear all
 HDGdata = [];
 
 % solution order
-order = 3;
+order = 2;
 
 % number of elements in x and y directions
-nelems = [3,3];
+nelems = [8,8];
 
 % generate the hexmesh with identity transform for now
 m = homg.hexmesh(nelems,@homg.xform.identity);
@@ -146,7 +146,7 @@ HDGdata.Bmaps = Bmaps;
 
 Nifaces = Nsfaces - Nbfaces;
 SkelInterior2All = zeros(Nifaces * Nfp,1);
-SkelAll2Interior = zeros(Nifaces * Nfp,1);
+SkelAll2Interior = zeros(Nsfaces * Nfp,1);
 InteriorF2AllF   = zeros(Nifaces,1);
 
 HDGdata.Nifaces = Nifaces;
@@ -176,7 +176,8 @@ HDGdata.InteriorF2AllF = InteriorF2AllF;
 
 %-------- form the RHS------------------
 lamInterior = zeros(size(HDGdata.SkelInterior2All));
-rhs = -residual(lamInterior,HDGdata,forcing, Bdata);
+%rhs = -residual(lamInterior,HDGdata,forcing, Bdata);
+rhs = -residualFast(lamInterior,HDGdata,forcing, Bdata);
 %--------- end form the RHS------------
 
 %--------- Construct the HDG matrix-------
@@ -194,7 +195,8 @@ nnzeros = 0;
 for n = 1:Nh
   lamInterior(n) = 1;
   
-  Aj = residual(lamInterior,HDGdata,forcingn, Bdatan);
+  %  Aj = residual(lamInterior,HDGdata,forcingn, Bdatan);
+  Aj = residualFast(lamInterior,HDGdata,forcingn, Bdatan);
   
   [i,j,s] = find(Aj); j(:) = n;
   
