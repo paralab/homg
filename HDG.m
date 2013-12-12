@@ -172,7 +172,6 @@ HDGdata.SkelAll2Interior = SkelAll2Interior;
 HDGdata.InteriorF2AllF = InteriorF2AllF;
 
 % Form the HDG matrix and RHS
-% Quick, dirty, and expensive way
 
 %-------- form the RHS------------------
 lamInterior = zeros(size(HDGdata.SkelInterior2All));
@@ -180,47 +179,53 @@ lamInterior = zeros(size(HDGdata.SkelInterior2All));
 rhs = -residualFast(lamInterior,HDGdata,forcing, Bdata);
 %--------- end form the RHS------------
 
-%--------- Construct the HDG matrix-------
-forcingn = @(pts) zeros(size(pts,1),1);
-Bdatan = zeros(size(Bdata));
-Nh = Nfp*Nifaces;
+% form the HDG matrix
+A = HDGmatrix(HDGdata);
 
-maxnnzeros = 5 * Nh;
-II = zeros(maxnnzeros,1);
-JJ = zeros(maxnnzeros,1);
-SS = zeros(maxnnzeros,1);
-
-nnzeros = 0;
-
-for n = 1:Nh
-  lamInterior(n) = 1;
-  
-  %  Aj = residual(lamInterior,HDGdata,forcingn, Bdatan);
-  Aj = residualFast(lamInterior,HDGdata,forcingn, Bdatan);
-  
-  [i,j,s] = find(Aj); j(:) = n;
-  
-  ni = length(i);
-  
-  if (nnzeros + ni) > maxnnzeros,
-    maxnnzeros = 2*maxnnzeros;
-    II(maxnnzeros) = 0;
-    JJ(maxnnzeros) = 0;
-    SS(maxnnzeros) = 0;
-  end
-  
-  maxnnzeros = 2*maxnnzeros;
-  
-  II(nnzeros+1:nnzeros+ni) = i;
-  JJ(nnzeros+1:nnzeros+ni) = j;
-  SS(nnzeros+1:nnzeros+ni) = s;
-  
-  nnzeros = nnzeros + ni; 
-  
-  lamInterior(n) = 0;
-  
-end
-A = sparse(II(1:nnzeros),JJ(1:nnzeros),SS(1:nnzeros),Nh,Nh);
+% $$$ % Quick, dirty, and expensive way
+% $$$ %--------- Construct the HDG matrix-------
+% $$$ forcingn = @(pts) zeros(size(pts,1),1);
+% $$$ Bdatan = zeros(size(Bdata));
+% $$$ Nh = Nfp*Nifaces;
+% $$$ 
+% $$$ maxnnzeros = 5 * Nh;
+% $$$ II = zeros(maxnnzeros,1);
+% $$$ JJ = zeros(maxnnzeros,1);
+% $$$ SS = zeros(maxnnzeros,1);
+% $$$ 
+% $$$ nnzeros = 0;
+% $$$ 
+% $$$ for n = 1:Nh
+% $$$   lamInterior(n) = 1;
+% $$$   
+% $$$   %  Aj = residual(lamInterior,HDGdata,forcingn, Bdatan);
+% $$$   Aj = residualFast(lamInterior,HDGdata,forcingn, Bdatan);
+% $$$   
+% $$$   [i,j,s] = find(Aj); j(:) = n;
+% $$$   
+% $$$   ni = length(i);
+% $$$   
+% $$$   if (nnzeros + ni) > maxnnzeros,
+% $$$     maxnnzeros = 2*maxnnzeros;
+% $$$     II(maxnnzeros) = 0;
+% $$$     JJ(maxnnzeros) = 0;
+% $$$     SS(maxnnzeros) = 0;
+% $$$   end
+% $$$   
+% $$$   maxnnzeros = 2*maxnnzeros;
+% $$$   
+% $$$   II(nnzeros+1:nnzeros+ni) = i;
+% $$$   JJ(nnzeros+1:nnzeros+ni) = j;
+% $$$   SS(nnzeros+1:nnzeros+ni) = s;
+% $$$   
+% $$$   nnzeros = nnzeros + ni; 
+% $$$   
+% $$$   lamInterior(n) = 0;
+% $$$   
+% $$$ end
+% $$$ Aa = sparse(II(1:nnzeros),JJ(1:nnzeros),SS(1:nnzeros),Nh,Nh);
+% $$$ 
+% $$$ keyboard
 
 % Now solve for lam
 lamInterior = A \ rhs;
