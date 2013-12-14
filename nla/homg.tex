@@ -52,7 +52,7 @@ T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 
 \title{Comparison of Multigrid Algorithms for High-order
   Continuous Finite Element Discretizations}
-
+% GS: Should we add "geometric'' to the title?
 \author{Hari Sundar, Georg Stadler and George Biros}
 
 \institute{Institute for Computational Engineering \& Sciences, The
@@ -61,30 +61,30 @@ T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 %\corraddr{\texttt{hari@ices.utexas.edu}}
 \maketitle
 
-
-%We are interested in asymptotically
-%optimal---$\mathcal{O}(N)$---complexity solvers for approximating the
-%solution of elliptic partial differential equations (PDEs), where $N$
-%is the number of unknowns.  Multigrid is such a solver. In practice
-%however, multigrid performs best for low-order uniform discretizations
-%with smooth coefficients.
-%
 \begin{abstract}
-We present a comprehensive comparison of different multigrid approaches for
-solving systems arising from high-order continuous finite element
-discretizations of elliptic partial differential equations on complex
-geometries in two and three dimensions.  For polynomial orders up to 16, we
-compare the computational cost and the performance of different point smoothers
-(Jacobi, Chebyshev-accelerated Jacobi and SSOR smoothing) and of different
-variants of multigrid, namely high-order geometric multigrid, $p$-multigrid,
-and using a low-order operator based on the high-order nodes as preconditioner,
-which is often used in combination with algebraic multigrid for problems on
-unstructured meshes.
-%High order discretizations offer several
-%advantages over low-order discretizations. Besides the faster
-%convergence per unknown for sufficiently smooth problems, high order
-%discretizations can often make better use of modern hardware due to
-%their locality, resulting in improved efficiency of the calculations.
+We present a comprehensive comparison of different multigrid
+approaches for the solution of systems arising from high-order
+continuous finite element discretizations of elliptic partial
+differential equations on complex geometries.  We consider the
+pointwise Jacobi, the Chebyshev-accelerated Jacobi and the symmetric
+successive over-relaxation (SSOR) smoothers, as well as an
+element-wise block Jacobi smoother. Three approaches to high-order
+multigrid are discussed: (1) high-order geometric multigrid, which
+uses high-order interpolation and restriction on geometrically
+coarsened meshes; (2) $p$-multigrid, in which the polynomial order is
+reduced while the mesh remains unchanged, and the interpolation and
+restriction take into account the different-order basis functions; and
+(3), a low-order operator based on the high-order nodes as
+preconditioner, which is often combined with algebraic multigrid for
+the low-order operator. The latter approach is particularly attractive
+for high-order discretizatons on unstructured meshes, where geometric
+coarsening is challenging.  Based on a simple performance model, we
+compare the computational cost of the different approaches.  Using
+test problems in two and three dimensions with constant and varying
+coefficients, we compare the performance of the algorithms for
+polynomial orders up to 16.  While we use moderate-size test problems
+in this comparison, we also discuss properties of the methods with
+regard to parallel implementations on high-performance computers.
 \end{abstract}
 
 \keywords{high-order, multigrid, continuous finite elements, spectral
