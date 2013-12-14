@@ -62,23 +62,23 @@ T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 \maketitle
 
 \begin{abstract}
-We present a comprehensive comparison of different multigrid
+We present a comparison of different multigrid
 approaches for the solution of systems arising from high-order
 continuous finite element discretizations of elliptic partial
 differential equations on complex geometries.  We consider the
 pointwise Jacobi, the Chebyshev-accelerated Jacobi and the symmetric
-successive over-relaxation (SSOR) smoothers, as well as an
-element-wise block Jacobi smoother. Three approaches to high-order
-multigrid are discussed: (1) high-order geometric multigrid, which
-uses high-order interpolation and restriction on geometrically
+successive over-relaxation (SSOR) smoothers, as well as
+element-wise block Jacobi smoothing. Three approaches for the
+multigrid hierarchy are compared: (1) high-order $h$-multigrid, which
+uses high-order interpolation and restriction between geometrically
 coarsened meshes; (2) $p$-multigrid, in which the polynomial order is
 reduced while the mesh remains unchanged, and the interpolation and
 restriction take into account the different-order basis functions; and
 (3), a low-order operator based on the high-order nodes as
-preconditioner, which is often combined with algebraic multigrid for
-the low-order operator. The latter approach is particularly attractive
+preconditioner. This latter approach is often combined with algebraic multigrid for
+the low-order operator and is thus particularly attractive
 for high-order discretizatons on unstructured meshes, where geometric
-coarsening is challenging.  Based on a simple performance model, we
+coarsening is difficult.  Based on a simple performance model, we
 compare the computational cost of the different approaches.  Using
 test problems in two and three dimensions with constant and varying
 coefficients, we compare the performance of the algorithms for
@@ -92,7 +92,7 @@ regard to parallel implementations on high-performance computers.
 
 \section{Introduction}
 
-This paper presents a systematic comparison of geometric multigrid methods for
+This paper presents a comprehensive comparison of geometric multigrid methods for
 the solution of systems arising from high-order (we target polynomial orders up
 to 16) discretizations of elliptic partial differential equations. Our
 particular interest is to compare the efficiency of different high-order
