@@ -244,7 +244,7 @@ implementations on high performance computing platforms.
 \section{Problem statement and preliminaries}
 \label{sec:problem}
 
-As our test problem, we target the solution of the Poisson problem with
+As test problem, we target the solution of the Poisson problem with
 homogeneous Dirichlet boundary conditions on an open bounded domain
 $\Omega\subset\mathbb R^d$ ($d=2$ or $d=3$) with boundary $\partial
 \Omega$, i.e., we search the solution $u(\bs x)$ of:
@@ -276,10 +276,10 @@ on $H_0^{1}(\Omega)$, and $f \in L^{2}(\Omega)$, we want to find $u
 \label{eqn:weakForm}
 a(u,v) =  (f,v)_{L^2(\Omega)}, \ \ \ \forall v \in H_0^{1}(\Omega).
 \end{equation}
-This problem is known to have a unique solution \cite{BrennerScott94}. 
-We now derive discrete equations that whose solution 
+This problem is known to have a unique solution $u^*$ \cite{BrennerScott94}. 
+We now derive discrete equations whose solutions
 approximate the solution of
-(\ref{eqn:weakForm}). First, we define a sequence of $m$ nested {\em finite}
+(\ref{eqn:weakForm}). First, we define a sequence of $m$ nested conforming {\em finite}
 dimensional spaces, $V_1 \subset V_2 \subset \cdots \subset V_m \subset
 H_0^{1}(\Omega)$.
 Here, $V_k$ is the finite element space corresponds to a finite element mesh
@@ -287,7 +287,7 @@ at a specified
 polynomial order, and $V_{k-1}$ corresponds to the next coarser
 problem, which is obtained either via geometric coarsening of the
 mesh ($h$-coarsening) or decreasing of the polynomial degree of the
-finite element basis functions ($p$-coarsening) as illustrated in
+finite element basis functions ($p$-coarsening), as illustrated in
 Figure~\ref{fig:approaches}.  Then, the discretized problem is to find
 $u_k \in V_k$ such that
 \begin{equation*}
@@ -295,11 +295,11 @@ $u_k \in V_k$ such that
 a(u_{k},v_k) = (f,v_k)_{L^2(\Omega)}, \ \ \ \forall v_k \in V_k.
 \end{equation*}
 The discretized problem has a unique solution, and the sequence
-$\{u_k\}$ converges to $u$ \cite{BrennerScott94}.
+$\{u_k\}$ converges to $u^*$ \cite{BrennerScott94}.
 %
 %Let $(\cdot,\cdot)_{k}$ be an inner product defined on $V_k$.
 The $L^2$-projection of the linear operator corresponding to the
-bilinear form $a(\cdot\,,\cdot)$ onto $V_k$ are defined as linear
+bilinear form $a(\cdot\,,\cdot)$ onto $V_k$ is defined as the linear
 operator $A_k : V_{k} \rightarrow V_{k}$ such that
 \begin{equation}
 \label{eqn:fematDef}
@@ -315,8 +315,8 @@ operator $A_k : V_{k} \rightarrow V_{k}$ such that
 %\begin{equation}
 %(f_k,v)_k = (f,v)_{L^2(\Omega)},  \ \ \ \forall v \in V_k.  
 %\end{equation}
-The operator $A_k$ is a symmetric (self-adjoint) positive operator
-with respect to the $L^2$-inner product.
+The operator $A_k$ is self-adjoint
+with respect to the $L^2$-inner product and positive definite.
 % In the following sections, we use italics to
 %represent an operator (or vector) in the continuous form and use boldface to represent the matrix (or vector) corresponding to its
 %coordinate basis representation.
@@ -327,17 +327,17 @@ for the coefficient vector $\mathbf{u}_k\in \mathbb{R}^{N_k}$
 \begin{equation}
 \mathbf{A}_k\mathbf{u}_k = \mathbf{f}_k,
 \end{equation}
-where
+where, for $i,j = 1,2,\ldots,N_k$, the components of $\mathbf A_k$, $\mathbf u_k$ and $\mathbf f_k$ are given by
 %\label{eq:femDiscretization}
 \begin{align*}
 %\mathbf{\tilde{A}_{k}} &=& (\mathbf{M_{k}^{k}})^{-1}\mathbf{A_{k}},  \\
 %\mathbf{\tilde{f}_{k}} &=& (\mathbf{M_{k}^{k}})^{-1}\mathbf{f_{k}},  \\
-\mathbf{A}_{k}(i,j) =& a(\phi_i^k,\phi_j^k)  && \text{ for } i,j = 1,2,\ldots,N_k, \\
-\mathbf{f}_{k}(j)   =& (f,\phi_j^k)_{L^2(\Omega)} && \text{ for } j=1,2,\ldots,N_k, \\
-\mathbf{M}_k(i,j) =& (\phi_i^k,\phi_j^k)_{L^2(\Omega)}. \\
+(\mathbf{A}_k)_{ij} =& a(\phi_i^k,\phi_j^k), \\% && 
+(\mathbf{f}_{k})_j   =& (f,\phi_j^k)_{L^2(\Omega)}, \\%&& \text{ for } j=1,2,\ldots,N_k, \\
+(\mathbf{M}_k)_{ij} =& (\phi_i^k,\phi_j^k)_{L^2(\Omega)}.
 \end{align*}
 %\end{equation}
-Here, where $\mathbf{M}_k$ is the mass matrix, which appears in the
+Here, $\mathbf{M}_k$ is the mass matrix, which appears in the
 approximation of the $L^2$-inner product in $V_k$ since
 $(u_k,v_k)_{L^2(\Omega)} = \mathbf{u}_k^T\mathbf{M}_k\mathbf{v}_k$ for
 all $u_k,v_k\in V_k$ with corresponding coefficient vectors
