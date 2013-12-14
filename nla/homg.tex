@@ -348,25 +348,25 @@ product weighted by the mass matrix $\mathbf{M}_k$.
 
 % subsection matrix_assembly_&_quadrature (end)
 
-\subsection{Restriction \& Prolongation} % (fold)
+\subsection{Restriction and prolongation} % (fold)
 \label{sub:restriction_&_prolongation}
 Since the coarse-grid vector space is a subspace of the fine-grid
 vector space, any coarse-grid function $v_{k-1}$ can be expanded in
 terms of the fine basis functions,
 \begin{equation} 
-  v_{k-1} = \sum_{i=1}^{N_{k-1}} v_{i,k-1}\phi_i^{k-1} = \sum_{j=1}^{N_k} v_{j,k}\phi_j^k, 
+  v_{k-1} = \sum_{i=1}^{N_{k-1}} \mathbf v_{i,k-1}\phi_i^{k-1} = \sum_{j=1}^{N_k} \mathbf v_{j,k}\phi_j^k, 
 \end{equation} 
-where, $v_{i,k}$ and $v_{i,k-1}$ are the coefficients in the basis
+where, $\mathbf v_{i,k}$ and $\mathbf v_{i,k-1}$ are the coefficients in the basis
 expansion for $v_{k-1}$ on the fine and coarse grids, respectively.
 
 The prolongation operator can be represented as a matrix-vector
 product with the input vector as the coarse grid nodal values and the
 output as the fine grid nodal values \cite{SampathBiros10}. The matrix
-entries are the coarse grid shape functions evaluated at the fine-grid
-vertices, $p_i$,
+entries of this operator are thus the coarse grid shape functions evaluated at the fine-grid
+vertices, $p_i$, i.e.,
 \begin{equation}
 	\label{eq:Pstencil}
-	P(i,j) = \phi_j^{k-1}(p_i). 
+	P_{ij} = \phi_j^{k-1}(p_i) \quad \text{ for } 1\le i \le N_k, 1\le j\le N_{k-1}. 
 \end{equation}
 This gives rise to two different operators depending on whether the
 coarse grid is obtained via $h$-coarsening or whether it is obtained
@@ -388,18 +388,17 @@ diffeomorphism, i.e., a smooth mapping from the reference domain
 $S\coloneqq[0,1]^d$ to the physical domain $\Omega$. Hexahedral finite
 element meshes and tensorized nodal basis function based on
 Legende-Gauss-Lobotto (LGL) points are used.  We use isoparametric
-elements to approximate deformed geometries, i.e., the geometry
-diffeomorphism is approximated on each element using the same basis
+elements to approximate the geometry of $\Omega$, i.e., on each element the geometry
+diffeomorphism is approximated using the same basis
 functions as the
 finite element approximation. The Jacobians for this transformation
 are computed at every quadrature point, and Gauss quadrature is used
 to numerically approximate integrals.  Although this paper is partly
 motivated by our interest in fast elliptic solvers on adaptively
 refined nonconforming octree-based
-meshes~\cite{SundarBirosBursteddeEtAl12, SampathBiros10}, for the
-comparisons in this paper
-we restrict ourselves to uniform conforming meshes.
-
+meshes~\cite{SundarBirosBursteddeEtAl12, SampathBiros10}, 
+we restrict our comparisons to uniformly refined conforming meshes.
+%
 Our implementation is written in Matlab and made available from
 \todo{XXX}. While in practice, matrix assembly for
 high-order discretizations is discouraged, we use sparse
