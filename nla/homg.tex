@@ -366,7 +366,7 @@ entries of this operator are thus the coarse grid shape functions evaluated at t
 vertices, $p_i$, i.e.,
 \begin{equation}
 	\label{eq:Pstencil}
-	P_{ij} = \phi_j^{k-1}(p_i) \quad \text{ for } 1\le i \le N_k, 1\le j\le N_{k-1}. 
+	\mathbf P_{\!ij} = \phi_j^{k-1}(p_i) \quad \text{ for } 1\le i \le N_k, 1\le j\le N_{k-1}. 
 \end{equation}
 This gives rise to two different operators depending on whether the
 coarse grid is obtained via $h$-coarsening or whether it is obtained
@@ -419,34 +419,32 @@ assembled operators in this prototype implementation.
 
 % ***********************************************************
 
-\section{Multigrid approaches for high-order finite elements}
+\section{Multigrid approaches for high-order finite element discretizations}
 \label{sec:approaches}
 
-In this section, we summarize different approaches to geometric
-multigrid for high-order/spectral finite element
-discretizations. These approaches can either be directly used as
-solvers or can serve as preconditioners within a Krylov method. We
-first summarize different approaches for the construction of
-multilevel hierarchies in \S\ref{subsec:hierarchy}, then discuss
-smoothers in \S\ref{subsec:smoothers}, and compare the
-computational cost of the different approaches in
-\S\ref{subsec:complexity}.
+In this section, we summarize different multigrid approaches
+for high-order/spectral finite element
+discretizations. Multigrid can either be used as
+solver or can serve as preconditioner within a Krylov method. We
+summarize different approaches for the construction of
+multilevel hierarchies in~\S\ref{subsec:hierarchy}, discuss
+smoothers in~\S\ref{subsec:smoothers}, and then compare the
+computational cost of these different approaches in~\S\ref{subsec:complexity}.
 
 \subsection{Hierarchy construction}\label{subsec:hierarchy}
-Several approaches to building a multilevel hierarchy for high-order
-discretized problems are possible; see the overview shown in
-Figure~\ref{fig:approaches}. One option is the construction of a
-geometric mesh hierarchy while keeping the polynomial order unchanged;
-we refer to this approach as \emph{$h$-multigrid}. An
-alternative is to construct coarse problems by reducing the polynomial
-degree of the finite element basis functions, possibly followed by
-standard geometric multigrid; this is
+There are several ways to building a multilevel hierarchy for
+high-order discretized problems; see Figure~\ref{fig:approaches}. One
+option is the construction of a geometric mesh hierarchy while keeping
+the polynomial order unchanged; we refer to this approach as
+high-order \emph{$h$-multigrid}. An alternative is to construct coarse
+problems by reducing the polynomial degree of the finite element basis
+functions, possibly followed by standard geometric multigrid; this is
 commonly referred to as \emph{$p$-multigrid}. For unstructured
 high-order element discretizations, where geometric coarsening is
-challenging, using an algebraic multigrid hierarchy of a \emph{low-oder
-approximation to the high-order operator} as a preconditioner has been
-proven efficient and flexible. We next discuss details of these
-different approaches.
+challenging, using an algebraic multigrid hierarchy of a
+\emph{low-oder approximation to the high-order operator} as a
+preconditioner has been proven efficient. Next, we discuss details of
+these different approaches.
 
 
 \begin{figure}
@@ -548,19 +546,24 @@ different approaches.
 			}
 			% \node at (2, -0.2) {\tiny $p=1$ collocated with $p=4$};
 		\end{tikzpicture}
-		\caption{\label{fig:approaches} Different approaches
-                  for high-order multigrid: high-order $h$-multigrid
-                  (left), $p$-multigrid (middle) and low-order
-                  multigrid based on the nodes of the nodes of the
-                  high-order discretization, which can be used to
-                  precondition the high-order system.}
+		\caption{\label{fig:approaches} Illustration of
+                  different multigrid hierarchies for high-order
+                  finite element discretizations: high-order
+                  $h$-multigrid (left), $p$-multigrid (middle) and
+                  sparsified approximation using linear elements based
+                  on the nodes of the high-order discretization
+                  (right); the resulting low-order system, which is
+                  amenable to, e.g., an algebraic multigrid method,
+                  can serve as preconditioner for the high-order
+                  system matrix.}
 \end{figure}
 
 \subsubsection{$h$-multigrid}\label{subsec:h}
-A direct approach to high-order multigrid is to use high-order
-restriction and prolongation operators, and use the high-order
-discretization of the operator for the residual computation on each
-multigrid level (\S\ref{sub:restriction_&_prolongation}).
+A straightforward extension of low-order to high-order geometric
+multigrid is to use the high-order discretization of the operator for
+the residual computation on each multigrid level combined with
+high-order restriction and prolongation operators
+(see \S\ref{sub:restriction_&_prolongation}).
 %A potential difficulty in this approach is that it
 %requires smoothers for matrices arising from high-order
 %discretization, which usually have less favorable properties compared
@@ -568,31 +571,29 @@ multigrid level (\S\ref{sub:restriction_&_prolongation}).
 %discretizations of scalar elliptic operators are usually not
 %M-matrices, which is a useful property to prove the convergence of
 %smoothers such as Jacobi of Gauss-Seidel.
-Due to the decreased sparsity of high-order discretized systems, the
+Due to the low sparsity of high-order discretized systems, the
 efficient computation of the residual as well as devising efficient
-smoothers can be a challenge. As a remedy, one can use matrix-free
-methods which do not require to assemble system matrices but rely on
-element-local computations. The performance of these element-local
-computations can often be speed up using tensorized finite element
-basis functions as common in spectral element methods; see
-e.g.~\cite{DevilleFischerMund02}. 
+smoothers can be a challenge. As a remedy, matrix-free methods for the
+residuum computation and the prolongation and restriction operators
+can be used. The corresponding element-local computations can often be
+sped up by using tensorized finite element basis functions as common
+in spectral element methods; see e.g.~\cite{DevilleFischerMund02}.
 
 \subsubsection{$p$-multigrid}\label{subsec:p}
-In the $p$-multigrid approach to high-order multigrid, one (initially)
-does not coarsen the mesh geometrically, but coarsens the finite
-element system by
-reducing the polynomial order. Starting from an order-$p$ polynomial
+In the $p$-multigrid approach to high-order multigrid, the mesh is
+(initially) not coarsened geometrically, but the polynomial order of
+the element basis functions is reduced. Starting from an order-$p$ polynomial
 basis (for simplicity, we assume here that $p$ is a power of 2), the
 coarser grids correspond to polynomials of order $p/2, p/4,\ldots,1$,
 followed by geometric coarsening of the $p=1$ grid (i.e., the standard
-low-order geometric multigrid). 
+low-order geometric multigrid).
 %Decreasing the polynomial order is an element-local operation and is particularly simple for discretizations with nonconforming meshes. \gsnote{Is that actually true?}. 
 As for high-order $h$-multigrid, devising smoothers can be a challenge for
 $p$-multigrid.  Moreover, one often finds dependence of the
 convergence factor on the order of the polynomial basis
 \cite{MadayMunoz89}.
 
-\subsubsection{Preconditioning using AMG hierarchy of lower-order operator} \label{subsec:low}
+\subsubsection{Preconditioning by lower-order operator} \label{subsec:low}
 In this defect correction approach (see
 \cite{TrottenbergOosterleeSchuller01, Hackbusch85}), the high-order
 defect/residual is iteratively corrected using a low order operator
