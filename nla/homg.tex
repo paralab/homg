@@ -1073,7 +1073,7 @@ polynomial degree of the finite element functions but retain the same
 mesh. This results in an increasing number of unknowns as $p$
 increases. Since, as illustrated in \S\ref{subsec:num_mesh}, we
 observe mesh independent convergence for fixed $p$, this does not
-affect the comparison.
+influence the comparison.
 
 
 \begin{figure}
@@ -1088,82 +1088,92 @@ affect the comparison.
 \end{figure}
 
 \subsection{Setup of comparisons}\label{subsec:measures}
-Tables \ref{tab:box}--\ref{tab:3d-fan} present the number of multigrid
-v-cycles or of conjugate gradient (CG) iterations required to reduce
-the norm of the discrete residual by a factor of $10^8$, where a ``-''
-indicates non-convergence of the method. In
-particular, these tables report the following convergence information:
+In tables \ref{tab:box}--\ref{tab:3d-fan}, we report the number of
+multigrid v-cycles or of conjugate gradient (CG) iterations (each of
+which uses a single multigrid v-cycle as preconditioner) required to
+reduce the norm of the discrete residual by a factor of $10^8$, where
+a ``-'' indicates that the method did not converge. In particular,
+these tables report the following information:
 \begin{itemize}
 \item[$\bullet$] The first column gives the polynomial \emph{order}
   used in the finite element discretization.
 \item[$\bullet$] The columns entitled by \emph{MG as solver} report
-  the number of v-cycles needed when multigrid is used as a
+  the number of v-cycles required for convergence when multigrid is used as
   solver. The subcolums are:
   \begin{itemize}
   \item \emph{Jacobi(3,3)} denotes that 3 pre-smoothing and 3
     post-smoothing steps of a pointwise Jacobi smoother are used on
     each level.
   \item \emph{Cheb(3,3)} indicates that Chebyshev-accelerated Jacobi
-    smoothing is used, again with 3 pre-smoothing and 3 post-smoothing
+    smoothing is used, again using 3 pre-smoothing and 3 post-smoothing
     steps. An estimate of the maximal eigenvalue of the linear system,
     as required by the Chebyshev method, is estimated using 10 Arnoldi
     iterations.
   \item \emph{SSOR(2,1)} denotes that a symmetric successive
-    over-relaxation method is employed, where 2 pre-smoothing and 1
-    post-smoothing step are used. Note that each SSOR smoothing
+    over-relaxation method is employed, with 2 pre-smoothing and 1
+    post-smoothing steps. Note that each SSOR
     iteration amounts to a forward and a backward Gauss-Seidel
-    smoothing step, and thus roughly
-    requires double the computational work compared to Jacobi
+    smoothing step, and thus
+    requires  roughly double the computational work compared to Jacobi
     smoothing.\footnote{This ignores aspects occurring in parallel
-      environments, where Gauss-Seidel smoothing---such as SSOR---can
+      environments, where Gauss-Seidel smoothing can
       be challenging to implement and requires more communication in
       distributed memory environments.}. The SSOR smoother is based on 
 			a lexicographic ordering of  the unknowns. 
   \end{itemize}
-    For the 2D tests reported in
+    For the two-dimensional problems reported in
     Tables~\ref{tab:box}-\ref{tab:2d-fan}, we use three different
-    meshes $32\times32$, $16\times16$ and $8\times8$ elements in the
-    multigrid v-cycle. For the v-cycle for the 3D tests reported in
-    Tables~\ref{tab:3d-box}-\ref{tab:3d-fan}, meshes with
-    $8\times8\times8$, $4\times4\times4$ and $2\times2\times2$
+    meshes with $32\times32$, $16\times16$ and $8\times8$ elements in
+    the multigrid v-cycle. For the v-cycle for the three-dimensional
+    tests reported in Tables~\ref{tab:3d-box}-\ref{tab:3d-fan}, meshes
+    with $8\times8\times8$, $4\times4\times4$ and $2\times2\times2$
     elements are used.  Note that for each smoother we report results
     for $h$-multigrid (columns marked by \emph{h}; see
     \S\ref{subsec:h}) as well as for $p$-multigrid (columns marked by
     \emph{p}; see \S\ref{subsec:p}). For $p$-multigrid, we restrict
     ourselves to orders that are powers of 2. After coarsening in $p$
-    till $p=1$, we coarsen in $h$. For example, in the 2D case, for
-    $p=16$, we will have a total of 7 grids; the first 5 are
-    grids of size $32\times32\times32$ with $p=16,8,4,2,1$,
-    respectively, followed by two additional coarse grids of size
-    $16\times16$ and $8\times8$, and $p=1$.
-\item[$\bullet$] The columns entitled \emph{MG with pCG} presents our
-  results obtained when multigrid is uses as preconditioner in a CG
-  algorithm. A single multigrid v-cycle is used per CG iteration. The sub-columns 
-  again correspond to different smoothers, as described above.
-\item[$\bullet$] The columns headed by \emph{low-order MG pCG} present
-  the number of CG iterations needed to solve the high-order system
-  preconditioned with the low-order operator based on the high-order
-  nodal points (see \S\ref{subsec:low}). \todo{While in practice one
-    would use an algebraic multigrid cycle to approximately solve the
-    linearized system, here we use a direct factorization method as
-    solver for the low-order system. The difference between the two
-    subcolumns is the way the residual is computed for the smoother on
-    the finest mesh; the experiments reported in the column headed by
-    \emph{l-res} use the residual computed from the low-order system
-    in the smoother on the finest level, while for the tests reported
-    in the column headed by \emph{h-res} we evaluate the residual in the
-    smoother based on the high-order system matrix. Both residual
-    computations require matrix-vector products with $N$ unknowns, but
-    the low-order operator is sparser and thus, in general, faster to
-    apply.  Both cases use 3 pre and post-smoothing steps of a
-    Chebyshev-accelerate Jacobi point smoother, and the diagonal of
-    the low-order system.  For that latter case, the Chebyshev
-    smoother requires an estimate of the largest eigenvalue of the
-    high-order matrix preconditioned with the diagonal of the
-    low-order operator, which is computed using 10 iterations of the
-    Arnoldi algorithm.}
+    till $p=1$, we coarsen in $h$. For example, for the
+    two-dimensional problems and $p=16$, we use a total of 7 grids;
+    the first five all use meshes with $32\times32\times32$ elements,
+    and $p=16,8,4,2,1$, respectively, followed by two additional
+    coarse grids of size $16\times16$ and $8\times8$, and $p=1$.
+\item[$\bullet$] The columns entitled \emph{MG with pCG} presents the
+  number of conjugate gradient iterations requires for the solution,
+  where each iteration uses one multigrid v-cycle as preconditioner.
+  The sub-columns correspond to different smoothers, as described
+  above.
+\item[$\bullet$] The columns headed by \emph{low-order MG pCG} report
+  the number of CG iterations needed to solve the high-order system,
+  when preconditioned with the low-order operator that is based on the
+  high-order nodal points (see \S\ref{subsec:low}).  While in practice
+  one would use algebraic multigrid to solve the linearized system
+  approximately, in our tests we use a factorization method to solve
+  the low-order system directly.  As a consequence, the reported
+  iteration counts are a lower bound for the iteration counts one
+  would obtain if the low-order system was inverted approximately by
+  algebraic multigrid.
+
+  The difference between the iteration counts reported in the two
+  subcolumns lies in the computation of the residual in the smoother
+  on the finest mesh; the experiments reported in the column headed by
+  \emph{h-res} use the residual computed from the high-order system in
+  the smoother on the finest level, while for the tests reported in
+  the column headed by \emph{l-res}, the residual in the smoother is
+  evaluated using the low-order system matrix.\footnote{Since in our
+    experiments the low-order system is solved with a direct solver,
+    smoothing steps with the low-order residual do not have an
+    effect.}  Both, the low-order and the high-order residual
+  computations require matrix products with vectors of dimension
+  $N$. As the low-order operator is sparser, in general it is faster
+  to apply.  We use 3 pre and 3 post-smoothing steps of a
+  Chebyshev-accelerated Jacobi point smoother.  The estimation of the
+  maximal eigenvalue required for the Chebyshev smoother is based on
+  the high-order operator preconditioned with the diagonal of the
+  low-order operator for \emph{h-res}, and based on the low-order
+  operator preconditioned with the diagonal of the low-order matrix
+  for \emph{l-res}.
 \end{itemize}
-In the next section, we summarize our numerical comparisons.
+%In the next section, we summarize our numerical comparisons.
 
 \subsection{Summary of numerical results}\label{subsec:results}
 Next, in Section~\ref{subsec:num_point}, we compare the performance of
@@ -1173,31 +1183,6 @@ illustrate that the number of iterations is independent of the mesh
 resolution. Finally, in Section~\ref{subsec:num_block} we study the
 performance of a block Jacobi smoother for discretizations with
 polynomial orders $p=8$ and $p=16$.
-
-\subsubsection{Comparison of point smoothers}\label{subsec:num_point}
-Tables \ref{tab:box} and \ref{tab:2d-fan} present the number of
-iterations obtained for various point smoothers and different
-polynomial orders for the two dimensional test problems. As can be seen in
-Table~\ref{tab:box}, for the Laplace problem on the unit square all
-solver/smoothing variants converge for all polynomial orders in a
-relatively small number of iterations. However, the number of
-iterations increases with the polynomial orders $p$, in particular
-when multigrid is used as a solver. Using multigrid as a
-preconditioner in CG results in a reduction of multigrid v-cycles, in
-some cases by a factor or two. Also, we observe that SSOR
-smoothing generally performs better than the two Jacobi-based
-smoothers. We find that the linear-order operator based on the
-high-order nodes is a good preconditioner for the high-order
-system. The convergence of this method is significantly improved when
-smoothing steps on the finest level are used. Note that the Jacobi
-smoother underlying the Chebyshev smoother uses the diagonal entries
-of the low-order operator, but the residual computed from the
-high-order operator. The low-order preconditioning approach proves to
-be efficient, making it particularly attractive for high-order
-discretized problems on unstructured meshes. However, in our tests
-this efficiency partly has to be attributed to the use of a direct
-solver for the low-order system, rather than an approximate solution
-based on an algebraic multigrid method.
 
 % \gsnote{It's interesting that with 3 smoothing steps this
 %  performs better than the high-order multigrid with Chebyshev
@@ -1235,6 +1220,31 @@ l-res & h-res\\
 \hline
   \end{tabular}
 \end{table}
+
+\subsubsection{Comparison of point smoothers}\label{subsec:num_point}
+Tables \ref{tab:box} and \ref{tab:2d-fan} present the number of
+iterations obtained for various point smoothers and different
+polynomial orders for the two dimensional test problems. As can be seen in
+Table~\ref{tab:box}, for the Laplace problem on the unit square all
+solver/smoothing variants converge for all polynomial orders in a
+relatively small number of iterations. However, the number of
+iterations increases with the polynomial orders $p$, in particular
+when multigrid is used as a solver. Using multigrid as a
+preconditioner in CG results in a reduction of multigrid v-cycles, in
+some cases by a factor or two. Also, we observe that SSOR
+smoothing generally performs better than the two Jacobi-based
+smoothers. We find that the linear-order operator based on the
+high-order nodes is a good preconditioner for the high-order
+system. The convergence of this method is significantly improved when
+smoothing steps on the finest level are used. Note that the Jacobi
+smoother underlying the Chebyshev smoother uses the diagonal entries
+of the low-order operator, but the residual computed from the
+high-order operator. The low-order preconditioning approach proves to
+be efficient, making it particularly attractive for high-order
+discretized problems on unstructured meshes. However, in our tests
+this efficiency partly has to be attributed to the use of a direct
+solver for the low-order system, rather than an approximate solution
+based on an algebraic multigrid method.
 
 Let us now contrast these observations with the results for the
 variable coefficient case summarized in Table~\ref{tab:2d-fan}. First,
