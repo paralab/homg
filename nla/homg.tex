@@ -1002,8 +1002,8 @@ solution is smooth, it is well known that the accuracy increases for
 high-order discretizations. Due to the decreased sparsity of the
 discretized operators, this does not automatically translate to more
 accuracy per computation time; see, e.g.~\cite{Brown10}. However, note
-that the complexity of most computations in a multigrid preconditioned
-conjugate gradient algorithm, for instance, are of complexity
+that the complexity of most computations in, for instance, a multigrid
+preconditioned conjugate gradient algorithm are of complexity
 $\mathcal{O}(N)$ (see Algorithm~\ref{alg:pcg}) and thus independent of
 $g_p$. Thus, the computational cost of these steps does not depend on
 the order of the discretization. Even if these $\mathcal{O}(N)$ steps
@@ -1037,45 +1037,44 @@ but also in terms of accuracy per computation time.
 % **************************************************
 % **************************************************
 \section{Numerical results}\label{sec:numerics}
-In this section we present a comprehensive comparison of our
+In this section, we present a comprehensive comparison of our
 algorithms for the solution of high-order discretizations of
 \eqref{eq:Poisson}.  After introducing our test problems in
-\S\ref{subsec:tests}, in \S\ref{subsec:measures} we
-discuss how we compare different methods for high-order multigrid. The
-results of these comparisons are presented and discussed
-\S\ref{subsec:results}.
+\S\ref{subsec:tests}, we describe how we compare different methods for
+high-order multigrid in \S\ref{subsec:measures}. The results of these
+comparisons are presented and discussed \S\ref{subsec:results}.
 
 
 \subsection{Test problems}\label{subsec:tests}
 We compare our algorithms for the solution of~\eqref{eq:Poisson} with
-constant coefficient $\mu\equiv 1$ on a unit square and a unit cube,
+constant coefficient $\mu\equiv 1$ on the unit square and the unit cube,
 and, with varying coefficients $\mu(\bs x)$, on the warped two and
 three dimensional domains shown in Figure~\ref{fig:mesh}. To be
 precise, we consider the following four problems:
 \begin{itemize}
-\item[] {\bf 2d-const:} The domain for the problem is the unit square, and $\mu\equiv
+\item[] {\bf 2d-const:} The domain $\Omega$ for the problem is the unit square, and $\mu\equiv
   1$.
-\item[] {\bf 2d-var:} The warped two-dimensional domain for this
-  problem is shown on the left in Figure~\ref{fig:mesh}, and the
+\item[] {\bf 2d-var:} The warped two-dimensional domain $\Omega$
+  is shown on the left in Figure~\ref{fig:mesh}, and the
   varying coefficient is $\mu(x,y) = 1 + 10^6(\cos^2(2\pi x) +
   \cos^2(2\pi y))$.
-\item[] {\bf 3d-const:} The domain for this problem is the unit cube,
+\item[] {\bf 3d-const:} The domain $\Omega$ for this problem is the unit cube,
   and we use the constant coefficient $\mu\equiv 1$.
-\item[] {\bf 3d-var:} The warped three-dimensional domain for this
-  problem is shown on the right of Figure~\ref{fig:mesh}, and the
+\item[] {\bf 3d-var:} The warped three-dimensional domain $\Omega$
+  shown on the right of Figure~\ref{fig:mesh} is used; the
   varying coefficient is $\mu(x,y,z) = 1 + 10^6(\cos^2(2\pi x) +
   \cos^2(2\pi y) + \cos^2(2\pi z))$.
 \end{itemize}
 
-The
-coefficient $\mu$ at the coarse grid quadrature points is computed as
-the linear interpolation of the coefficient at the fine grid
-quadrature points. In our tests, we change the polynomial degree of
-the finite element functions, but retain the same mesh; this results
-in an increasing number of unknowns as $p$ increases. Since, as
-illustrated in \S\ref{subsec:num_mesh}, mesh independence is observed
-for all polynomial orders $p$, these results coincide with those
-obtained for larger mesh sizes.
+The coefficient $\mu$ at the coarse grid quadrature points is computed
+using linear interpolation of the coefficient at the fine grid
+quadrature points. For the different test problems, we change the
+polynomial degree of the finite element functions but retain the same
+mesh. This results in an increasing number of unknowns as $p$
+increases. Since, as illustrated in \S\ref{subsec:num_mesh}, we
+observe mesh independent convergence for fixed $p$, this does not
+affect the comparison.
+
 
 \begin{figure}
 	\includegraphics[width=0.48\textwidth]{figs/fan2d}
@@ -1084,7 +1083,7 @@ obtained for larger mesh sizes.
 	\includegraphics[width=0.48\textwidth]{figs/fan3d}
 	\caption{\label{fig:mesh} Two and three-dimensional warped
           meshes used in our numerical experiments. The color
-          illustrates the logarithm of the coefficient $\mu(\bs x)\in [1.0,
+          illustrates the logarithm of the coefficient field $\mu(\bs x)\in [1.0,
             d\cdot 10^6]$.}
 \end{figure}
 
