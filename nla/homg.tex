@@ -713,21 +713,21 @@ significantly better error reduction than Jacobi or Chebyshev
 smoothing.
 
 In Figure~\ref{fig:smoothers-var}, we study the solution of
-\eqref{eq:Poisson} with a smoothly (but significantly) varying
-coefficient $\mu$ on the deformed geometry. Compared to the constant
-coefficient case, Jacobi smoothing performs significantly worse, both,
-when used as a solver and as a smoother. Let us focus on the two-grid
-correction for polynomial order $p=16$ and compare with the results
-for using multigrid as a solver summarized in Table~\ref{tab:2d-fan}.
-Jacobi smoothing does not lead to a converging two-grid algorithm, as
-many coefficients are amplified by the two-grid cycle. For Chebyshev
-smoothing, the multigrid v-cycle converges (although very slowly)
-although one or two coefficients appear to be amplified in the
-two-grid iteration. This convergence can be explained by the fact that
-errors can be interchanged between different eigenvectors in the
-v-cycle.  SSOR smoothing combined with the two-grid method retains a
-significant error reduction and, as a consequence, convergens at a
-satisfactory rate.
+\eqref{eq:Poisson} with a smoothly (but strongly) varying coefficient
+$\mu$ on the deformed geometry. Compared to the constant coefficient
+case, Jacobi smoothing performs significantly worse, both, when used
+as a solver and as a smoother. Let us focus on the two-grid correction
+for polynomial order $p=16$ and compare with the results obtained when
+using multigrid as a solver from Table~\ref{tab:2d-fan}.  Jacobi
+smoothing does not lead to a converging two-grid algorithm, as many
+coefficients are amplified by the two-grid cycle. For Chebyshev
+smoothing, the multigrid v-cycle converges (although slowly) although
+one or two coefficients appear amplified in the two-grid
+iteration. This convergence can be explained by the fact that errors
+can be interchanged between different eigenvectors in the v-cycle.
+SSOR smoothing combined with the two-grid method retains a significant
+error reduction and, as a consequence, convergens at a satisfactory
+rate.
 
 \begin{figure}
 	\centering
@@ -807,22 +807,22 @@ satisfactory rate.
 		\draw[black, fill=white] (3.95, 5.375) rectangle +(2.9,0.325);
 		\node at (5.35, 5.53) {\bf \small{v-cycle, $p=16$}};
 		\end{tikzpicture}
-	\caption{\label{fig:smoothers} Error decay for different
-          point smoothers when used as solver (left column) and when used
-          within a single two-grid step (right column) for a two-dimensional,
-          constant coefficient Laplace problem on a unit square
-          (problem {\bf 2d-const} specified in \S\ref{subsec:tests}.). To
-          keep the number of unknowns the same for
-          different polynomial orders, meshes of $32\times 32$,
-          $8\times 8$ and $2\times 2$ elements are used for polynomial
-          orders $p=1$, $p=4$ and $p=16$, respectively.
-          Plotted are the coefficients of the error
-          expanded in the eigenvectors of the system matrix $\mathbf{A}_k$.
-          The order of the eigenvectors is such that the
-          corresponding eigenvalues are descending; thus, the
-          smoothness of the eigenvectors decays from left to right.
-          The initialization is chosen to have all unit coefficients in
-          the eigenvector expansion.}
+	\caption{\label{fig:smoothers} Error decay for different point
+          smoothers when used as solver (left column) and when used in
+          a single two-grid step with exact coarse grid solution
+          (right column) for a two-dimensional, constant coefficient
+          Laplace problem on a unit square (problem {\bf 2d-const}
+          specified in \S\ref{subsec:tests}). To keep the number of
+          unknowns the same accross all polynomial orders, meshes of
+          $32\times 32$, $8\times 8$ and $2\times 2$ elements are used
+          for polynomial orders $p=1$, $p=4$ and $p=16$, respectively.
+          Plotted are the coefficients of the error expanded in the
+          eigenvectors of the system matrix $\mathbf{A}_k$.  The
+          eigenvectors are ordered such that the corresponding
+          eigenvalues are descending; thus, the smoothness of the
+          eigenvectors decays from left to right.  The system right
+          hand side is zero and the initialization is chosen to have
+          all unit coefficients in the eigenvector expansion.}
 \end{figure}
 
 %% Variable Coefficients ----- SHELL
@@ -912,14 +912,14 @@ satisfactory rate.
 
 \subsubsection{Schwarz-based smoothers}\label{subsec:schwarz}
 An alternative smoothing approach for high-order discretizations is
-based on local block solves.  Schwarz-type domain decomposition
-smoothers have successfully been used for spectral element
-discretizations with orders significantly 8 and higher. They are more
-stable for anisotropic meshes or anisotropic problems than point
-smoothers. A main challenge of Schwarz-type smoothers is that they
-require the solution of dense local systems.  This is either done by
-using direct methods or approximations that allow for a fast iterative
-solution \cite{LottesFischer05, FischerLottes05}. However, the
+based on local block solves.  Since for high polynomial orders many
+unknowns lie in the element interiors, Schwarz-type domain
+decomposition smoothers are promising. For instance, they are more
+stable for anisotropic meshes than point smoothers. A main challenge
+of Schwarz-type smoothers is that they require the solution of dense
+local systems.  This is either done by using direct methods or
+approximations that allow for a fast iterative solution on hexahedral
+meshes \cite{LottesFischer05, FischerLottes05}. However, these
 coarse-grid solves can become fairly expensive. Moreover, depending on
 how much overlap between the domains is used, it is not
 straightforward to achieve good parallel scalability. In
@@ -929,7 +929,7 @@ smoothers with a element-wise block Jacobi smoothing.
 
 \subsection{Comparing the computational cost}\label{subsec:complexity}
 To compare the computational cost of the different methods, we focus
-on matrix-vector multiplications on the finest multigrid level, which
+on the matrix-vector multiplications on the finest multigrid level, which
 dominate the overall computation. Denoting the number of unknowns on
 the finest level by $N$, the cost for a matrix-vector product is
 $Ng_p$, where $g_p>0$ is the cost per unknown for the application of
@@ -946,7 +946,9 @@ strongly on the implementation and on the system architecture.
 %operations \cite{DevilleFischerMund02}.
 In general, high-order implementations allow more memory locality,
 which often results in higher performance compared to low order
-methods.
+methods. As a consequence, $g_p$ grows significantly slower with $p$
+than the number of nonzero entries in each row of the assembled system
+matrix.
 
 The dominant computational cost per iteration of the high-order
 multigrid approaches discussed in \S\ref{sec:approaches} can
@@ -961,13 +963,13 @@ computations (and thus matrix-vector computations) per smoothing step.
 Jacobi smoothing and Chebyshev-accelerated Jacobi require $m=1$
 matrix-vector multiplication per smoothing step, while SSOR requires
 $m=2$ matrix-vector operations. If, in the approach discussed in
-\S\ref{subsec:low}, the linear-order residual is used in the
-smoother, then the cost \eqref{eq:compcost} reduces to
+\S\ref{subsec:low}, the sparsified linear-element residual is used in the
+smoother, the cost \eqref{eq:compcost} reduces to
 \begin{equation}\label{eq:compcost2}
-  g_p+g_1m(s_\text{pre}+s_\text{post})).
+  g_p+g_1m(s_\text{pre}+s_\text{post}).
 \end{equation}
 However, since the overall number of iterations increases (see
-\S\ref{subsec:results}), this usually does not decrease the
+\S\ref{subsec:results}), this does not necessarily decrease the
 solution time.
 
 % note that  Jacobi, SSOR and
@@ -998,7 +1000,7 @@ solution time.
 If the overall number of unknowns $N$ is kept fixed and the problem
 solution is smooth, it is well known that the accuracy increases for
 high-order discretizations. Due to the decreased sparsity of the
-discretized operators, this does not automatically translate into more
+discretized operators, this does not automatically translate to more
 accuracy per computation time; see, e.g.~\cite{Brown10}. However, note
 that the complexity of most computations in a multigrid preconditioned
 conjugate gradient algorithm, for instance, are of complexity
