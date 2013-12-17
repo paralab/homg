@@ -77,7 +77,7 @@ restriction take into account the different-order basis functions; and
 (3), a low-order operator based on the high-order nodes as
 preconditioner. This latter approach is often combined with algebraic multigrid for
 the low-order operator and is thus particularly attractive
-for high-order discretizatons on unstructured meshes, where geometric
+for high-order discretizations on unstructured meshes, where geometric
 coarsening is difficult.  Based on a simple performance model, we
 compare the computational cost of the different approaches.  Using
 test problems in two and three dimensions with constant and varying
@@ -159,8 +159,8 @@ one-dimensional spectral methods and spectral element problems. This high-order
 geometric multigrid requires the computation of high-order residuals and the use of
 high-order interpolation and prolongation operators. Thus, an efficient implementation
 cannot assemble these operators, i.e., has to be matrix-free.  Here, we compare
-different smoothers for such a high-order $h$-multigrid method on two and three
-dimensional complex geometries with varying coefficients.
+different smoothers for such a high-order $h$-multigrid method on two
+and three-dimensional complex geometries with varying coefficients.
 
 An alternative to high-order geometric multigrid is $p$-multigrid, which
 coarsens the polynomial degree while (at least, initially) keeping the mesh
@@ -698,7 +698,7 @@ $\lambda_\text{max}$ is the maximum eigenvalue of the system matrix.
 
 The results for the constant coefficient Laplacian operator on the
 unit square (Figure~\ref{fig:smoothers}) show that all point
-smoothers decrease the error compoments in the upper half of the
+smoothers decrease the error components in the upper half of the
 spectrum; however,  the decrease is smaller for high-order
 elements. Note that Chebyshev accelerated Jacobi smoothing results in
 a uniform damping of a larger part of the spectrum than Jacobi
@@ -726,7 +726,7 @@ one or two coefficients appear amplified in the two-grid
 iteration. This convergence can be explained by the fact that errors
 can be interchanged between different eigenvectors in the v-cycle.
 SSOR smoothing combined with the two-grid method retains a significant
-error reduction and, as a consequence, convergens at a satisfactory
+error reduction and, as a consequence, converges at a satisfactory
 rate.
 
 \begin{figure}
@@ -1049,7 +1049,7 @@ comparisons are presented and discussed \S\ref{subsec:results}.
 We compare our algorithms for the solution of~\eqref{eq:Poisson} with
 constant coefficient $\mu\equiv 1$ on the unit square and the unit cube,
 and, with varying coefficients $\mu(\bs x)$, on the warped two and
-three dimensional domains shown in Figure~\ref{fig:mesh}. To be
+three-dimensional domains shown in Figure~\ref{fig:mesh}. To be
 precise, we consider the following four problems:
 \begin{itemize}
 \item[] {\bf 2d-const:} The domain $\Omega$ for the problem is the unit square, and $\mu\equiv
@@ -1224,7 +1224,7 @@ l-res & h-res\\
 \subsubsection{Comparison of point smoothers}\label{subsec:num_point}
 Tables \ref{tab:box} and \ref{tab:2d-fan} present the number of
 iterations obtained for various point smoothers and different
-polynomial orders for the two dimensional test problems. As can be
+polynomial orders for the two-dimensional test problems. As can be
 seen in Table~\ref{tab:box}, for {\bf 2d-const}
 all solver variants converge in a
 relatively small number of iterations for all polynomial
@@ -1491,7 +1491,6 @@ low-order preconditioner. Support for this work was
   funded by the U.S.~Department of Energy
   Office of Science, Advanced Scientific Computing Research and
   Biological and Environmental Research.
-% \todo{Check with George and Omar; these are Diamond, DOE ice, NSF ice and NSF mantle/wave.}
 
 
 \bibliographystyle{siam}
