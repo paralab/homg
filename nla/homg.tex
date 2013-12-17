@@ -1176,11 +1176,11 @@ these tables report the following information:
 %In the next section, we summarize our numerical comparisons.
 
 \subsection{Summary of numerical results}\label{subsec:results}
-Next, in Section~\ref{subsec:num_point}, we compare the performance of
+Next, in \S\ref{subsec:num_point}, we compare the performance of
 different point smoothers for the test problems presented in
-Section~\ref{subsec:tests}. Then, in Section~\ref{subsec:num_mesh}, we
+\S\ref{subsec:tests}. Then, in \S\ref{subsec:num_mesh}, we
 illustrate that the number of iterations is independent of the mesh
-resolution. Finally, in Section~\ref{subsec:num_block} we study the
+resolution. Finally, in \S\ref{subsec:num_block}, we study the
 performance of a block Jacobi smoother for discretizations with
 polynomial orders $p=8$ and $p=16$.
 
@@ -1224,22 +1224,26 @@ l-res & h-res\\
 \subsubsection{Comparison of point smoothers}\label{subsec:num_point}
 Tables \ref{tab:box} and \ref{tab:2d-fan} present the number of
 iterations obtained for various point smoothers and different
-polynomial orders for the two dimensional test problems. As can be seen in
-Table~\ref{tab:box}, for the Laplace problem on the unit square all
-solver/smoothing variants converge for all polynomial orders in a
-relatively small number of iterations. However, the number of
-iterations increases with the polynomial orders $p$, in particular
-when multigrid is used as a solver. Using multigrid as a
-preconditioner in CG results in a reduction of multigrid v-cycles, in
-some cases by a factor or two. Also, we observe that SSOR
-smoothing generally performs better than the two Jacobi-based
-smoothers. We find that the linear-order operator based on the
-high-order nodes is a good preconditioner for the high-order
+polynomial orders for the two dimensional test problems. As can be
+seen in Table~\ref{tab:box}, for {\bf 2d-const}
+all solver variants converge in a
+relatively small number of iterations for all polynomial
+orders. However, the number of
+iterations increases with the polynomial order $p$, in particular when
+multigrid is used as a solver. Using multigrid as a preconditioner in
+the conjugate gradient method results in a reduction of overall
+multigrid v-cycles, in some cases even by a factor or two. Also, we
+observe that SSOR smoothing generally performs better than the two
+Jacobi-based smoothers. We find that the linear-order operator based
+on the high-order nodes is a good preconditioner for the high-order
 system. The convergence of this method is significantly improved when
-smoothing steps on the finest level are used. Note that the Jacobi
-smoother underlying the Chebyshev smoother uses the diagonal entries
-of the low-order operator, but the residual computed from the
-high-order operator. The low-order preconditioning approach proves to
+smoothing based on the high-order residual (but the low-order
+diagonal) is used on the finest mesh.
+% Note that the Jacobi
+%smoother, which underlies the Chebyshev smoother, uses the diagonal entries
+%of the low-order operator, but the residual computed from the
+%high-order operator.
+In this case, the low-order preconditioning approach proves to
 be efficient, making it particularly attractive for high-order
 discretized problems on unstructured meshes. However, in our tests
 this efficiency partly has to be attributed to the use of a direct
@@ -1247,8 +1251,8 @@ solver for the low-order system, rather than an approximate solution
 based on an algebraic multigrid method.
 
 Let us now contrast these observations with the results for the
-variable coefficient case summarized in Table~\ref{tab:2d-fan}. First,
-note that all variants perform reasonably for discretizations up to
+variable coefficient problem {\bf 2d-var} summarized in Table~\ref{tab:2d-fan}. First,
+note that all variants of the solver perform reasonably for discretizations up to
 order $p=4$. When used as a solver, multigrid either diverges or
 converges very slowly for orders $p>4$. Convergence is reestablished
 when multigrid is combined with CG. Using multigrid with SSOR
@@ -1256,19 +1260,18 @@ smoothing as preconditioner in CG results, for orders up to $p=8$ in a
 convergence factor of at least $0.1$ in each iteration, and in a
 factor of $0.25$ for order $p=16$.
 
-Next, we turn to the three dimensional results reported in
-Tables~\ref{tab:3d-box} and \ref{tab:3d-fan}. All of our
-multigrid/smoother variants converge for the Laplace equation on the
-unit cube, as shown in Table~\ref{tab:3d-box}. The benefit of using
+Next, we turn to the results for {\bf 3d-const} and {\bf 3d-var},
+which are reported in Tables~\ref{tab:3d-box} and \ref{tab:3d-fan},
+respectively. For {\bf 3d-const}, all variants of the solver
+converge. For this three-dimensional problem, the benefit of using
 multigrid as preconditioner rather than as solver is even more evident
-in three dimensions than for the two dimensional unit square
-problem.
+than in two dimensions.
 
-Our results for the varying coefficient problem on the
-three-dimensional geometry shown in Figure~\ref{fig:mesh} are
-summarized in Table~\ref{tab:3d-fan}. As in two dimensions, the
+
+Our results for {\bf 3d-var} are
+summarized in Table~\ref{tab:3d-fan}. As for {\bf 2d-var}, the
 performance of multigrid when used as a solver degrades significantly
-for orders $p>4$. As can be seen, the linear element matrix based on
+for orders $p>4$. It can also be seen that the low-order matrix based on
 the high order node points represents a good preconditioner for the
 high-order system. As in two dimensions, smoothing steps based on the
 high-order residual and the diagonal of the low-order operator
