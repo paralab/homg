@@ -1414,12 +1414,12 @@ problematic with respect to computational time as well as storage in
 realistic problems, in particular for warped meshes and very high
 polynomial orders. As can be seen in Table~\ref{tab:block-jac}, the
 number of iterations is reduced compared to pointwise Jacobi
-smoothing; however, the gained efficiency reduces when multigrid is
+smoothing; however, the gained speed up reduces when multigrid is
 used as a preconditioner in CG rather than as a solver.
 \begin{table}\centering
 	\caption{\label{tab:block-jac} Comparison between block-Jacobi
           and point-Jacobi smoothing. Shown is the number of
-          iterations for three of our test problems, obtained with 3
+          iterations, obtained with 3
           pre and 3 post-smoothing steps. Shown in brackets is the
           number of iterations requires for point Jacobi smoothing.}
 \begin{tabular}{|c|c|c|c|c|c|c|}
@@ -1434,8 +1434,6 @@ used as a preconditioner in CG rather than as a solver.
 	\hline
 \end{tabular}
 \end{table}
-
-
 In the next section, we summarize our findings and draw conclusions.
 
 \section{Discussion and conclusions}
