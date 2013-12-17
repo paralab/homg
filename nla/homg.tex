@@ -163,9 +163,11 @@ dimensional complex geometries with varying coefficients.
 
 An alternative to high-order geometric multigrid is $p$-multigrid, which
 coarsens the polynomial degree while (at least, initially) keeping the mesh
-unchanged, see, e.g.,~\cite{HelenbrookMavriplisAtkins03}. Here, we compare the
-performance and this $p$-multigrid approach\footnote{when $p$ is a power of
-$2$.} with $h$-multigrid for different smoothers and polynomial orders.
+unchanged, see, e.g.,~\cite{HelenbrookMavriplisAtkins03}. Here, we
+compare the
+performance and $p$-multigrid
+%\footnote{when $p$ is a power of$2$.}
+with high-order $h$-multigrid for different smoothers and polynomial orders.
 
 %Even though high-order discretizations can, in principle, benefit from
 %modern hardware, the rapid loss of sparsity of the involved systems as
@@ -656,11 +658,10 @@ additional high-order residual computation per smoothing step.
 
 % **********************************************************
 \subsection{Smoothers}\label{subsec:smoothers}
-Next, we summarize different smoothing approaches. In our numerical
-comparisons, we restrict ourselves to the point smoothers reviewed in
-\S\ref{subsec:ptsmoothers}. For completeness of the
-presentation, we briefly describe Schwarz-type smoothers in
-\S\ref{subsec:schwarz}.
+Next, we summarize different smoothing approaches. Point smoothers,
+which are the main target of this paper, are reviewed in
+\S\ref{subsec:ptsmoothers}. In \S\ref{subsec:schwarz}, we discuss
+domain decomposition based smoothers.
 
 
 \subsubsection{Point smoothers}\label{subsec:ptsmoothers}
@@ -743,9 +744,9 @@ satisfactory rate.
 		\node[fill=blue!70, draw, circle,minimum width=0.1cm] at (4.3, 5.0) {}; 
 		\node[fill=red!70!black, draw, circle,minimum width=0.1cm] at (4.3, 4.5) {};
 		\node[fill=green!70!black, draw, circle,minimum width=0.1cm] at (4.3, 4.0) {};
-		\node[text width=1.9cm] at (5.75, 5.0) {\small jacobi $(6)$};
-		\node[text width=1.9cm] at (5.75, 4.5) {\small chebyshev $(6)$};
-		\node[text width=1.9cm] at (5.75, 4.0) {\small ssor $(3)$};
+		\node[text width=1.9cm] at (5.75, 5.0) {\small Jacobi$(6)$};
+		\node[text width=1.9cm] at (5.75, 4.5) {\small Chebyshev$(6)$};
+		\node[text width=1.9cm] at (5.75, 4.0) {\small SSOR$(3)$};
 		\end{tikzpicture}
 		\begin{tikzpicture}[scale=0.8]
 		\begin{semilogyaxis}[ymajorgrids,ymin=1e-5,ymax=2,xmin=0,xmax=961,yticklabels={,,}]
@@ -760,9 +761,9 @@ satisfactory rate.
 		\node[fill=blue!70, draw, circle,minimum width=0.1cm] at (4.0, 5.0) {}; 
 		\node[fill=red!70!black, draw, circle,minimum width=0.1cm] at (4.0, 4.5) {};
 		\node[fill=green!70!black, draw, circle,minimum width=0.1cm] at (4.0, 4.0) {};
-		\node[text width=2.1cm] at (5.55, 5.0) {\small jacobi $(3,3)$};
-		\node[text width=2.1cm] at (5.55, 4.5) {\small chebyshev $(3,3)$};
-		\node[text width=2.1cm] at (5.55, 4.0) {\small ssor $(2,1)$};
+		\node[text width=2.1cm] at (5.55, 5.0) {\small Jacobi$(3,3)$};
+		\node[text width=2.1cm] at (5.55, 4.5) {\small Chebyshev$(3,3)$};
+		\node[text width=2.1cm] at (5.55, 4.0) {\small SSOR$(2,1)$};
 		\end{tikzpicture}
 	\\
 		\begin{tikzpicture}[scale=0.8]
@@ -809,7 +810,8 @@ satisfactory rate.
 	\caption{\label{fig:smoothers} Error decay for different
           point smoothers when used as solver (left column) and when used
           within a single two-grid step (right column) for a two-dimensional,
-          constant coefficient Laplace problem on a unit square. To
+          constant coefficient Laplace problem on a unit square
+          (problem {\bf 2d-const} specified in \S\ref{subsec:tests}.). To
           keep the number of unknowns the same for
           different polynomial orders, meshes of $32\times 32$,
           $8\times 8$ and $2\times 2$ elements are used for polynomial
@@ -839,9 +841,9 @@ satisfactory rate.
 		\node[fill=blue!70, draw, circle,minimum width=0.1cm] at (4.3, 5.0) {}; 
 		\node[fill=red!70!black, draw, circle,minimum width=0.1cm] at (4.3, 4.5) {};
 		\node[fill=green!70!black, draw, circle,minimum width=0.1cm] at (4.3, 4.0) {};
-		\node[text width=1.9cm] at (5.75, 5.0) {\small jacobi $(6)$};
-		\node[text width=1.9cm] at (5.75, 4.5) {\small chebyshev $(6)$};
-		\node[text width=1.9cm] at (5.75, 4.0) {\small ssor $(3)$};
+		\node[text width=1.9cm] at (5.75, 5.0) {\small Jacobi$(6)$};
+		\node[text width=1.9cm] at (5.75, 4.5) {\small Chebyshev$(6)$};
+		\node[text width=1.9cm] at (5.75, 4.0) {\small SSOR$(3)$};
 		\end{tikzpicture}
 		\begin{tikzpicture}[scale=0.8]
 		\begin{semilogyaxis}[ymajorgrids,ymin=1e-5,ymax=2,xmin=0,xmax=961,yticklabels={,,}]
@@ -855,9 +857,9 @@ satisfactory rate.
 		\node[fill=blue!70, draw, circle,minimum width=0.1cm] at (4.0, 5.0) {}; 
 		\node[fill=red!70!black, draw, circle,minimum width=0.1cm] at (4.0, 4.5) {};
 		\node[fill=green!70!black, draw, circle,minimum width=0.1cm] at (4.0, 4.0) {};
-		\node[text width=2.1cm] at (5.55, 5.0) {\small jacobi $(3,3)$};
-		\node[text width=2.1cm] at (5.55, 4.5) {\small chebyshev $(3,3)$};
-		\node[text width=2.1cm] at (5.55, 4.0) {\small ssor $(2,1)$};
+		\node[text width=2.1cm] at (5.55, 5.0) {\small Jacobi$(3,3)$};
+		\node[text width=2.1cm] at (5.55, 4.5) {\small Chebyshev$(3,3)$};
+		\node[text width=2.1cm] at (5.55, 4.0) {\small SSOR$(2,1)$};
 		\end{tikzpicture}
 	\\
 		\begin{tikzpicture}[scale=0.8]
@@ -902,9 +904,9 @@ satisfactory rate.
 		\node at (5.35, 5.53) {\bf \small{v-cycle, $p=16$}};
 		\end{tikzpicture}
 	\caption{\label{fig:smoothers-var} Same as
-          Figure~\ref{fig:smoothers}, but for the two-dimensional warped
-          geometry shown in Figure~\ref{fig:mesh} with varying coefficient
-          $\mu(x,y) = 1 + 10^6(\cos^2(2\pi x) + \cos^2(2\pi y))$.}
+          Figure~\ref{fig:smoothers}, but for the two-dimensional
+          warped geometry, variable coefficient problem {\bf 2d-const}
+          specified in \S\ref{subsec:tests}.}
 \end{figure}
 
 
@@ -912,7 +914,7 @@ satisfactory rate.
 An alternative smoothing approach for high-order discretizations is
 based on local block solves.  Schwarz-type domain decomposition
 smoothers have successfully been used for spectral element
-discretizations with orders significantly higher than 8. They are more
+discretizations with orders significantly 8 and higher. They are more
 stable for anisotropic meshes or anisotropic problems than point
 smoothers. A main challenge of Schwarz-type smoothers is that they
 require the solution of dense local systems.  This is either done by
@@ -920,9 +922,12 @@ using direct methods or approximations that allow for a fast iterative
 solution \cite{LottesFischer05, FischerLottes05}. However, the
 coarse-grid solves can become fairly expensive. Moreover, depending on
 how much overlap between the domains is used, it is not
-straightforward to achieve good parallel scalability.
+straightforward to achieve good parallel scalability. In
+Section~\ref{sec:numerics}, we compare the performance of point
+smoothers with a element-wise block Jacobi smoothing.
 
-\subsection{Comparing computational cost}\label{subsec:complexity}
+
+\subsection{Comparing the computational cost}\label{subsec:complexity}
 To compare the computational cost of the different methods, we focus
 on matrix-vector multiplications on the finest multigrid level, which
 dominate the overall computation. Denoting the number of unknowns on
@@ -1034,42 +1039,59 @@ In this section we present a comprehensive comparison of our
 algorithms for the solution of high-order discretizations of
 \eqref{eq:Poisson}.  After introducing our test problems in
 \S\ref{subsec:tests}, in \S\ref{subsec:measures} we
-describe how we compare our methods for high-order multigrid. The
-results for our test problem are then presented and discussed
+discuss how we compare different methods for high-order multigrid. The
+results of these comparisons are presented and discussed
 \S\ref{subsec:results}.
 
 
-\subsection{Presentation of test problems}\label{subsec:tests}
-We compare our algorithms for the solution of~\eqref{eq:Poisson} on a
-unit square and a unit cube with constant coefficient $\mu\equiv 1$,
-as well as on the warped two and three dimensional domains shown in
-Figure~\ref{fig:mesh}, where we use a varying coefficient $\mu(\bs
-x)$. 
-% \todo{How anisotropic is the 2d-fan mesh? Probably we also have to update the mesh plots.}  
-The coefficient $\mu$ at the coarse grid quadrature points is
-computed as the linear interpolation of the coefficient at the fine
-grid quadrature points. In our tests, we change the polynomial degree of
-the finite element functions but keep the same mesh; this results in
-an increasing number of unknowns as $p$ increases. It is important to 
-point out that mesh independence is acheived for all $p$, therefore
-the results are similar for larger mesh sizes as well.
+\subsection{Test problems}\label{subsec:tests}
+We compare our algorithms for the solution of~\eqref{eq:Poisson} with
+constant coefficient $\mu\equiv 1$ on a unit square and a unit cube,
+and, with varying coefficients $\mu(\bs x)$, on the warped two and
+three dimensional domains shown in Figure~\ref{fig:mesh}. To be
+precise, we consider the following four problems:
+\begin{itemize}
+\item[] {\bf 2d-const:} The domain for the problem is the unit square, and $\mu\equiv
+  1$.
+\item[] {\bf 2d-var:} The warped two-dimensional domain for this
+  problem is shown on the left in Figure~\ref{fig:mesh}, and the
+  varying coefficient is $\mu(x,y) = 1 + 10^6(\cos^2(2\pi x) +
+  \cos^2(2\pi y))$.
+\item[] {\bf 3d-const:} The domain for this problem is the unit cube,
+  and we use the constant coefficient $\mu\equiv 1$.
+\item[] {\bf 3d-var:} The warped three-dimensional domain for this
+  problem is shown on the right of Figure~\ref{fig:mesh}, and the
+  varying coefficient is $\mu(x,y,z) = 1 + 10^6(\cos^2(2\pi x) +
+  \cos^2(2\pi y) + \cos^2(2\pi z))$.
+\end{itemize}
+
+The
+coefficient $\mu$ at the coarse grid quadrature points is computed as
+the linear interpolation of the coefficient at the fine grid
+quadrature points. In our tests, we change the polynomial degree of
+the finite element functions, but retain the same mesh; this results
+in an increasing number of unknowns as $p$ increases. Since, as
+illustrated in \S\ref{subsec:num_mesh}, mesh independence is observed
+for all polynomial orders $p$, these results coincide with those
+obtained for larger mesh sizes.
 
 \begin{figure}
 	\includegraphics[width=0.48\textwidth]{figs/fan2d}
 	%\input{tikz/fan.tikz}
 	%\input{tikz/fan-3d.tikz}
 	\includegraphics[width=0.48\textwidth]{figs/fan3d}
-	\caption{\label{fig:mesh} Two and three dimensional warped
+	\caption{\label{fig:mesh} Two and three-dimensional warped
           meshes used in our numerical experiments. The color
-          illustrates the value of the coefficient $\mu(\bs x)\in [1.0,
+          illustrates the logarithm of the coefficient $\mu(\bs x)\in [1.0,
             d\cdot 10^6]$.}
 \end{figure}
 
 \subsection{Setup of comparisons}\label{subsec:measures}
 Tables \ref{tab:box}--\ref{tab:3d-fan} present the number of multigrid
 v-cycles or of conjugate gradient (CG) iterations required to reduce
-the norm of the discrete residual by a factor of $10^8$. In
-particular, these tables report the following.
+the norm of the discrete residual by a factor of $10^8$, where a ``-''
+indicates non-convergence of the method. In
+particular, these tables report the following convergence information:
 \begin{itemize}
 \item[$\bullet$] The first column gives the polynomial \emph{order}
   used in the finite element discretization.
@@ -1081,13 +1103,15 @@ particular, these tables report the following.
     post-smoothing steps of a pointwise Jacobi smoother are used on
     each level.
   \item \emph{Cheb(3,3)} indicates that Chebyshev-accelerated Jacobi
-    smoothing is used, again with 3 pre-smoothing and 3
-    post-smoothing steps. The maximal eigenvalue required by the
-    Chebyshev method is estimated using 10 Arnoldi iterations.
+    smoothing is used, again with 3 pre-smoothing and 3 post-smoothing
+    steps. An estimate of the maximal eigenvalue of the linear system,
+    as required by the Chebyshev method, is estimated using 10 Arnoldi
+    iterations.
   \item \emph{SSOR(2,1)} denotes that a symmetric successive
     over-relaxation method is employed, where 2 pre-smoothing and 1
-    post-smoothing step are employed. Note that each SSOR smoothing
-    iteration amounts to a forward and a backward v-cycle, and thus
+    post-smoothing step are used. Note that each SSOR smoothing
+    iteration amounts to a forward and a backward Gauss-Seidel
+    smoothing step, and thus roughly
     requires double the computational work compared to Jacobi
     smoothing.\footnote{This ignores aspects occurring in parallel
       environments, where Gauss-Seidel smoothing---such as SSOR---can
@@ -1095,56 +1119,71 @@ particular, these tables report the following.
       distributed memory environments.}. The SSOR smoother is based on 
 			a lexicographic ordering of  the unknowns. 
   \end{itemize}
-  \item For the 2D meshes, Tables~\ref{tab:box}-\ref{tab:2d-fan}, we use 
-  three $h$-grids of sizes $32\times32$, $16\times16$ and $8\times8$. For 
-  the 3D meshes, Tables~\ref{tab:3d-box}-\ref{tab:3d-fan}, we use grids of 
-  sizes $8\times8\times8$, $4\times4\times4$ and $2\times2\times2$.
-  Note that for each smoother we report results for
-  $h$-multigrid (columns marked by \emph{h}; see
-  \S\ref{subsec:h}) as well as for $p$-multigrid (columns marked
-  by \emph{p}; see \S\ref{subsec:p}). For $p$-multigrid, we
-  restrict ourselves to orders that are powers of 2. After
-  coarsening in $p$ till $p=1$, we coarsen in $h$. For example in the 2D case, 
-  for $p=16$, we will have a total of 7 grids; the first 5 shall be grids of 
-  size $32\times32\times32$ with $p=16,8,4,2,1$, respectively, followed by 
-  two additional coarse grids of size $16\times16$ and $8\times8$ and $p=1$.
+    For the 2D tests reported in
+    Tables~\ref{tab:box}-\ref{tab:2d-fan}, we use three different
+    meshes $32\times32$, $16\times16$ and $8\times8$ elements in the
+    multigrid v-cycle. For the v-cycle for the 3D tests reported in
+    Tables~\ref{tab:3d-box}-\ref{tab:3d-fan}, meshes with
+    $8\times8\times8$, $4\times4\times4$ and $2\times2\times2$
+    elements are used.  Note that for each smoother we report results
+    for $h$-multigrid (columns marked by \emph{h}; see
+    \S\ref{subsec:h}) as well as for $p$-multigrid (columns marked by
+    \emph{p}; see \S\ref{subsec:p}). For $p$-multigrid, we restrict
+    ourselves to orders that are powers of 2. After coarsening in $p$
+    till $p=1$, we coarsen in $h$. For example, in the 2D case, for
+    $p=16$, we will have a total of 7 grids; the first 5 are
+    grids of size $32\times32\times32$ with $p=16,8,4,2,1$,
+    respectively, followed by two additional coarse grids of size
+    $16\times16$ and $8\times8$, and $p=1$.
 \item[$\bullet$] The columns entitled \emph{MG with pCG} presents our
   results obtained when multigrid is uses as preconditioner in a CG
   algorithm. A single multigrid v-cycle is used per CG iteration. The sub-columns 
   again correspond to different smoothers, as described above.
-\item[$\bullet$] The columns headed by \emph{linearized pCG} present
+\item[$\bullet$] The columns headed by \emph{low-order MG pCG} present
   the number of CG iterations needed to solve the high-order system
   preconditioned with the low-order operator based on the high-order
-  node points (see \S\ref{subsec:low}). While in practice one
-  would most likely use an algebraic multigrid cycle to approximately
-  solve the linearized system, here we use a direct factorization
-  method as solver for the low-order system. The different columns
-  correspond to different numbers of Chebyshev-accelerated Jacobi
-  smoothing steps on the finest mesh. These smoothing steps use the
-  high-order residual but the diagonal from the low-order system. As a
-  consequence, the Chebyshev smoother requires an estimate of the
-  largest eigenvalue of the high-order matrix preconditioned with the
-  diagonal of the low-order operator, which is computed using
-  10 iterations of the Arnoldi algorithm.
+  nodal points (see \S\ref{subsec:low}). \todo{While in practice one
+    would use an algebraic multigrid cycle to approximately solve the
+    linearized system, here we use a direct factorization method as
+    solver for the low-order system. The difference between the two
+    subcolumns is the way the residual is computed for the smoother on
+    the finest mesh; the experiments reported in the column headed by
+    \emph{l-res} use the residual computed from the low-order system
+    in the smoother on the finest level, while for the tests reported
+    in the column headed by \emph{h-res} we evaluate the residual in the
+    smoother based on the high-order system matrix. Both residual
+    computations require matrix-vector products with $N$ unknowns, but
+    the low-order operator is sparser and thus, in general, faster to
+    apply.  Both cases use 3 pre and post-smoothing steps of a
+    Chebyshev-accelerate Jacobi point smoother, and the diagonal of
+    the low-order system.  For that latter case, the Chebyshev
+    smoother requires an estimate of the largest eigenvalue of the
+    high-order matrix preconditioned with the diagonal of the
+    low-order operator, which is computed using 10 iterations of the
+    Arnoldi algorithm.}
 \end{itemize}
 In the next section, we summarize our numerical comparisons.
 
 \subsection{Summary of numerical results}\label{subsec:results}
-
-
+Next, in Section~\ref{subsec:num_point}, we compare the performance of
+different point smoothers for the test problems presented in
+Section~\ref{subsec:tests}. Then, in Section~\ref{subsec:num_mesh}, we
+illustrate that the number of iterations is independent of the mesh
+resolution. Finally, in Section~\ref{subsec:num_block} we study the
+performance of a block Jacobi smoother for discretizations with
+polynomial orders $p=8$ and $p=16$.
 
 \subsubsection{Comparison of point smoothers}\label{subsec:num_point}
-The Tables \ref{tab:box} and \ref{tab:2d-fan} present our comparison
-of the performance of point smoothers for the
-
-the two dimensional test problems. As can be seen in
+Tables \ref{tab:box} and \ref{tab:2d-fan} present the number of
+iterations obtained for various point smoothers and different
+polynomial orders for the two dimensional test problems. As can be seen in
 Table~\ref{tab:box}, for the Laplace problem on the unit square all
 solver/smoothing variants converge for all polynomial orders in a
 relatively small number of iterations. However, the number of
 iterations increases with the polynomial orders $p$, in particular
 when multigrid is used as a solver. Using multigrid as a
 preconditioner in CG results in a reduction of multigrid v-cycles, in
-some cases even by a factor or two. Also, we observe that SSOR
+some cases by a factor or two. Also, we observe that SSOR
 smoothing generally performs better than the two Jacobi-based
 smoothers. We find that the linear-order operator based on the
 high-order nodes is a good preconditioner for the high-order
@@ -1166,28 +1205,32 @@ based on an algebraic multigrid method.
 
 \begin{table}
   \caption{\label{tab:box} Results for two-dimensional unit square
-    with constant coefficient $\mu\equiv 1$.  A total of 3 grids were
-    used, the finest grid was $32\times 32$, and the coarsest was
-    $8\times 8$. For a detailed description of the different
-    experiments reported in this table we refer to
+    problem {\bf 2d-const} defined in \S\ref{subsec:tests}.
+%  A total
+%    of 3 grids were used, the finest grid was $32\times 32$, and the
+%    coarsest was $8\times 8$.
+    For a detailed description of the
+    different experiments reported in this table we refer to
     \S\ref{subsec:measures}.}  \centering
-  \begin{tabular}{|r|c c|c c|c c||c c|c c|c c||c c c|} 
+  \begin{tabular}{|r|c c|c c|c c||c c|c c|c c||c c|} 
     \hline
-    & \multicolumn{6}{c||}{MG as solver} & \multicolumn{6}{c||}{MG with pCG} & \multicolumn{3}{r|}{linearized} \\
+    & \multicolumn{6}{c||}{MG as solver} & \multicolumn{6}{c||}{MG
+      with pCG} & \multicolumn{2}{r|}{\!\!low-order MG\!\!} \\
     \cline{2-13}
-    \!\!\! order \!\!\!\! &  \multicolumn{2}{c|}{\!\scriptsize  Jacobi(3)\!} &  \multicolumn{2}{c|}{\!\scriptsize Cheb(3)\!} & \multicolumn{2}{c||}{\!\scriptsize  SSOR(2)\!} & \multicolumn{2}{c|}{\!\scriptsize Jacobi(3)\!} &  \multicolumn{2}{c|}{\!\scriptsize Cheb(3)\!} & \multicolumn{2}{c||}{\!\scriptsize SSOR(2)\!} & \multicolumn{3}{c|}{pCG}\\
+    \!\!\! order \!\!\!\! &  \multicolumn{2}{c|}{\!\!\scriptsize  Jacobi(3,3)\!\!} &  \multicolumn{2}{c|}{\!\!\scriptsize Cheb(3,3)\!\!} & \multicolumn{2}{c||}{\!\!\scriptsize  SSOR(2,1)\!\!} & \multicolumn{2}{c|}{\!\!\scriptsize Jacobi(3,3)\!\!} &  \multicolumn{2}{c|}{\!\!\scriptsize Cheb(3,3)\!\!} & \multicolumn{2}{c||}{\!\!\scriptsize SSOR(2,1)\!\!} & \multicolumn{2}{c|}{pCG}\\
 \hline
- & $h$ & $p$ & $h$ & $p$& $h$ & $p$& $h$ & $p$& $h$ & $p$& $h$ & $p$& 0 & 1 & 3\\
- \cline{2-16}
-1 & 6 & & 5 & & 5 & & 5 & & 4 & & 4 & & - & - & - \\
-2 & 7 & 7 & 5 & 6 & 5 & 5 & 5 & 5 & 4 & 4 & 4 & 4 & 14 & 9 & 4 \\
-3 & 8 & & 6 & & 5 & & 6 & & 5 & & 4 & & 16 & 9 & 4 \\
-4 & 9 & 8 & 6 & 6 & 5 & 5 & 6 & 5 & 5 & 5 & 4 & 4 & 16 & 10 & 4 \\
-5 & 12 & & 8 & & 7 & & 7 & & 6 & & 5 & & 17 & 10 & 4 \\
-6 & 12 & & 9 & & 7 & & 7 & & 6 & & 5 & & 18 & 11 & 5\\
-7 & 16 & & 12 & & 8 & & 8 & & 7 & & 6 & & 18 & 12 & 5 \\
-8 & 17/16 & 14 & 13 & 10 & 8 & 7 & 9/8 & 8 & 7 & 6 & 6 & 5 & 19 & 12 & 5\\
-16 & 40/31 & 33 & 33 & 27 & 17 & 14 & 14/12 & 12 & 12 & 11 & 9 & 8 & 21 & 14 & 8 \\
+ & $h$ & $p$ & $h$ & $p$& $h$ & $p$& $h$ & $p$& $h$ & $p$& $h$ & $p$&
+l-res & h-res\\
+ \cline{2-15}
+1 & 6 & & 5 & & 5 & & 5 & & 4 & & 4 & & -  & - \\
+2 & 7 & 7 & 5 & 6 & 5 & 5 & 5 & 5 & 4 & 4 & 4 & 4 & 14 & 4 \\
+3 & 8 & & 6 & & 5 & & 6 & & 5 & & 4 & & 16  & 4 \\
+4 & 9 & 8 & 6 & 6 & 5 & 5 & 6 & 5 & 5 & 5 & 4 & 4 & 16 & 4 \\
+5 & 12 & & 8 & & 7 & & 7 & & 6 & & 5 & & 17 & 4 \\
+6 & 12 & & 9 & & 7 & & 7 & & 6 & & 5 & & 18 & 5\\
+7 & 16 & & 12 & & 8 & & 8 & & 7 & & 6 & & 18 & 5 \\
+8 & 17 & 14 & 13 & 10 & 8 & 7 & 9 & 8 & 7 & 6 & 6 & 5 & 19 & 5\\
+16 & 40 & 33 & 33 & 27 & 17 & 14 & 14 & 12 & 12 & 11 & 9 & 8 & 21 & 8 \\
 \hline
   \end{tabular}
 \end{table}
@@ -1223,95 +1266,116 @@ convergence.
 
 
 \begin{table}
-  \caption{\label{tab:2d-fan} Results for two-dimensional warped
-    geometry with varying coefficient $\mu(x,y) = 1 + 10^6(\cos^2(2\pi
-    x) + \cos^2(2\pi y))$.  A total of 3 grids were used, the finest
-    grid was $32\times 32$, and the coarsest was $8\times 8$. For a
+  \caption{\label{tab:2d-fan} Results for two-dimensional
+    warped-geometry, varying coefficient problem {\bf 2d-var} defined
+    in \S\ref{subsec:tests}.
+%  A total of 3 grids were used, the finest
+%    grid was $32\times 32$, and the coarsest was $8\times 8$.
+    For a
     detailed description of the different experiments reported in this
     table we refer to \S\ref{subsec:measures}.}  \centering
-  \begin{tabular}{|r|c c|c c|c c||c c|c c|c c||c c c|} 
+  \begin{tabular}{|r|c c|c c|c c||c c|c c|c c||c c|} 
     \hline
-    & \multicolumn{6}{c||}{MG as solver} & \multicolumn{6}{c||}{MG with pCG} & \multicolumn{3}{r|}{linearized} \\
+    & \multicolumn{6}{c||}{MG as solver} & \multicolumn{6}{c||}{MG
+      with pCG} & \multicolumn{2}{r|}{\!\!low-order MG\!\!} \\
     \cline{2-13}
-    \!\!\! order \!\!\!\! &  \multicolumn{2}{c|}{\!\scriptsize  Jacobi(3)\!} &  \multicolumn{2}{c|}{\!\scriptsize Cheb(3)\!} & \multicolumn{2}{c||}{\!\scriptsize  SSOR(2)\!} & \multicolumn{2}{c|}{\!\scriptsize Jacobi(3)\!} &  \multicolumn{2}{c|}{\!\scriptsize Cheb(3)\!} & \multicolumn{2}{c||}{\!\scriptsize SSOR(2)\!} & \multicolumn{3}{c|}{pCG}\\
+    \!\!\! order \!\!\!\! &  \multicolumn{2}{c|}{\!\!\scriptsize  Jacobi(3,3)\!\!} &  \multicolumn{2}{c|}{\!\!\scriptsize Cheb(3,3)\!\!} & \multicolumn{2}{c||}{\!\!\scriptsize  SSOR(2,1)\!\!} & \multicolumn{2}{c|}{\!\!\scriptsize Jacobi(3,3)\!\!} &  \multicolumn{2}{c|}{\!\!\scriptsize Cheb(3,3)\!\!} & \multicolumn{2}{c||}{\!\!\scriptsize SSOR(2,1)\!\!} & \multicolumn{2}{c|}{pCG}\\
 \hline
- & $h$ & $p$ & $h$ & $p$& $h$ & $p$& $h$ & $p$& $h$ & $p$& $h$ & $p$& 0 & 1 & 3\\
- \cline{2-16}
-1 & 14 & & 11 & & 6 & & 8 & & 7 & & 5 & & - & - & - \\
-2 & 20 & 19 & 15 & 15 & 7 & 8 & 10 & 10 & 8 & 8 & 5 & 6 & 16 & 9 & 5 \\
-3 & 20 & & 16 & & 8 & & 10 & & 9 & & 6 & & 18 & 9 & 6 \\
-4 & 22 & 21 & 21 & 19 & 10 & 9 & 11 & 10 & 10 & 10 & 7 & 6 & 19 & 11 & 7\\
-5 & -  & & 28 & & 12 & & 14 & & 12 & & 7 & & 21 & 12 & 8  \\
-6 & -  & & 35 & & 13 & & 15 & & 13 & & 8 & & 23 & 13 & 9 \\
-7 & -  & & 45 & & 16 & & 18 & & 15 & & 9 & & 24 & 14 & 9 \\
-8 & -  & - & 52 & 46 & 17 & 15 & 20 & 20 & 16 & 15 & 9 & 8 & 25 & 14 & 10 \\
-16 & - & - & 169 & 148 & 37 & 33 & 51 & 45 & 30 & 27 & 13 & 12 & 31 & 19 & 13 \\
+ & $h$ & $p$ & $h$ & $p$& $h$ & $p$& $h$ & $p$& $h$ & $p$& $h$ & $p$& l-res & h-res\\
+ \cline{2-15}
+1 & 14 & & 11 & & 6 & & 8 & & 7 & & 5 & & -  & - \\
+2 & 20 & 19 & 15 & 15 & 7 & 8 & 10 & 10 & 8 & 8 & 5 & 6 & 16  & 5 \\
+3 & 20 & & 16 & & 8 & & 10 & & 9 & & 6 & & 18 & 6 \\
+4 & 22 & 21 & 21 & 19 & 10 & 9 & 11 & 10 & 10 & 10 & 7 & 6 & 19 & 7\\
+5 & -  & & 28 & & 12 & & 14 & & 12 & & 7 & & 21 & 8  \\
+6 & -  & & 35 & & 13 & & 15 & & 13 & & 8 & & 23 &  9 \\
+7 & -  & & 45 & & 16 & & 18 & & 15 & & 9 & & 24 &  9 \\
+8 & -  & - & 52 & 46 & 17 & 15 & 20 & 20 & 16 & 15 & 9 & 8 & 25 & 10 \\
+16 & - & - & 169 & 148 & 37 & 33 & 51 & 45 & 30 & 27 & 13 & 12 & 31 & 13 \\
 \hline
   \end{tabular}
 \end{table}
 
 
 \begin{table}
-  \caption{\label{tab:3d-box} Results for three-dimensional cube
-    geometry with constant coefficient $\mu(\bs x) \equiv 1$. For a
+  \caption{\label{tab:3d-box} Results for three-dimensional unit cube
+    problem  {\bf 3d-const} defined in \S\ref{subsec:tests}. For a
     detailed description of the different experiments reported in this
     table we refer to \S\ref{subsec:measures}.}  \centering
-	  \begin{tabular}{|r|c c|c c|c c||c c|c c|c c||c c c|} 
+	  \begin{tabular}{|r|c c|c c|c c||c c|c c|c c||c c|} 
 	    \hline
-	    & \multicolumn{6}{c||}{MG as solver} & \multicolumn{6}{c||}{MG with pCG} & \multicolumn{3}{r|}{linearized} \\
+	    & \multicolumn{6}{c||}{MG as solver} &
+            \multicolumn{6}{c||}{MG with pCG} &
+            \multicolumn{2}{r|}{\!\!low-order MG\!\!} \\
 	    \cline{2-13}
-	    \!\!\! order \!\!\!\! &  \multicolumn{2}{c|}{\!\scriptsize  Jacobi(3)\!} &  \multicolumn{2}{c|}{\!\scriptsize Cheb(3)\!} & \multicolumn{2}{c||}{\!\scriptsize  SSOR(2)\!} & \multicolumn{2}{c|}{\!\scriptsize Jacobi(3)\!} &  \multicolumn{2}{c|}{\!\scriptsize Cheb(3)\!} & \multicolumn{2}{c||}{\!\scriptsize SSOR(2)\!} & \multicolumn{3}{c|}{pCG}\\
+	    \!\!\! order \!\!\!\! &  \multicolumn{2}{c|}{\!\!\scriptsize  Jacobi(3,3)\!\!} &  \multicolumn{2}{c|}{\!\!\scriptsize Cheb(3,3)\!\!} & \multicolumn{2}{c||}{\!\!\scriptsize  SSOR(2,1)\!\!} & \multicolumn{2}{c|}{\!\!\scriptsize Jacobi(3,3)\!\!} &  \multicolumn{2,1}{c|}{\!\!\scriptsize Cheb(3)\!\!} & \multicolumn{2}{c||}{\!\!\scriptsize SSOR(2,1)\!\!} & \multicolumn{2}{c|}{pCG}\\
 	\hline
-	 & $h$ & $p$ & $h$ & $p$& $h$ & $p$& $h$ & $p$& $h$ & $p$& $h$ & $p$& 0 & 1 & 3\\
-	 \cline{2-16}
-1 & 6 & & 4 & & 4 & & 5 & & 4 & & 3 & & - & - & - \\
-2 & 8 & 8 & 4 & 5 & 4 & 5 & 6 & 6 & 4 & 4 & 4 & 4 &  25 & 14 & 5 \\
-3 & 10 & & 7 & & 5 & & 6 & & 5 & & 5 & & 27 & 13 & 5  \\
-4 & 11 & 10 & 8 & 7 & 6 & 5 & 7 & 7 & 6 & 5 & 5 & 4 & 28 & 15 & 6 \\
-5 & 14 & & 10 & & 7 & & 8 & & 7 & & 5 & & 29 & 16 & 6 \\
-6 & 16 & & 11 & & 7 & & 9 & & 7 & & 6 & & 32 & 18 & 6 \\
-7 & 20 & & 15 & & 9 & & 10 & & 9 & & 6 & & 34 & 19 & 7 \\
-8 & 22/18 & 19 & 17 & 15 & 9 & 8 & 10/10 & 10 & 9 & 8 & 6 & 6 & 35 & 20 & 7 \\
-16 & 47 & 42 & 38 & 34 & 17 & 15 & 16 & 14 & 14 & 13 & 9 & 9 & 39 & 22 & 11 \\
+	 & $h$ & $p$ & $h$ & $p$& $h$ & $p$& $h$ & $p$& $h$ & $p$& $h$ & $p$& l-res  & h-res\\
+	 \cline{2-15}
+1 & 6 & & 4 & & 4 & & 5 & & 4 & & 3 & & -  & - \\
+2 & 8 & 8 & 4 & 5 & 4 & 5 & 6 & 6 & 4 & 4 & 4 & 4 &  25 &  5 \\
+3 & 10 & & 7 & & 5 & & 6 & & 5 & & 5 & & 27 &  5  \\
+4 & 11 & 10 & 8 & 7 & 6 & 5 & 7 & 7 & 6 & 5 & 5 & 4 & 28 & 6 \\
+5 & 14 & & 10 & & 7 & & 8 & & 7 & & 5 & & 29  & 6 \\
+6 & 16 & & 11 & & 7 & & 9 & & 7 & & 6 & & 32  & 6 \\
+7 & 20 & & 15 & & 9 & & 10 & & 9 & & 6 & & 34 & 7 \\
+8 & 22 & 19 & 17 & 15 & 9 & 8 & 10 & 10 & 9 & 8 & 6 & 6 & 35 & 7 \\
+16 & 47 & 42 & 38 & 34 & 17 & 15 & 16 & 14 & 14 & 13 & 9 & 9 & 39 & 11 \\
 \hline 
  \end{tabular}
 \end{table}
 
 \begin{table}
-  \caption{\label{tab:3d-fan} Results for three-dimensional warped
-    geometry with varying coefficient $\mu(x,y,z) = 1 +
-    10^6(\cos^2(2\pi x) + \cos^2(2\pi y) + \cos^2(2\pi z))$. For a
-    detailed description of the different experiments reported in this
-    table we refer to \S\ref{subsec:measures}.}  \centering
-	  \begin{tabular}{|r|c c|c c|c c||c c|c c|c c||c c c|} 
+  \caption{\label{tab:3d-fan} Results for three-dimensional,
+    warped-geometry, varying coefficient problem {\bf 3d-var} defined
+    in \S\ref{subsec:tests}. For a detailed description of the
+    different experiments reported in this table we refer to
+    \S\ref{subsec:measures}.}  \centering
+	  \begin{tabular}{|r|c c|c c|c c||c c|c c|c c||c c|} 
 	    \hline
-	    & \multicolumn{6}{c||}{MG as solver} & \multicolumn{6}{c||}{MG with pCG} & \multicolumn{3}{r|}{linearized} \\
+	    & \multicolumn{6}{c||}{MG as solver} &
+            \multicolumn{6}{c||}{MG with pCG} &
+            \multicolumn{2}{r|}{\!\!low-order MG\!\!} \\
 	    \cline{2-13}
-	    \!\!\! order \!\!\!\! &  \multicolumn{2}{c|}{\!\scriptsize  Jacobi(3)\!} &  \multicolumn{2}{c|}{\!\scriptsize Cheb(3)\!} & \multicolumn{2}{c||}{\!\scriptsize  SSOR(2)\!} & \multicolumn{2}{c|}{\!\scriptsize Jacobi(3)\!} &  \multicolumn{2}{c|}{\!\scriptsize Cheb(3)\!} & \multicolumn{2}{c||}{\!\scriptsize SSOR(2)\!} & \multicolumn{3}{c|}{pCG}\\
+	    \!\!\! order \!\!\!\! &  \multicolumn{2}{c|}{\!\!\scriptsize  Jacobi(3,3)\!\!} &  \multicolumn{2}{c|}{\!\!\scriptsize Cheb(3,3)\!\!} & \multicolumn{2}{c||}{\!\!\scriptsize  SSOR(2,1)\!\!} & \multicolumn{2}{c|}{\!\!\scriptsize Jacobi(3,3)\!\!} &  \multicolumn{2}{c|}{\!\!\scriptsize Cheb(3,3)\!\!} & \multicolumn{2}{c||}{\!\!\scriptsize SSOR(2,1)\!\!} & \multicolumn{2}{c|}{pCG}\\
 	\hline
-	 & $h$ & $p$ & $h$ & $p$& $h$ & $p$& $h$ & $p$& $h$ & $p$& $h$ & $p$& 0 & 1 & 3\\
-	 \cline{2-16}
-1 & 13 & & 7 & & 5 & & 7 & & 5 & & 4 & & - & - & - \\
-2 & 17 & 18 & 13 & 13 & 7 & 7 & 9 & 9 & 8 & 8 & 5 & 5 & 26 & 14 & 7 \\
-3 & 20 & & 16 & & 8 & & 10 & & 9 & & 6 & & 29 & 14 & 8 \\
-4 & 23 & 22 & 18 & 18 & 9 & 9 & 11 & 11 & 9 & 9 & 7 & 6 & 31 & 16 & 9\\
-5 & 26 & & 21 & & 10 & & 12 & & 10 & & 7 & & 34 & 17 & 10  \\
-6 & 30 & & 27 & & 12 & & 13 & & 12 & & 8 & & 37 & 20 & 13 \\
-7 & 35 & & 34 & & 14 & & 14 & & 14 & & 8 & & 37 & 21 & 13  \\
-8 & -/46 & - & 40 & 38 & 16 & 15 & 18/16 & 17 & 15 & 14 & 9 & 9 & 38 & 21 & 14 \\
-16 & - & - & 117 & 110 & 32 & 29 & 67 & 60 & 27 & 26 & 13 & 13 & 47 & 28 & 22 \\
+	 & $h$ & $p$ & $h$ & $p$& $h$ & $p$& $h$ & $p$& $h$ & $p$& $h$ & $p$& l-res  & h-res\\
+	 \cline{2-15}
+1 & 13 & & 7 & & 5 & & 7 & & 5 & & 4 & & - & - \\
+2 & 17 & 18 & 13 & 13 & 7 & 7 & 9 & 9 & 8 & 8 & 5 & 5 & 26  & 7 \\
+3 & 20 & & 16 & & 8 & & 10 & & 9 & & 6 & & 29  & 8 \\
+4 & 23 & 22 & 18 & 18 & 9 & 9 & 11 & 11 & 9 & 9 & 7 & 6 & 31 & 9\\
+5 & 26 & & 21 & & 10 & & 12 & & 10 & & 7 & & 34  & 10  \\
+6 & 30 & & 27 & & 12 & & 13 & & 12 & & 8 & & 37 & 13 \\
+7 & 35 & & 34 & & 14 & & 14 & & 14 & & 8 & & 37 & 13  \\
+8 & - & - & 40 & 38 & 16 & 15 & 18 & 17 & 15 & 14 & 9 & 9 & 38 & 14 \\
+16 & - & - & 117 & 110 & 32 & 29 & 67 & 60 & 27 & 26 & 13 & 13 & 47 & 22 \\
 \hline
   \end{tabular}
 \end{table}
 
 \subsubsection{Mesh independence of iterations}\label{subsec:num_mesh}
-
-\begin{table}
-\caption{\label{tab:meshInd} Mesh independence for 2D grid with
-  variable coefficients. Coarsest grid for all cases is $2\times 2$.}
+To illustrate the mesh-independence of our multigrid-based solvers, we
+compare the number of v-cycles required for the solution of a problem,
+which has been discretized using different meshes. In all tests, the
+coarsest mesh in the multigrid hierarchy is kept the same and, thus,
+the number of levels in the hierarchy increases as the problem is
+discretized on a finer mesh. As can be seen in
+Table~\ref{tab:meshInd}, once the mesh is sufficiently fine, for all
+polynomial orders the number of iterations remains the same.
+\begin{table}[h]\centering
+\caption{\label{tab:meshInd} Number of v-cycles required for the
+  solution of the two dimensional problems {\bf 2d-const} and {\bf
+    2d-var} defined in \S\ref{subsec:tests} for differently fine
+  meshes and different polynomial orders. The coarsest grid for all
+  cases has $2\times 2$ elements. In this comparison, multigrid with
+  SSOR(2,1) smoothing is used as preconditioner in the conjugate
+  gradient method. A star indicated that we did not perform the
+  corresponding test due to the large size of the problem.}
 \begin{tabular}{|c|c|c|c|c|c|c|c||c|c|c|c|c|c|c|}
 	\hline
-	 & \multicolumn{7}{c||}{unit square, constant} & \multicolumn{7}{c|}{warped square, variable} \\  
+	 & \multicolumn{7}{c||}{\bf 2d-const} &
+        \multicolumn{7}{c|}{\bf 2d-var} \\  
   \hline
 	order & 4  &  8 & 16 & 32 & 64 & 128 & 256 & 4  &  8 & 16 & 32 & 64 & 128 & 256 \\
 	\hline 
@@ -1319,27 +1383,39 @@ convergence.
 	 2    &  4 &  4 &  4 &  4 &  4 &  4  &  4  & 5  &  5 & 5  &  5 &  5 &  5  &  5  \\
 	 4    &  5 &  5 &  4 &  4 &  4 &  4  &  4  & 6  &  6 & 7  &  7 &  7 &  7  &  7  \\
 	 8    &  6 &  6 &  6 &  6 &  6 &  6  &  6  & 9  &  9 & 9  &  9 &  9 &  9  &  9  \\
-	 16   &  9 &  9 &  9 &  9 &  9 &  -  &  -  & 13 & 13 & 13 & 13 & 13 &  -  &  -  \\
+	 16   &  9 &  9 &  9 &  9 &  9 &  *  &  *  & 13 & 13 & 13 & 13 & 13 &  *  &  *  \\
 	 \hline
 \end{tabular}
 
 \end{table}
 
 \subsubsection{Performance of block Jacobi smoother}\label{subsec:num_block}
-
-
-
-\begin{table}
-	\caption{\label{tab:block-jac} Block-Jacobi smoother compared with the point-Jacobi smoother.}
-
+Schwarz-type domain decomposition smoothers are particularly promising
+for high polynomial orders, such as order 8 or higher. Results
+obtained with an element-wise block Jacobi preconditioner for orders 8
+and 16 are summarized in Table~\ref{tab:block-jac}. For this
+comparison, we invert the element matrices exactly, which can be
+problematic with respect to computational time as well as storage in
+realistic problems, in particular for warped meshes and very high
+polynomial orders. As can be seen in Table~\ref{tab:block-jac}, the
+number of iterations is reduced compared to pointwise Jacobi
+smoothing; however, the gained efficiency reduces when multigrid is
+used as a preconditioner in CG rather than as a solver.
+\begin{table}\centering
+	\caption{\label{tab:block-jac} Comparison between block-Jacobi
+          and point-Jacobi smoothing. Shown is the number of
+          iterations for three of our test problems, obtained with 3
+          pre and 3 post-smoothing steps. Shown in brackets is the
+          number of iterations requires for point Jacobi smoothing.}
 \begin{tabular}{|c|c|c|c|c|c|c|}
 	\hline
-	order & \multicolumn{2}{c|}{unit square, constant} & \multicolumn{2}{c|}{warped square, variable} & \multicolumn{2}{c|}{warped cube, variable} \\
+	order & \multicolumn{2}{c|}{\bf 2d-const} &
+        \multicolumn{2}{c|}{\bf 2d-var} & \multicolumn{2}{c|}{\bf 3d-var} \\
 	\cline{2-7}
-	 & MG & pCG & MG & pCG & MG & pCG \\
+	 & MG & pCG  & MG & pCG & MG & pCG \\
 	\hline
-	8     & \\
-	16    & \\
+	8  & 16(17) & 8(9)   &  31(-)  & 12(20) & 46?(-) & 16?(18) \\
+	16 & 31(40) & 12(14) &  61(-)  & 17(51) &  ? (-)  &  ?(67)  \\
 	\hline
 \end{tabular}
 \end{table}
@@ -1353,18 +1429,19 @@ In the next section, we summarize our findings and draw conclusions.
 Despite the fact that discrete systems originating from high-order
 discretizations do not satisfy favorable matrix properties such as the
 M-matrix property, we find that point smoothers can be efficient for
-polynomial orders up to $p=16$.  For constant coefficient, two and
-three-dimensional problems, all tested point smoothers (Jacobi,
-Chebyshev-accelerated Jacobi and Gauss-Seidel SSOR smoothing) lead to
-converging multigrid methods. For highly varying coefficients on
-deformed geometries, SSOR outperforms Jacobi-based smoothing, which
-performs poorly for orders $p>4$.
+finite element discretizations with polynomial orders up to $p=16$.
+For constant coefficient, two and three-dimensional problems, all
+tested point smoothers (Jacobi, Chebyshev-accelerated Jacobi and
+Gauss-Seidel SSOR smoothing) lead to converging multigrid methods. For
+highly varying coefficients on deformed geometries, SSOR outperforms
+Jacobi-based smoothing, which performs poorly for orders $p>4$.
 
 In a parallel environment, where Gauss-Seidel smoothing is
 significantly more difficult to implement and requires more parallel
 communication, Chebyshev-accelerated Jacobi smoothing represents an
 interesting alternative since it is as simple to implement as Jacobi
-smoothing.
+smoothing and additionally only requires an estimate of the largest
+eigenvalue of the diagonally preconditioned system matrix.
 
 Using multigrid as preconditioner in a Krylov method rather than as
 solver results in significantly faster convergence, which by far
@@ -1379,7 +1456,7 @@ is an excellent preconditioner for the low-order system, in particular
 when combined with smoothing based on the high-order residual is
 performed on the finest mesh.  When combined with algebraic multigrid
 for the low-order operator, this approach is attractive for high-order
-discretizations on unstructured meshes as also shown in
+discretizations on unstructured meshes, as also shown in
 ~\cite{Brown10, DevilleMund90, HeysManteuffelMcCormickEtAl05}.
 
 
@@ -1401,7 +1478,7 @@ low-order preconditioner. Support for this work was
   funded by the U.S.~Department of Energy
   Office of Science, Advanced Scientific Computing Research and
   Biological and Environmental Research.
- \todo{Check with George and Omar; these are Diamond, DOE ice, NSF ice and NSF mantle/wave.}
+% \todo{Check with George and Omar; these are Diamond, DOE ice, NSF ice and NSF mantle/wave.}
 
 
 \bibliographystyle{siam}
