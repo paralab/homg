@@ -1457,10 +1457,10 @@ smoothing and additionally only requires an estimate of the largest
 eigenvalue of the diagonally preconditioned system matrix.
 
 Using multigrid as preconditioner in a Krylov method rather than as
-solver results in significantly faster convergence, which by far
+solver results in significantly faster convergence, which more than
 compensates for the additional work required by the Krylov method,
 namely vector additions and inner products.  For problems with varying
-coefficients, we found that the number of required v-cycles decreases
+coefficients, we find that the number of required v-cycles decreases
 by up to a factor of three when combining multigrid with the conjugate
 gradient method.
 
