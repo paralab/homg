@@ -16,7 +16,7 @@ classdef hexmesh < handle
     coeff
 		muvec
     rhs
-  end % properties
+  end % properties	
   
   methods
     function mesh = hexmesh(nelems, X)
@@ -1194,6 +1194,17 @@ end
 				nf = nf + sum(self.nelems);
 			else
 				nf = nf + sum(self.nelems .* circshift(self.nelems, [1 1]) );
+			end
+		end
+		
+		function nf = get_num_bdy_faces(self)
+			% function nf = get_num_faces(self)
+			% 
+			% returns the total number of bdy. faces in the mesh ...
+			if (self.dim == 2)
+				nf = 2 * sum(self.nelems);
+			else
+				nf = 2 * sum(self.nelems .* circshift(self.nelems, [1 1]) );
 			end
 		end
 		

@@ -2,16 +2,35 @@ function A = gen_hdg_matrix(mesh, refel)
 	% Dec 28, 2014
 	% Compute the HDG Jacobian matrix, using the mesh
 
+
+	refel = homg.refel (mesh.dim, mesh.order);
+
 	% variables
-	SkelAll2Interior = mesh.SkelAll2Interior; % to be added
-	
 	Nfp = refel.Nrp ^ (refel.dim - 1);
+	Nsfaces = mesh.get_num_faces();
 	Nfaces = refel.dim * 2;
-	Nifaces = mesh.Nifaces;                   % to be added
+	Nifaces = Nsfaces - mesh.get_num_bdy_faces();
 	Nv = refel.Nrp ^ (refel.dim);
 	
 	K = prod(mesh.nelems);
+	
+	
+	SkelAll2Interior = zeros(Nsfaces * Nfp, 1);
 
+	% Construct the skeleton maps
+	iindex = 0;
+	for  sf=1:Nsfaces
+	    [e1, f1, e2, f2]  = mesh.get_face_elements(sf);
+    
+	    % interior faces
+	    if (e1 > 0) && (e2 > 0), 
+	      % global trace index for f1
+	      idxf = mesh.get_skeletal_face_indices(refel, e1, f1);
+	      SkelAll2Interior(idxf) = iindex+1:iindex+Nfp;
+	      iindex = iindex + Nfp;
+	    end
+	end
+	
 	% @todo hard-coded for now, get from mesh later
 	nx = [-1, 1, 0, 0];
 	ny = [0, 0, -1, 1];
