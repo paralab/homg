@@ -15,7 +15,7 @@ order = 4;
 nelems = [8,8];
 
 % generate mesh heirarchy 
-grid = create_hdg_grids(2, @homg.xform.identity, [2 4], [8]);
+grid = create_hdg_grids(2, @homg.xform.identity, [2 4], 8);
 
 % generate the hexmesh with identity transform for now
 m = grid.Mesh; % homg.hexmesh(nelems,@homg.xform.identity); 
@@ -188,11 +188,14 @@ rhs = -residualFast(lamInterior,HDGdata,forcing, Bdata);
 
 %% Exact galerkin operator ...  
 coarse = grid;
+coarse.K = gen_hdg_matrix(coarse.Mesh);
 while ( ~ isempty(coarse.Coarse) )
-	grid.K = gen_hdg_matrix(coarse.Mesh);
-	coarse = coarse.Coarse;	
+	coarse.P = coarse.Coarse.Mesh.assemble_hdg_interpolation();
+	coarse.R = coarse.P';
+	coarse = coarse.Coarse;
+  coarse.K = gen_hdg_matrix(coarse.Mesh);
 end
-A = grid.K; 
+% A = grid.K; 
 
 
 % $$$ % Quick, dirty, and expensive way
@@ -241,7 +244,11 @@ A = grid.K;
 % $$$ keyboard
 
 % Now solve for lam
-lamInterior = A \ rhs; % replace witg multigrid solve ...
+% lamInterior = A \ rhs; % replace with multigrid solve ...
+
+lamInterior = grid.solve_pcg(20, 'chebyshev', 3, 3, -rhs, zeros(size(rhs)));
+
+
 
 lamAll = zeros(Nsfaces * Nfp,1);
 lamAll(Bmaps) = Bdata;

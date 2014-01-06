@@ -301,7 +301,7 @@ classdef grid < handle
 			
       % 3. restrict
       res_coarse = grid.R * res;
-      res_coarse(grid.Coarse.Boundary) = 0;
+      % res_coarse(grid.Coarse.Boundary) = 0;
       
       % 4. recurse
       u_corr_coarse = grid.Coarse.vcycle(v1, v2, res_coarse, zeros(size(res_coarse)));

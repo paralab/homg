@@ -37,8 +37,10 @@ classdef refel < handle
         Qz
         
         
-        % Prolongation 
-        Ph      % interpolation from this element to its 4/8 children
+        % Prolongation
+				p_h_1d 
+        p_p_1d
+				Ph      % interpolation from this element to its 4/8 children
         Pp      % interpolation from this element to its 2p version
 				
         Mr     % exact 1D Mass matrix (Nrp x Nrp) at gll
@@ -93,16 +95,16 @@ classdef refel < handle
             
             q1d         = transpose (elem.Vr \ elem.Vg);  
             
-						p_h_1d      = transpose (elem.Vr \ Vph);  
-            p_p_1d      = transpose (elem.Vr \ Vpp);  
+						elem.p_h_1d      = transpose (elem.Vr \ Vph);  
+            elem.p_p_1d      = transpose (elem.Vr \ Vpp);  
 						
             elem.W      = zeros(elem.Nrp^elem.dim, 1);
             elem.Wgll   = zeros(elem.Nrp^elem.dim, 1);
             if (d == 2)
               elem.Q  = kron(q1d, q1d) ;
               
-							elem.Ph = kron(p_h_1d, p_h_1d) ;
-							elem.Pp = kron(p_p_1d, p_p_1d) ;
+							elem.Ph = kron(elem.p_h_1d, elem.p_h_1d) ;
+							elem.Pp = kron(elem.p_p_1d, elem.p_p_1d) ;
               
               elem.Qx = kron(q1d, elem.Dg);
               elem.Qy = kron(elem.Dg, q1d);
@@ -120,8 +122,8 @@ classdef refel < handle
             else
               elem.Q  = kron(kron(q1d, q1d), q1d);
 							
-              elem.Ph = kron(kron(p_h_1d, p_h_1d), p_h_1d);
-							elem.Pp = kron(kron(p_p_1d, p_p_1d), p_p_1d);
+              elem.Ph = kron(kron(elem.p_h_1d, elem.p_h_1d), elem.p_h_1d);
+							elem.Pp = kron(kron(elem.p_p_1d, elem.p_p_1d), elem.p_p_1d);
               
               elem.Qx = kron(kron(q1d, q1d), elem.Dg);
               elem.Qy = kron(kron(q1d, elem.Dg), q1d);

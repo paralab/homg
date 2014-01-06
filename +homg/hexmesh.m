@@ -628,6 +628,54 @@ end
       % M = sparse(M);
     end
     
+		function P = assemble_hdg_interpolation(self)
+			% assemble prolongation operator from coarse (self) to fine mesh on the skeleton mesh
+			refel = homg.refel ( self.dim, self.order );
+			
+			fine_order = self.order*2;
+		
+			num_faces = self.get_num_faces() - self.get_num_bdy_faces();
+		
+			NP_c = self.order + 1;
+			NP_f = fine_order + 1;
+			
+			dof_coarse = num_faces * NP_c;
+			dof_fine   = num_faces * NP_f;
+			
+			Pe = refel.p_p_1d; 
+			
+			% storage for indices and values
+      NPNP = NP_c * NP_f;
+      
+      I = zeros(num_faces * NPNP, 1);
+      J = zeros(num_faces * NPNP, 1);
+      val = zeros(num_faces * NPNP, 1);
+			
+			for f=1:num_faces
+				idx_c = ((f-1)*NP_c+1):(f*NP_c);
+				idx_f = ((f-1)*NP_f+1):(f*NP_f);
+				
+        ind1 = repmat(idx_f, NP_c, 1);
+        ind2 = reshape(repmat(idx_c', NP_f, 1), NPNP, 1);
+        st = (f-1)*NPNP+1;
+        en = f*NPNP;
+				
+        I(st:en) = ind1;
+        J(st:en) = ind2;
+      
+        val(st:en) = Pe(:);
+			end
+			
+			[u_ij,q] = unique([I,J],'rows','first');
+			 u_val   = val(q);
+       I = u_ij(:,1);
+       J = u_ij(:,2);
+       
+			 P = sparse (I,J,u_val,dof_fine,dof_coarse);
+			
+		end
+		
+		
     function P = assemble_interpolation(self, order)
       % assemble prolongation operator from coarse (self) to fine mesh
 			refel = homg.refel ( self.dim, self.order );
