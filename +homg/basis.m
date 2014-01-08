@@ -99,6 +99,10 @@ classdef basis
             if (N==1) 
                 x(1)=-1.0; 
                 x(2)=1.0; 
+                
+                w(1) = 1.0;
+                w(2) = 1.0;
+                
                 return 
             end
             
