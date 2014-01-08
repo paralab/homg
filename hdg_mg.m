@@ -186,7 +186,6 @@ rhs = -residualFast(lamInterior,HDGdata,forcing, Bdata);
 % form the HDG matrix
 % A = gen_hdg_matrix(m);
 
-%% Exact galerkin operator ...  
 coarse = grid;
 coarse.K = gen_hdg_matrix(coarse.Mesh);
 while ( ~ isempty(coarse.Coarse) )
@@ -248,7 +247,13 @@ end
 
 lamInterior = grid.solve_pcg(20, 'chebyshev', 3, 3, -rhs, zeros(size(rhs)));
 
-
+% smooth u_hat
+% do local solve  
+% restrict - u
+% -- recurse 
+% u_hat_new <- u + P e
+% smooth u_hat_new
+% do local solve  
 
 lamAll = zeros(Nsfaces * Nfp,1);
 lamAll(Bmaps) = Bdata;
