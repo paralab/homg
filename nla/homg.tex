@@ -1312,6 +1312,32 @@ convergence.
 
 
 \begin{table}
+  \caption{\label{tab:2d-fan2} Results for two-dimensional
+    warped-geometry, varying coefficient problem $\cos(10 \pi x)$.}
+  \centering
+  \begin{tabular}{|r|c c|c c|c c||c c|c c|c c||c c|} 
+    \hline
+    & \multicolumn{6}{c||}{MG as solver} & \multicolumn{6}{c||}{MG
+      with pCG} & \multicolumn{2}{r|}{\!\!low-order MG\!\!} \\
+    \cline{2-13}
+    \!\!\! order \!\!\!\! &  \multicolumn{2}{c|}{\!\!\scriptsize  Jacobi(3,3)\!\!} &  \multicolumn{2}{c|}{\!\!\scriptsize Cheb(3,3)\!\!} & \multicolumn{2}{c||}{\!\!\scriptsize  SSOR(2,1)\!\!} & \multicolumn{2}{c|}{\!\!\scriptsize Jacobi(3,3)\!\!} &  \multicolumn{2}{c|}{\!\!\scriptsize Cheb(3,3)\!\!} & \multicolumn{2}{c||}{\!\!\scriptsize SSOR(2,1)\!\!} & \multicolumn{2}{c|}{pCG}\\
+\hline
+ & $h$ & $p$ & $h$ & $p$& $h$ & $p$& $h$ & $p$& $h$ & $p$& $h$ & $p$& l-res & h-res\\
+ \cline{2-15}
+					1 & 14 & & 12 & & 8 & & 8 & & 8 & & 6 & & 1 & 1  \\
+					2 & 19 & 19 & 15 & 14 & 7 & 8 & 10 & 10 & 8 & 8 & 6 & 6 & 16 & 9 \\
+					3 & 20 & & 17 & & 8 & & 10 & & 9 & & 6 & & 18 & 9  \\
+					4 & 261 & 333 & 21 & 20 & 10 & 9 & 15 & 15 & 11 & 10 & 7 & 6 & 20 & 11 \\
+					5 & - & & 30 & & 12 & & 19 & & 13 & & 8 & & 21 & 12  \\
+					6 & - & & 39 & & 13 & & 37 & & 15 & & 8 & & 23 & 13  \\
+					7 & - & & 52 & & 16 & & 78 & & 18 & & 9 & & 24 & 14  \\
+					8 & - & - & 63 & 55 & 17 & 16 & 137 & 109 & 19 & 18 & 10 & 9 & 24 & 14 \\
+\hline
+  \end{tabular}
+\end{table}
+
+
+\begin{table}
   \caption{\label{tab:3d-box} Results for three-dimensional unit cube
     problem  {\bf 3d-const} defined in \S\ref{subsec:tests}. For a
     detailed description of the different experiments reported in this
