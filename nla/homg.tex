@@ -62,33 +62,32 @@ T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 \maketitle
 
 \begin{abstract}
-We present a comparison of different multigrid
-approaches for the solution of systems arising from high-order
-continuous finite element discretizations of elliptic partial
-differential equations on complex geometries.  We consider the
-pointwise Jacobi, the Chebyshev-accelerated Jacobi and the symmetric
-successive over-relaxation (SSOR) smoothers, as well as
-element-wise block Jacobi smoothing. Three approaches for the
-multigrid hierarchy are compared: (1) high-order $h$-multigrid, which
-uses high-order interpolation and restriction between geometrically
-coarsened meshes; (2) $p$-multigrid, in which the polynomial order is
-reduced while the mesh remains unchanged, and the interpolation and
-restriction take into account the different-order basis functions; and
-(3), a low-order operator based on the high-order nodes as
-preconditioner. This latter approach is often combined with algebraic multigrid for
-the low-order operator and is thus particularly attractive
+We present a comparison of different multigrid approaches for the
+solution of systems arising from high-order continuous finite element
+discretizations of elliptic partial differential equations on complex
+geometries.  We consider the pointwise Jacobi, the
+Chebyshev-accelerated Jacobi and the symmetric successive
+over-relaxation (SSOR) smoothers, as well as element-wise block Jacobi
+smoothing. Three approaches for the multigrid hierarchy are compared:
+(1) high-order $h$-multigrid, which uses high-order interpolation and
+restriction between geometrically coarsened meshes; (2) $p$-multigrid,
+in which the polynomial order is reduced while the mesh remains
+unchanged, and the interpolation and restriction take into account the
+different-order basis functions; and (3), a classical first-order
+approximation multigrid preconditioner constructed using the
+quadrature nodes of the high-order fine discretization.
+This latter approach is often combined with algebraic multigrid for
+the low-order operator and is attractive
 for high-order discretizations on unstructured meshes, where geometric
 coarsening is difficult.  Based on a simple performance model, we
 compare the computational cost of the different approaches.  Using
 test problems in two and three dimensions with constant and varying
 coefficients, we compare the performance of the algorithms for
-polynomial orders up to 16.  While we use moderate-size test problems
-in this comparison, we also discuss properties of the methods with
-regard to parallel implementations on high-performance computers.
+polynomial orders up to 16. \todo{Add summary of findings.}
 \end{abstract}
 
-\keywords{high-order, multigrid, continuous finite elements, spectral
-  elements, preconditioning}
+\keywords{high-order, geometric multigrid, algebraic multigrid, continuous finite elements, spectral
+  elements, preconditioning.}
 
 \section{Introduction}
 
