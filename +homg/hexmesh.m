@@ -1,7 +1,15 @@
 classdef hexmesh < handle
   %HEXMESH A container class for homg regular grid meshes
   %      RGRID class for homg meshes, made of hexahedral elements.
-  
+  properties 
+		Ns_faces
+		Ni_faces
+		Nb_faces
+		nx
+		ny
+		taur	
+	end
+	
   properties (SetAccess = private)
     dim=2;
     nelems=[8 8];
@@ -29,7 +37,17 @@ classdef hexmesh < handle
       mesh.Xf = X;
 
       mesh.coeff = @(x,y,z)(1);
-    end
+    
+			% new hDG related metrics ...
+			mesh.Ns_faces = mesh.get_num_faces();
+			mesh.Nb_faces = mesh.get_num_bdy_faces();
+			mesh.Ni_faces = mesh.Ns_faces - mesh.Nb_faces;
+			
+			mesh.nx = [-1, 1, 0, 0];
+			mesh.ny = [0, 0, -1, 1];
+
+			mesh.taur = 1; % HDG.taur; pass as parameter to construction ?
+		end
     
     function plot(self)
       % display the mesh. Needs X.
@@ -1232,6 +1250,89 @@ end
     end
  
     %% ~~~~~~ functions for dG ... 
+		
+		function [SkelInterior2All, SkelAll2Interior, Bmaps, LIFT, VtoF] = generate_skeleton_maps(self, refel)
+			Nfp = refel.Nrp ^ (refel.dim-1);
+			Nfaces = refel.dim * 2;
+			Nv     = refel.Nrp ^ (refel.dim);
+			
+			% find boundary faces and indices
+			Nbfaces = 0; 
+			Bmaps = zeros(Nfp,1); 
+			Bdata = zeros(Nfp,1);
+			iindex = 0;
+			for  sf=1:self.Ns_faces
+			    [e1, f1, e2, f2]  = self.get_face_elements(sf);
+
+			    if (e1 < 0) || (e2 < 0), % boundary faces
+			      if e1 < 0, 
+			        e = e2; f = f2;
+			      else
+			        e = e1; f = f1;
+			      end
+			      Nbfaces = Nbfaces + 1;
+			      idxf = self.get_skeletal_face_indices(refel, e, f);
+			      idxv = self.get_discontinuous_face_indices(refel, 1, f);
+      
+			      Bmaps(iindex+1:iindex+Nfp) = idxf;
+			      % Bdata(iindex+1:iindex+Nfp) = Uexact(idxv,e);
+			      iindex = iindex + Nfp;
+			    end
+			end
+			% assert(self.Nb_faces == Nbfaces);
+
+			SkelInterior2All = zeros(self.Ni_faces * Nfp,1);
+			SkelAll2Interior = zeros(self.Ns_faces * Nfp,1);
+
+			% Construct the skeleton maps
+			iindex = 0;
+			for  sf=1:self.Ns_faces
+			    [e1, f1, e2, f2]  = self.get_face_elements(sf);
+    
+			    % interior faces
+			    if (e1 > 0) && (e2 > 0), 
+			      % global trace index for f1
+			      idxf = self.get_skeletal_face_indices(refel, e1, f1);
+			      SkelInterior2All(iindex+1:iindex+Nfp) = idxf;
+			      SkelAll2Interior(idxf) = iindex+1:iindex+Nfp;
+			      iindex = iindex + Nfp;
+			    end
+			end
+			
+			% Construct the Lift and VtoF
+			LIFT = zeros(Nv, Nfp, Nfaces);
+			VtoF = zeros(Nfp, Nv, Nfaces);
+			for f = 1:Nfaces
+			  idxv = self.get_discontinuous_face_indices(refel, 1, f);
+			  LIFT(idxv,:,f) = refel.Mr;
+			  for fp = 1:Nfp
+			    VtoF(fp,idxv(fp),f) = 1;
+			  end
+			end
+		end
+		
+		function Bdata = get_boundary_data(self, refel, Uexact)
+			Nfp = refel.Nrp ^ (refel.dim-1);
+			
+			Bdata = zeros(Nfp,1);
+			iindex = 0;
+			for  sf=1:self.Ns_faces
+		    [e1, f1, e2, f2]  = self.get_face_elements(sf);
+
+		    if (e1 < 0) || (e2 < 0), % boundary faces
+		      if e1 < 0, 
+		        e = e2; f = f2;
+		      else
+		        e = e1; f = f1;
+		      end
+		      
+					idxv = self.get_discontinuous_face_indices(refel, 1, f);
+				
+	      	Bdata(iindex+1:iindex+Nfp) = Uexact(idxv,e);
+	      	iindex = iindex + Nfp;
+				end
+			end
+		end
 		
 		function nf = get_num_faces(self)
 			% function nf = get_num_faces(self)

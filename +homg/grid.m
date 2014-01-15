@@ -35,6 +35,15 @@ classdef grid < handle
     Coarse  % handle to coarse grid 
     debug
     dbg_spaces
+    
+    % variables needed for hdg solve 
+		refel 
+    is_hDG_solve
+		SkelInterior2All
+    SkelAll2Interior
+    Bmaps
+    LIFT
+    VtoF
   end % properties
   
   methods
@@ -68,6 +77,8 @@ classdef grid < handle
       grid.jacobi_omega = 2/3;
 			grid.linear_smoother = false;
       grid.is_finest       = false;
+			
+			self.is_hDG_solve = false;
 		end
     
 		function assemble_poisson(grid, mu)
@@ -266,29 +277,46 @@ classdef grid < handle
     end
 
     % main v-cycle
-    function u = vcycle(grid, v1, v2, rhs, u)
+    function u = vcycle(grid, v1, v2, rhs, u) % <- u and not u_hat
       % function u = vcycle(grid, v1, v2, rhs, u)
       % solve system using initial guess u, given rhs
       % with v1 pre and v2 post-smoothing steps
       
-      % disp( [grid.dbg_spaces 'v-cycle at level ' num2str(grid.level)]);
-      % handle for the coarsest level
       if ( isempty( grid.Coarse ) )
-        % disp('------- coarse solve -------');
-        % disp( [' grid level is ' num2str(grid.level)]);
-        % Kc = grid.Null' * grid.K * grid.Null;
-        % Lc = grid.Null' * rhs;
-        % u = grid.Null * (Kc \ Lc) + grid.Ud;
-				if (grid.linear_smoother)
+    		if (grid.linear_smoother)
 					u = grid.K_lin \ rhs;
 				else
-					u = grid.K \ rhs;
+					if ( grid.is_hDG_solve )
+						
+						lamInterior = zeros(size(self.SkelInterior2All));
+			
+						rhs_skel = -self.hdg_residual(lamInterior, rhs, BData);  
+			
+						lamInterior = self.K \ rhs_skel;
+			
+						lamAll = zeros(self.Mesh.Ns_faces * Nfp,1);
+						lamAll(self.Bmaps) = Bdata;
+						lamAll(self.SkelInterior2All) = lamInterior;
+
+						u = zeros(Nv,K);
+						% qx = zeros(Nv,K);
+						% qy = zeros(Nv,K);
+
+						for e = 1:K
+						  [u(:,e), ~, ~] = self.localSolver(e, lamAll, rhs);
+						end
+					else
+						u = grid.K \ rhs;
+					end
 				end
         return;
       end
       
+			% 0. extract u_hat from u if is hdg solve 
+			u_hat = self.VtoF * u;
+			
       % 1. pre-smooth
-      u = grid.smooth ( v1, rhs, u );
+      u_hat = grid.smooth ( v1, rhs, u_hat );
       
       % 2. compute residual
 			if (grid.linear_smoother && ~grid.is_finest)
@@ -300,18 +328,29 @@ classdef grid < handle
 			end
 			
       % 3. restrict
-      res_coarse = grid.R * res;
-      % res_coarse(grid.Coarse.Boundary) = 0;
+      if ( grid.is_hDG_solve )
+				res_coarse = grid.hdg_restrict(res);
+			else
+				res_coarse = grid.R * res;
+				% res_coarse(grid.Coarse.Boundary) = 0;
+			end
       
       % 4. recurse
       u_corr_coarse = grid.Coarse.vcycle(v1, v2, res_coarse, zeros(size(res_coarse)));
       
       % 5. prolong and correct
-      u = u - grid.P * u_corr_coarse;
-      grid.plot_spectrum(u, 'r', rhs);
-      % 6. post-smooth
+      if ( grid.is_hDG_solve )
+				
+			else
+				u = u - grid.P * u_corr_coarse;
+			end
+			% grid.plot_spectrum(u, 'r', rhs);
+      
+			
+			% 6. post-smooth
       u = grid.smooth ( v2, rhs, u );
-      grid.plot_spectrum(u, 'g', rhs);
+      
+			% grid.plot_spectrum(u, 'g', rhs);
       
     end % v-cycle
     
@@ -694,7 +733,7 @@ classdef grid < handle
         rr = g.residual(rhs, u);
         n = sqrt(length(rr));
         imagesc(reshape(rr, n, n)); colorbar; hold off;
-        grid on;
+        % grid on;
         odr = g.Mesh.fem.shape;
         set(gca, 'xtick', odr+0.5:odr:odr*g.Mesh.nelem);
         set(gca, 'ytick', odr+0.5:odr:odr*g.Mesh.nelem);
@@ -715,6 +754,358 @@ classdef grid < handle
         u0(grid.Boundary) = 0;
       end
     end
+		
+		%%~~~~~~~~~~ hDG functions ~~~~~~~~~~
+		%
+		% to use multigrid, use solve or solve_pcg instead 
+		function [u, qx, qy] = solve_hdg (self, forcing, Bdata)
+			% full solve without multigrid, 
+				
+			K = prod(self.Mesh.nelems);	
+			Nfp = self.refel.Nrp ^ (self.refel.dim - 1);
+			Nv = self.refel.Nrp ^ (self.refel.dim);	
+		
+			lamInterior = zeros(size(self.SkelInterior2All));
+			
+			rhs = -self.hdg_residual(lamInterior, forcing, Bdata);
+			
+			lamInterior = self.K \ rhs;
+			
+			lamAll = zeros(self.Mesh.Ns_faces * Nfp,1);
+			lamAll(self.Bmaps) = Bdata;
+			lamAll(self.SkelInterior2All) = lamInterior;
+
+			u = zeros(Nv,K);
+			qx = zeros(Nv,K);
+			qy = zeros(Nv,K);
+
+			for e = 1:K
+			  [u(:,e),qx(:,e),qy(:,e)] = self.localSolver(e, lamAll, forcing);
+			end
+		end
+		
+		function res = hdg_residual(self, lamInterior, forcing, Bdata)
+			% InteriorF2AllF = HDG.InteriorF2AllF;
+			
+			refel = self.refel;
+			K = prod(self.Mesh.nelems);	
+			Nfp = self.refel.Nrp ^ (self.refel.dim - 1);
+			Nfaces = self.refel.dim * 2;
+			
+			nx   = self.Mesh.nx;
+			ny   = self.Mesh.ny;
+			taur = self.Mesh.taur;
+			
+			res = zeros(Nfp * self.Mesh.Ni_faces, 1);
+
+			% lamAll
+			lamAll = zeros(self.Mesh.Ns_faces * Nfp, 1);
+			lamAll(self.Bmaps) = Bdata;
+			lamAll(self.SkelInterior2All) = lamInterior;
+
+			for e = 1:K
+			  % e1 solution
+			  [u, qx, qy] = self.localSolver(e, lamAll, forcing);
+	
+			  for f = 1:Nfaces
+			    idxf = self.Mesh.get_skeletal_face_indices(refel, e, f);
+      
+			    if abs( self.SkelAll2Interior( idxf(1) ) ) < eps
+			      continue;
+			    end
+			    lam = lamAll(idxf);
+    
+			    Jf   = self.Mesh.geometric_factors_face(refel,e,f);
+			    idxv = self.Mesh.get_discontinuous_face_indices(refel, 1, f);
+    
+    
+			    % construct the residual
+			    Fhat = Jf .* (refel.Mr * (qx(idxv) * nx(f) + qy(idxv) * ny(f) + ...
+			                              taur * (u(idxv) - lam)));
+    
+			    res(self.SkelAll2Interior(idxf)) = res(self.SkelAll2Interior(idxf)) + Fhat;
+			  end
+			end
+		end
+		
+		function [du_dlam, dqx_dlam, dqy_dlam] = DifflocalSolver(self, e1)
+			% compute derivatives for the local solver
+	
+			% predefined normal vector, don't like it but stick with it for now
+			nx   = self.Mesh.nx;
+			ny   = self.Mesh.ny;
+			taur = self.Mesh.taur; % maybe move to grid 
+
+			Nfp = self.refel.Nrp ^ (self.refel.dim - 1);
+			Nv = self.refel.Nrp ^ (self.refel.dim);
+
+			uu  = zeros(Nv,Nv);
+			uqx = zeros(Nv,Nv);
+			uqy = zeros(Nv,Nv);
+      
+			pts = self.Mesh.element_nodes(e1, self.refel);
+			[Jv, Dv] = self.Mesh.geometric_factors(self.refel, pts);
+
+			eMat = self.Mesh.element_mass(e1, self.refel, Jv);
+			eMatInv = inv(eMat);
+
+			% number of faces
+			Nfaces = self.refel.dim * 2;
+
+			du_dlam  = zeros(Nv, Nfp * Nfaces);
+			dqx_dlam = zeros(Nv, Nfp * Nfaces);
+			dqy_dlam = zeros(Nv, Nfp * Nfaces);
+
+			drhsqx_dlam = zeros(Nv, Nfp * Nfaces);
+			drhsqy_dlam = zeros(Nv, Nfp * Nfaces);
+			drhu_dlam   = zeros(Nv, Nfp * Nfaces);
+
+			dF_dlam     = zeros(Nv, Nfp * Nfaces);
+
+			% advection stiffness
+			[Kex, Key] = self.Mesh.element_stiffness_advection (e1, self.refel, Jv, Dv);
+
+			uqx = Kex;
+			uqy = Key;
+	
+			% residual for qx and qy equations
+			for f = 1:Nfaces %
+				index = (f-1)*Nfp+1:f*Nfp;
+	
+				% geometrix factors at gll points on face
+				Jf = self.Mesh.geometric_factors_face(self.refel,e1,f);
+  
+				%-- residual due to lambda
+				% rhsfx = Jf .* (refel.Mr * lamlocal) * nx(f);
+				%-- lift to volume residual q equation
+				% rhsqx(idxv) = rhsqx(idxv) + rhsfx;
+				drhsqx_dlam(:,index) = self.LIFT(:,:,f) * (diag(Jf .* nx(f)));
+
+				% rhsfy = Jf .* (refel.Mr * lamlocal) * ny(f);
+				% rhsqy(idxv) = rhsqy(idxv) + rhsfy;
+				drhsqy_dlam(:,index) = self.LIFT(:,:,f) * (diag(Jf .* ny(f)));
+  
+				% lift to volume residual u equation
+				% rhsu(idxv)  = rhsu(idxv) - ...
+				%    taur * Jf .* (refel.Mr * lamlocal);
+				drhsu_dlam(:,index) = -self.LIFT(:,:,f) * (diag(Jf .* taur));
+  
+				% lift to volume for uu
+				bdry =  self.LIFT(:,:,f) * (diag(Jf) * self.VtoF(:,:,f));
+				bdryx = self.LIFT(:,:,f) * (diag(Jf) * self.VtoF(:,:,f)) * nx(f);
+				bdryy = self.LIFT(:,:,f) * (diag(Jf) * self.VtoF(:,:,f)) * ny(f);
+  
+				uu  = uu  - taur * bdry; 
+				uqx = uqx -        bdryx;
+				uqy = uqy -        bdryy;
+			end
+
+			qxMatrix = -eMatInv * Kex;
+			% qxrhs = eMatInv * rhsqx;
+			drhsqx_dlam = eMatInv * drhsqx_dlam;
+
+			qyMatrix = -eMatInv * Key;
+			%qyrhs = eMatInv * rhsqy;
+			drhsqy_dlam = eMatInv * drhsqy_dlam;
+
+			%F = rhsu - uqx * qxrhs - uqy * qyrhs;
+			dF_dlam = drhsu_dlam - uqx * drhsqx_dlam - uqy * drhsqy_dlam;
+
+			dF = uqx * qxMatrix + uqy * qyMatrix + uu;
+
+			%u = dF \ F;
+			% $$$ [L,U] = lu(dF);
+			% $$$ du_dlam = U\(L \ dF_dlam);
+			du_dlam = inv(dF) * dF_dlam;
+
+			%qx = qxMatrix * u + qxrhs;
+			%qy = qyMatrix * u + qyrhs;
+			dqx_dlam = qxMatrix * du_dlam + drhsqx_dlam;
+			dqy_dlam = qyMatrix * du_dlam + drhsqy_dlam;
+		end
+		
+		
+		function A = gen_hdg_matrix(self)
+			self.refel = homg.refel (self.Mesh.dim, self.Mesh.order);
+			
+			[self.SkelInterior2All, self.SkelAll2Interior, self.Bmaps, self.LIFT, self.VtoF] = self.Mesh.generate_skeleton_maps(self.refel);
+			
+			% variables
+			Nfp = self.refel.Nrp ^ (self.refel.dim - 1);
+			Nfaces = self.refel.dim * 2;
+			Nv = self.refel.Nrp ^ (self.refel.dim);
+			K = prod(self.Mesh.nelems);	
+			
+			nx   = self.Mesh.nx;
+			ny   = self.Mesh.ny;
+			taur = self.Mesh.taur;
+			
+			maxnnzeros = Nfaces * 2 * Nfp * Nfp * self.Mesh.Ni_faces;
+			II = zeros(maxnnzeros,1);
+			JJ = zeros(maxnnzeros,1);
+			SS = zeros(maxnnzeros,1);
+
+			Nfp2 = Nfp * Nfp;
+			nnzeros = 0;
+			I = eye(Nfp);
+
+			for e = 1:K
+				% e1 solution
+				[du_dlam, dqx_dlam, dqy_dlam] = self.DifflocalSolver(e);
+				for f = 1:Nfaces
+					index = (f-1)*Nfp+1:f*Nfp;  
+					idxf = self.Mesh.get_skeletal_face_indices(self.refel, e, f);
+					idxf_interior = self.SkelAll2Interior(idxf);
+
+					% if this is boundary face, ignore
+					if idxf_interior(1) < eps,
+						continue;
+					end
+
+					Jf = self.Mesh.geometric_factors_face(self.refel,e,f);
+					idxv = self.Mesh.get_discontinuous_face_indices(self.refel, 1, f);
+    
+    
+					% $$$     % construct the residual
+					% $$$     Fhat = Jf .* (refel.Mr * (qx(idxv) * nx(f) + qy(idxv) * ny(f) + ...
+					% $$$                               taur * (u(idxv) - lam)));
+					du_dlam_f  = du_dlam(idxv, index);
+					dqx_dlam_f = dqx_dlam(idxv,index);
+					dqy_dlam_f = dqy_dlam(idxv,index);
+
+					dFhat_dlam = self.refel.Mr * (diag(Jf .* nx(f)) * dqx_dlam_f +...
+					diag(Jf .* ny(f)) * dqy_dlam_f +...
+					diag(Jf .* taur)  * (du_dlam_f - I));
+                      
+					%    res(SkelAll2Interior(idxf)) = res(SkelAll2Interior(idxf)) + Fhat;
+					% self derivative
+					II(nnzeros+1:nnzeros+Nfp2) = repmat(idxf_interior, 1, Nfp);
+					JJ(nnzeros+1:nnzeros+Nfp2) = repmat(idxf_interior', Nfp, 1);
+					SS(nnzeros+1:nnzeros+Nfp2) = dFhat_dlam;
+    
+					nnzeros = nnzeros + Nfp2;
+
+					for fn = 1:Nfaces
+						indexn = (fn-1)*Nfp+1:fn*Nfp;
+						idxfn = self.Mesh.get_skeletal_face_indices(self.refel, e, fn);
+						idxf_interiorn = self.SkelAll2Interior(idxfn);
+      
+						% derivative wrt f is already counted in the identity I above
+						if (idxf_interiorn(1) < eps) || (fn == f)
+							continue;
+						end
+      
+						du_dlam_fn  = du_dlam(idxv, indexn);
+						dqx_dlam_fn = dqx_dlam(idxv,indexn);
+						dqy_dlam_fn = dqy_dlam(idxv,indexn);
+
+						dFhat_dlamn = self.refel.Mr * (diag(Jf .* nx(f)) * dqx_dlam_fn +...
+						diag(Jf .* ny(f)) * dqy_dlam_fn +...
+						diag(Jf .* taur)  * du_dlam_fn );
+
+						% neighbor derivative
+						II(nnzeros+1:nnzeros+Nfp2) = repmat(idxf_interior, 1, Nfp);
+						JJ(nnzeros+1:nnzeros+Nfp2) = repmat(idxf_interiorn', Nfp, 1);
+						SS(nnzeros+1:nnzeros+Nfp2) = dFhat_dlamn;
+      
+						nnzeros = nnzeros + Nfp2;
+					end
+
+				end
+			end
+
+			A = sparse(II(1:nnzeros),JJ(1:nnzeros),SS(1:nnzeros), self.Mesh.Ni_faces * Nfp, self.Mesh.Ni_faces * Nfp);
+			
+			self.K = A;
+			self.is_hDG_solve = true;
+		end		
+		
+		function [u,qx,qy] = localSolver (self, e1, lam, forcing)
+			m     = self.Mesh;
+			refel = self.refel;
+			
+			taur  = m.taur;
+			
+			LIFT  = self.LIFT;
+			VtoF  = self.VtoF;
+
+			nx = m.nx;
+			ny = m.ny;
+
+			% the number of volume point
+			Nv = refel.Nrp ^ (refel.dim);
+
+			uu = zeros(Nv,Nv);
+			uqx = zeros(Nv,Nv);
+			uqy = zeros(Nv,Nv);
+
+			rhsqx = zeros(Nv,1);
+			rhsqy = zeros(Nv,1);
+			rhsu  = zeros(Nv,1);
+      
+			pts = m.element_nodes(e1, refel);
+			[Jv, Dv] = m.geometric_factors(refel, pts);
+
+			eMat = m.element_mass(e1, refel, Jv);
+			eMatInv = inv(eMat);
+
+			% number of faces
+			Nfaces = refel.dim * 2;
+
+			% compute the forcing
+			if ( isnumeric(forcing) )
+				rhsu = eMat * forcing(:,e1);
+			else
+				rhsu = eMat * forcing(pts);
+			end 
+			% advection stiffness
+			[Kex,Key] = m.element_stiffness_advection(e1, refel, Jv, Dv);
+
+			uqx = Kex;
+			uqy = Key;
+			% residual for qx and qy equations
+			for f = 1:Nfaces %
+			  idxf = m.get_skeletal_face_indices(refel, e1, f);      
+			  % geometrix factors at gll points on face
+			  Jf = m.geometric_factors_face(refel,e1,f);
+  
+			  idxv = m.get_discontinuous_face_indices(refel, 1, f);       
+  
+			  % residual due to lambda
+			  rhsfx = Jf .* (refel.Mr * lam(idxf)) * nx(f);
+			  rhsfy = Jf .* (refel.Mr * lam(idxf)) * ny(f);
+			  % lift to volume residual q equation
+			  rhsqx(idxv) = rhsqx(idxv) + rhsfx;
+			  rhsqy(idxv) = rhsqy(idxv) + rhsfy;
+			  % lift to volume residual u equation
+			  rhsu(idxv)  = rhsu(idxv) - ...
+			      taur * Jf .* (refel.Mr * lam(idxf));
+  
+			  % lift to volume for uu
+			  bdry =  LIFT(:,:,f) * (diag(Jf) * VtoF(:,:,f));
+			  bdryx = LIFT(:,:,f) * (diag(Jf) * VtoF(:,:,f)) * nx(f);
+			  bdryy = LIFT(:,:,f) * (diag(Jf) * VtoF(:,:,f)) * ny(f);
+  
+			  uu  = uu  - taur * bdry; 
+			  uqx = uqx -        bdryx;
+			  uqy = uqy -        bdryy;
+			end
+
+			qxMatrix = -eMatInv * Kex;
+			qxrhs = eMatInv * rhsqx;
+
+			qyMatrix = -eMatInv * Key;
+			qyrhs = eMatInv * rhsqy;
+
+			F = rhsu - uqx * qxrhs - uqy * qyrhs;
+			dF = uqx * qxMatrix + uqy * qyMatrix + uu;
+
+			u = dF \ F;
+			qx = qxMatrix * u + qxrhs;
+			qy = qyMatrix * u + qyrhs;
+			
+		end 
+		
   end %methods
   
 end %classdef

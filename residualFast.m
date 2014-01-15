@@ -1,4 +1,4 @@
-function [res] = residualFast(lamInterior,HDG,forcing, Bdata)
+function [res] = residualFast(lamInterior, HDG, forcing, Bdata)
 % Dec 10, 2013
 % Compute the HDG residual in a faster way
 
@@ -8,7 +8,7 @@ Nifaces = HDG.Nifaces;
 Nfp = HDG.Nfp;
 Nsfaces = HDG.Nsfaces;
 Bmaps = HDG.Bmaps;
-InteriorF2AllF = HDG.InteriorF2AllF;
+% InteriorF2AllF = HDG.InteriorF2AllF;
 refel = HDG.refel;
 m = HDG.m;
 LIFT = HDG.LIFT;
@@ -28,6 +28,7 @@ lamAll(SkelInterior2All) = lamInterior;
 for e = 1:K
   % e1 solution
   [u,qx,qy] = localSolver(HDG, e, lamAll, forcing);
+	
   for f = 1:Nfaces
     idxf = m.get_skeletal_face_indices(refel, e, f);
       
