@@ -73,25 +73,31 @@ smoothing. Three approaches for the multigrid hierarchy are compared:
 restriction between geometrically coarsened meshes; (2) $p$-multigrid,
 in which the polynomial order is reduced while the mesh remains
 unchanged, and the interpolation and restriction take into account the
-different-order basis functions; and (3), a classical first-order
+different-order basis functions; and (3), a first-order
 approximation multigrid preconditioner constructed using the
-quadrature nodes of the high-order fine discretization.
-This latter approach is often combined with algebraic multigrid for
-the low-order operator and is attractive
-for high-order discretizations on unstructured meshes, where geometric
-coarsening is difficult.  Based on a simple performance model, we
-compare the computational cost of the different approaches.  Using
-test problems in two and three dimensions with constant and varying
-coefficients, we compare the performance of the algorithms for
-polynomial orders up to 16. \todo{Add summary of findings.}
+quadrature nodes of the high-order discretization on the fine mesh.  This latter
+approach is often combined with algebraic multigrid for the low-order
+operator and is attractive for high-order discretizations on
+unstructured meshes, where geometric coarsening is difficult.  Based
+on a simple performance model, we compare the computational cost of
+the different approaches.  Using scalar test problems in two and three
+dimensions with constant and varying coefficients, we compare the
+performance of the different multigrid approaches for polynomial
+orders up to 16. We find that all smoothers yield good
+performance for constant coefficients; for varying coefficients,
+Chebyshev and SSOR smoothing outperform Jacobi smoothing. None of the
+methods is completely independent of the polynomial order in terms of
+the number of iterations. When multigrid is used as preconditioner in
+a Krylov method, the iteration number decreases significantly (up to a
+factor of three) compared to using multigrid as a solver.
 \end{abstract}
 
-\keywords{high-order, geometric multigrid, algebraic multigrid, continuous finite elements, spectral
-  elements, preconditioning.}
+\keywords{high-order, geometric multigrid, algebraic multigrid,
+  continuous finite elements, spectral elements, preconditioning.}
 
 \section{Introduction}
 
-This paper presents a comprehensive comparison of geometric multigrid
+This paper presents a comparison of geometric multigrid
 methods for the solution of systems arising from high-order (we target
 polynomial orders up to 16) continuous finite element discretizations
 of elliptic partial differential equations. Our particular interest is
@@ -99,17 +105,20 @@ to compare the efficiency of different multigrid methods for elliptic
 problems with varying coefficients and complex geometry.
 % High-order discretization
 High-order spatial discretizations can have significant advantages
-over low-order methods, especially when the solution is smooth and
-high accuracy is desired. However, the sparsity of the systems arising
-upon discretization decreases as the order of the polynomial
-approximation increases, which makes the application of high-order
-operators to vectors computationally more expensive. This is also true
-if matrix-free methods are used, i.e., system matrices are not
-assembled, but their application to vectors is implemented through
-elemental loops.  Besides the loss of sparsity, another challenge in
-high-order discretizations is due to the fact that the discretization
-matrices loose structural properties such as the M-matrix property,
-which often allows to prove convergence of iterative solvers.
+over low-order methods since they reduce the problem size for given
+accuracy, and have better performance on modern hardware.
+%, especially when the solution is smooth and
+%high accuracy is desired. However, the sparsity of the systems arising
+%upon discretization decreases as the order of the polynomial
+%approximation increases, which makes the application of high-order
+%operators to vectors computationally more expensive. This is also true
+%if matrix-free methods are used, i.e., system matrices are not
+%assembled, but their application to vectors is implemented through
+%elemental loops.  Besides the loss of sparsity,
+The main challenge in high-order discretizations is that the matrices
+become denser and loose structural properties such as the M-matrix
+property, which often allows to prove convergence of iterative
+solvers.
 
 We use high-order discretizations based on Legende-Gauss-Lobotto (LGL) nodal
 basis functions. For the polynomial orders $1\le p\le 16$, we compare different approaches for the multigrid hierarchy, different smoothers and the use of multigrid as a solver
