@@ -48,15 +48,17 @@ T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 
 \begin{document}
 
-\titlerunning{Comparison of high-order geometric multigrid methods}
 
 \title{Comparison of Multigrid Algorithms for High-order
   Continuous Finite Element Discretizations}
+\titlerunning{Comparison of multigrid algorithms for high-order discretizations}
 % GS: Should we add "geometric'' to the title?
-\author{Hari Sundar, Georg Stadler and George Biros}
+\author{Hari Sundar$^1$, Georg Stadler$^1$ and George Biros$^{1,2}$}
 
-\institute{Institute for Computational Engineering \& Sciences, The
-  University of Texas at Austin, Austin, TX}
+\institute{$^1$Institute for Computational Engineering \& Sciences, The
+  University of Texas at Austin, Austin, TX,\\
+$^2$Department of Mechanical Engineering, The University of Texas at Austin, Austin, TX.
+}
 
 %\corraddr{\texttt{hari@ices.utexas.edu}}
 \maketitle
@@ -72,10 +74,10 @@ smoothing. Three approaches for the multigrid hierarchy are compared:
 (1) high-order $h$-multigrid, which uses high-order interpolation and
 restriction between geometrically coarsened meshes; (2) $p$-multigrid,
 in which the polynomial order is reduced while the mesh remains
-unchanged, and the interpolation and restriction take into account the
+unchanged, and the interpolation and restriction incorporate the
 different-order basis functions; and (3), a first-order
 approximation multigrid preconditioner constructed using the
-quadrature nodes of the high-order discretization on the fine mesh.  This latter
+quadrature nodes of the high-order discretization.  This latter
 approach is often combined with algebraic multigrid for the low-order
 operator and is attractive for high-order discretizations on
 unstructured meshes, where geometric coarsening is difficult.  Based
@@ -85,8 +87,8 @@ dimensions with constant and varying coefficients, we compare the
 performance of the different multigrid approaches for polynomial
 orders up to 16. We find that all smoothers yield good
 performance for constant coefficients; for varying coefficients,
-Chebyshev and SSOR smoothing outperform Jacobi smoothing. None of the
-methods is completely independent of the polynomial order in terms of
+Chebyshev and SSOR smoothing outperforms Jacobi smoothing. None of the
+tested methods is completely independent of the polynomial order in terms of
 the number of iterations. When multigrid is used as preconditioner in
 a Krylov method, the iteration number decreases significantly (up to a
 factor of three) compared to using multigrid as a solver.
