@@ -54,6 +54,7 @@ T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 \titlerunning{Comparison of multigrid algorithms for high-order discretizations}
 % GS: Should we add "geometric'' to the title?
 \author{Hari Sundar$^1$, Georg Stadler$^1$ and George Biros$^{1,2}$}
+\authorrunning{Hari Sundar, Georg Stadler and George Biros}
 
 \institute{$^1$Institute for Computational Engineering \& Sciences, The
   University of Texas at Austin, Austin, TX,\\
@@ -152,6 +153,118 @@ exploiting the tensor structure of the basis functions, as is common for
 spectral elements, e.g.,~\cite{DevilleFischerMund02}. We use
 geometry-resolving, isoparametric quadrilateral and hexahedral finite elements
 in our comparisons.
+
+
+\begin{figure}[t]
+		% illustration for p-multigrid
+		\begin{tikzpicture}[scale=0.85]
+		% homg
+		\draw (-5,4) grid +(4,1);
+		\foreach \e in {-5,...,-2}
+		\foreach \x in {0,0.1727,0.5,0.8273, 1.0} {
+			\draw[fill=utsecblue] (\e+\x, 4) circle (0.03);
+			\draw[fill=utsecblue] (\e+\x, 4.1727) circle (0.03);
+			\draw[fill=utsecblue] (\e+\x, 4.5) circle (0.03);
+			\draw[fill=utsecblue] (\e+\x, 4.8273) circle (0.03);
+			\draw[fill=utsecblue] (\e+\x, 5) circle (0.03);
+		}
+		%\node at (5,4.5) {\small $p=4$};
+		\draw[-latex',thick] (-3, 3.75) -- node[right] {{\scriptsize $h$-coarsen}} (-3, 3.25);
+		\draw (-5,2) rectangle +(4,1);
+		\draw (-3,2) -- (-3,3);
+		\foreach \e in {-5,-3}
+		\foreach \x in {0,0.1727,0.5,0.8273, 1.0} {
+			\draw[fill=utsecblue] (\e+2*\x, 2) circle (0.03);
+			\draw[fill=utsecblue] (\e+2*\x, 2.1727) circle (0.03);
+			\draw[fill=utsecblue] (\e+2*\x, 2.5) circle (0.03);
+			\draw[fill=utsecblue] (\e+2*\x, 2.8273) circle (0.03);
+			\draw[fill=utsecblue] (\e+2*\x, 3) circle (0.03);
+		}
+		%\node at (5,2.5) {\small $p=2$};
+	
+		\draw[-latex',thick] (-3, 1.75) -- node[right] {{\scriptsize $h$-coarsen}} (-3, 1.25);
+	
+		\draw (-5,0) rectangle +(4,1);
+		\foreach \x in {0,0.1727,0.5,0.8273, 1.0} {
+			\draw[fill=utsecblue] (-5+4*\x, 0) circle (0.03);
+			\draw[fill=utsecblue] (-5+4*\x, 0.1727) circle (0.03);
+			\draw[fill=utsecblue] (-5+4*\x, 0.5) circle (0.03);
+			\draw[fill=utsecblue] (-5+4*\x, 0.8273) circle (0.03);
+			\draw[fill=utsecblue] (-5+4*\x, 1) circle (0.03);
+		}
+		
+	%% p-multigrid
+		\draw (0,4) grid +(4,1);
+		\foreach \e in {0,...,3}
+		\foreach \x in {0,0.1727,0.5,0.8273, 1.0} {
+			\draw[fill=utsecblue] (\e+\x, 4) circle (0.03);
+			\draw[fill=utsecblue] (\e+\x, 4.1727) circle (0.03);
+			\draw[fill=utsecblue] (\e+\x, 4.5) circle (0.03);
+			\draw[fill=utsecblue] (\e+\x, 4.8273) circle (0.03);
+			\draw[fill=utsecblue] (\e+\x, 5) circle (0.03);
+		}
+		%\node at (5,4.5) {\small $p=4$};
+	
+		\draw[-latex',thick] (2, 3.75) -- node[right] {{\scriptsize $p$-coarsen}} (2, 3.25);
+	
+		\draw (0,2) grid +(4,1);
+		\foreach \x in {0,0.5,...,4} {
+			\draw[fill=utsecblue] (\x, 2) circle (0.03);
+			\draw[fill=utsecblue] (\x, 2.5) circle (0.03);
+			\draw[fill=utsecblue] (\x, 3) circle (0.03);
+		}
+		%\node at (5,2.5) {\small $p=2$};
+	
+		\draw[-latex',thick] (2, 1.75) -- node[right] {{\scriptsize $p$-coarsen}} (2, 1.25);
+	
+		\draw (0,0) grid +(4,1);
+		\foreach \x in {0,1,2,3,4} {
+			\draw[fill=utsecblue] (\x, 0) circle (0.05);
+			\draw[fill=utsecblue] (\x, 1) circle (0.05);
+		}
+		%\node at (5,0.5) {\small $p=1$};
+		
+		%% collocated
+			\draw (5,4) grid +(4,1);
+			\foreach \e in {5,...,8}
+			\foreach \x in {0,0.1727,0.5,0.8273, 1.0} {
+				\draw[fill=utsecblue] (\e+\x, 4) circle (0.03);
+				\draw[fill=utsecblue] (\e+\x, 4.1727) circle (0.03);
+				\draw[fill=utsecblue] (\e+\x, 4.5) circle (0.03);
+				\draw[fill=utsecblue] (\e+\x, 4.8273) circle (0.03);
+				\draw[fill=utsecblue] (\e+\x, 5) circle (0.03);
+			}
+			%\node at (2, 1.8) {\tiny $p=4$};
+	
+			\draw[-latex',thick] (7, 3.75) -- node[right] {{\scriptsize sparsify}} (7, 1.25);
+	
+			\draw[step=0.5] (4.99,0) grid +(4.01,1);
+			\draw (5,0.1727) -- (9,0.1727);
+			\draw (5,0.8273) -- (9,0.8273);
+			\foreach \e in {5,...,8} {
+				\draw (\e+0.1727,0) -- (\e+0.1727,1);
+				\draw (\e+0.8273,0) -- (\e+0.8273,1);
+				\foreach \x in {0,0.1727,0.5,0.8273, 1.0} {
+					\draw[fill=utsecblue] (\e+\x, 0) circle (0.03);
+					\draw[fill=utsecblue] (\e+\x, 0.1727) circle (0.03);
+					\draw[fill=utsecblue] (\e+\x, 0.5) circle (0.03);
+					\draw[fill=utsecblue] (\e+\x, 0.8273) circle (0.03);
+					\draw[fill=utsecblue] (\e+\x, 1) circle (0.03);
+				}
+			}
+			% \node at (2, -0.2) {\tiny $p=1$ collocated with $p=4$};
+		\end{tikzpicture}
+		\caption{\label{fig:approaches} Illustration of
+                  different multigrid hierarchies for high-order
+                  finite element discretizations: high-order
+                  $h$-multigrid (left), $p$-multigrid (middle) and
+                  sparsified approximation using linear elements based
+                  on the nodes of the high-order discretization
+                  (right); the resulting low-order system, which is
+                  amenable to, e.g., an algebraic multigrid method,
+                  can serve as preconditioner for the high-order
+                  system matrix.}
+\end{figure}
 
 
 
@@ -301,7 +414,7 @@ Here, $\mu(\bs x)\ge \mu_0>0$ is a spatially varying coefficient that
 is bounded away from zero, and $f(x)$ is a given right hand side. We
 discretize~\eqref{eq:Poisson} using finite elements with basis
 functions of polynomial order $p$, and solve the resulting discrete
-system using different multigrid variants. Below, in
+system using different multigrid variants. Next, in
 \S\ref{subsec:galerkin} and \S\ref{sub:restriction_&_prolongation}, we
 discuss the Galerkin approximation to~\eqref{eq:Poisson} and the setup
 of the inter-grid transfer operators to establish a multilevel
@@ -311,14 +424,18 @@ and implementation used for our comparisons.
 \subsection{Galerkin approximation} \label{subsec:galerkin}
 
 Given a bounded, symmetric bilinear form\footnote{In our case,
-  $a(u,v)=\int_\Omega \mu\nabla u \cdot \nabla v$.} $a(u,v)$ that is
+$a(u,v)=\int_\Omega \mu\nabla u \cdot \nabla v$.} $a(u,v)$ that is
 coercive
 on $H_0^{1}(\Omega)$, and $f \in L^{2}(\Omega)$, we want to find $u
 \in H_0^{1}(\Omega)$ such that $u$ satisfies
 \begin{equation}
 \label{eqn:weakForm}
-a(u,v) =  (f,v)_{L^2(\Omega)}, \ \ \ \forall v \in H_0^{1}(\Omega).
+a(u,v) =  (f,v)_{L^2(\Omega)}, \ \ \ \forall v \in H_0^{1}(\Omega),
 \end{equation}
+where $(f,v)_{L^2(\Omega)} = \int_\Omega fv\,dx$ and
+$H_0^1(\Omega)\subset L^2(\Omega)$ denotes the subspace of
+functions with square integrable derivatives that vanish on the
+boundary.
 This problem is known to have a unique solution $u^*$ \cite{BrennerScott94}. 
 We now derive discrete equations whose solutions
 approximate the solution of
@@ -328,10 +445,11 @@ H_0^{1}(\Omega)$.
 Here, $V_k$ is the finite element space corresponds to a finite element mesh
 at a specified
 polynomial order, and $V_{k-1}$ corresponds to the next coarser
-problem, which is obtained either via geometric coarsening of the
-mesh ($h$-coarsening) or decreasing of the polynomial degree of the
-finite element basis functions ($p$-coarsening), as illustrated in
-Figure~\ref{fig:approaches}.  Then, the discretized problem is to find
+problem,
+% which is obtained either via geometric coarsening of the
+%mesh ($h$-coarsening) or decreasing of the polynomial degree of the
+%finite element basis functions ($p$-coarsening),
+as illustrated  in Figure~\ref{fig:approaches} for different coarsenings.  Then, the discretized problem is to find
 $u_k \in V_k$ such that
 \begin{equation*}
 %\label{eqn:galerkinForm}
@@ -490,116 +608,6 @@ preconditioner has been proven efficient. Next, we discuss details of
 these different approaches.
 
 
-\begin{figure}
-		% illustration for p-multigrid
-		\begin{tikzpicture}[scale=0.85]
-		% homg
-		\draw (-5,4) grid +(4,1);
-		\foreach \e in {-5,...,-2}
-		\foreach \x in {0,0.1727,0.5,0.8273, 1.0} {
-			\draw[fill=utsecblue] (\e+\x, 4) circle (0.03);
-			\draw[fill=utsecblue] (\e+\x, 4.1727) circle (0.03);
-			\draw[fill=utsecblue] (\e+\x, 4.5) circle (0.03);
-			\draw[fill=utsecblue] (\e+\x, 4.8273) circle (0.03);
-			\draw[fill=utsecblue] (\e+\x, 5) circle (0.03);
-		}
-		%\node at (5,4.5) {\small $p=4$};
-		\draw[-latex',thick] (-3, 3.75) -- node[right] {{\scriptsize $h$-coarsen}} (-3, 3.25);
-		\draw (-5,2) rectangle +(4,1);
-		\draw (-3,2) -- (-3,3);
-		\foreach \e in {-5,-3}
-		\foreach \x in {0,0.1727,0.5,0.8273, 1.0} {
-			\draw[fill=utsecblue] (\e+2*\x, 2) circle (0.03);
-			\draw[fill=utsecblue] (\e+2*\x, 2.1727) circle (0.03);
-			\draw[fill=utsecblue] (\e+2*\x, 2.5) circle (0.03);
-			\draw[fill=utsecblue] (\e+2*\x, 2.8273) circle (0.03);
-			\draw[fill=utsecblue] (\e+2*\x, 3) circle (0.03);
-		}
-		%\node at (5,2.5) {\small $p=2$};
-	
-		\draw[-latex',thick] (-3, 1.75) -- node[right] {{\scriptsize $h$-coarsen}} (-3, 1.25);
-	
-		\draw (-5,0) rectangle +(4,1);
-		\foreach \x in {0,0.1727,0.5,0.8273, 1.0} {
-			\draw[fill=utsecblue] (-5+4*\x, 0) circle (0.03);
-			\draw[fill=utsecblue] (-5+4*\x, 0.1727) circle (0.03);
-			\draw[fill=utsecblue] (-5+4*\x, 0.5) circle (0.03);
-			\draw[fill=utsecblue] (-5+4*\x, 0.8273) circle (0.03);
-			\draw[fill=utsecblue] (-5+4*\x, 1) circle (0.03);
-		}
-		
-	%% p-multigrid
-		\draw (0,4) grid +(4,1);
-		\foreach \e in {0,...,3}
-		\foreach \x in {0,0.1727,0.5,0.8273, 1.0} {
-			\draw[fill=utsecblue] (\e+\x, 4) circle (0.03);
-			\draw[fill=utsecblue] (\e+\x, 4.1727) circle (0.03);
-			\draw[fill=utsecblue] (\e+\x, 4.5) circle (0.03);
-			\draw[fill=utsecblue] (\e+\x, 4.8273) circle (0.03);
-			\draw[fill=utsecblue] (\e+\x, 5) circle (0.03);
-		}
-		%\node at (5,4.5) {\small $p=4$};
-	
-		\draw[-latex',thick] (2, 3.75) -- node[right] {{\scriptsize $p$-coarsen}} (2, 3.25);
-	
-		\draw (0,2) grid +(4,1);
-		\foreach \x in {0,0.5,...,4} {
-			\draw[fill=utsecblue] (\x, 2) circle (0.03);
-			\draw[fill=utsecblue] (\x, 2.5) circle (0.03);
-			\draw[fill=utsecblue] (\x, 3) circle (0.03);
-		}
-		%\node at (5,2.5) {\small $p=2$};
-	
-		\draw[-latex',thick] (2, 1.75) -- node[right] {{\scriptsize $p$-coarsen}} (2, 1.25);
-	
-		\draw (0,0) grid +(4,1);
-		\foreach \x in {0,1,2,3,4} {
-			\draw[fill=utsecblue] (\x, 0) circle (0.05);
-			\draw[fill=utsecblue] (\x, 1) circle (0.05);
-		}
-		%\node at (5,0.5) {\small $p=1$};
-		
-		%% collocated
-			\draw (5,4) grid +(4,1);
-			\foreach \e in {5,...,8}
-			\foreach \x in {0,0.1727,0.5,0.8273, 1.0} {
-				\draw[fill=utsecblue] (\e+\x, 4) circle (0.03);
-				\draw[fill=utsecblue] (\e+\x, 4.1727) circle (0.03);
-				\draw[fill=utsecblue] (\e+\x, 4.5) circle (0.03);
-				\draw[fill=utsecblue] (\e+\x, 4.8273) circle (0.03);
-				\draw[fill=utsecblue] (\e+\x, 5) circle (0.03);
-			}
-			%\node at (2, 1.8) {\tiny $p=4$};
-	
-			\draw[-latex',thick] (7, 3.75) -- node[right] {{\scriptsize sparsify}} (7, 1.25);
-	
-			\draw[step=0.5] (4.99,0) grid +(4.01,1);
-			\draw (5,0.1727) -- (9,0.1727);
-			\draw (5,0.8273) -- (9,0.8273);
-			\foreach \e in {5,...,8} {
-				\draw (\e+0.1727,0) -- (\e+0.1727,1);
-				\draw (\e+0.8273,0) -- (\e+0.8273,1);
-				\foreach \x in {0,0.1727,0.5,0.8273, 1.0} {
-					\draw[fill=utsecblue] (\e+\x, 0) circle (0.03);
-					\draw[fill=utsecblue] (\e+\x, 0.1727) circle (0.03);
-					\draw[fill=utsecblue] (\e+\x, 0.5) circle (0.03);
-					\draw[fill=utsecblue] (\e+\x, 0.8273) circle (0.03);
-					\draw[fill=utsecblue] (\e+\x, 1) circle (0.03);
-				}
-			}
-			% \node at (2, -0.2) {\tiny $p=1$ collocated with $p=4$};
-		\end{tikzpicture}
-		\caption{\label{fig:approaches} Illustration of
-                  different multigrid hierarchies for high-order
-                  finite element discretizations: high-order
-                  $h$-multigrid (left), $p$-multigrid (middle) and
-                  sparsified approximation using linear elements based
-                  on the nodes of the high-order discretization
-                  (right); the resulting low-order system, which is
-                  amenable to, e.g., an algebraic multigrid method,
-                  can serve as preconditioner for the high-order
-                  system matrix.}
-\end{figure}
 
 \subsubsection{$h$-multigrid}\label{subsec:h}
 A straightforward extension of low-order to high-order geometric
