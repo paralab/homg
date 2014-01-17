@@ -451,11 +451,11 @@ problem,
 %finite element basis functions ($p$-coarsening),
 as illustrated  in Figure~\ref{fig:approaches} for different coarsenings.  Then, the discretized problem is to find
 $u_k \in V_k$ such that
-\begin{equation*}
-%\label{eqn:galerkinForm}
+\begin{equation}
+\label{eqn:galerkinForm}
 a(u_{k},v_k) = (f,v_k)_{L^2(\Omega)}, \ \ \ \forall v_k \in V_k.
-\end{equation*}
-The discretized problem has a unique solution, and the sequence
+\end{equation}
+This problem has a unique solution, and the sequence
 $\{u_k\}$ converges to $u^*$ \cite{BrennerScott94}.
 %
 %Let $(\cdot,\cdot)_{k}$ be an inner product defined on $V_k$.
@@ -481,7 +481,7 @@ with respect to the $L^2$-inner product and positive definite.
 % In the following sections, we use italics to
 %represent an operator (or vector) in the continuous form and use boldface to represent the matrix (or vector) corresponding to its
 %coordinate basis representation.
-Let $\{\phi_1^k,\phi_2^k,\ldots,\phi_{N_k}^k\}$ be a nodal basis for $V_k$ and
+Let $\{\phi_1^k,\phi_2^k,\ldots,\phi_{N_k}^k\}$ be a basis for $V_k$ and
 denote by $\mathbf{A_k}$ the representation of $A_k$ in that
 basis. Then, \eqref{eqn:fematDef} becomes the linear matrix equation
 for the coefficient vector $\mathbf{u}_k\in \mathbb{R}^{N_k}$
@@ -489,22 +489,24 @@ for the coefficient vector $\mathbf{u}_k\in \mathbb{R}^{N_k}$
 \mathbf{A}_k\mathbf{u}_k = \mathbf{f}_k,
 \end{equation}
 where, for $i,j = 1,2,\ldots,N_k$, the components of $\mathbf A_k$, $\mathbf u_k$ and $\mathbf f_k$ are given by
-%\label{eq:femDiscretization}
 \begin{align*}
 %\mathbf{\tilde{A}_{k}} &=& (\mathbf{M_{k}^{k}})^{-1}\mathbf{A_{k}},  \\
 %\mathbf{\tilde{f}_{k}} &=& (\mathbf{M_{k}^{k}})^{-1}\mathbf{f_{k}},  \\
 (\mathbf{A}_k)_{ij} =& a(\phi_i^k,\phi_j^k), \\% && 
 (\mathbf{f}_{k})_j   =& (f,\phi_j^k)_{L^2(\Omega)}, \\%&& \text{ for } j=1,2,\ldots,N_k, \\
-(\mathbf{M}_k)_{ij} =& (\phi_i^k,\phi_j^k)_{L^2(\Omega)}.
+(\mathbf{M}_k)_{ij} =& (\phi_i^k,\phi_j^k)_{L^2(\Omega)},
 \end{align*}
-%\end{equation}
+where the integrals on the right hand sides are often approximated
+using numerical quadrature. \todo{George, did you want a longer
+  discussion about the quadrature?}
 Here, $\mathbf{M}_k$ is the mass matrix, which appears in the
 approximation of the $L^2$-inner product in $V_k$ since
 $(u_k,v_k)_{L^2(\Omega)} = \mathbf{u}_k^T\mathbf{M}_k\mathbf{v}_k$ for
 all $u_k,v_k\in V_k$ with corresponding coefficient vectors
-$\mathbf{u}_k,\mathbf{v}_k\in \mathbb{R}^{N_k}$. Thus, the
-approximation to the $L^2$-inner product in $V_k$ is the Euclidean
-product weighted by the mass matrix $\mathbf{M}_k$.
+$\mathbf{u}_k,\mathbf{v}_k\in \mathbb{R}^{N_k}$.
+% Thus, the
+% approximation to the $L^2$-inner product in $V_k$ is the Euclidean
+% product weighted by the mass matrix $\mathbf{M}_k$.
 
 
 % subsection matrix_assembly_&_quadrature (end)
@@ -559,10 +561,14 @@ motivated by our interest in fast elliptic solvers on adaptively
 refined nonconforming octree-based
 meshes~\cite{SundarBirosBursteddeEtAl12, SampathBiros10}, 
 we restrict our comparisons to uniformly refined conforming meshes.
-%
 Our implementation is written in Matlab and made available from
-\todo{XXX}. While in practice, matrix assembly for
-high-order discretizations is discouraged, we use sparse
+\todo{XXX}. It allows comparisons of different smoothing and
+coarsening methods for high-order discretized problems in two and three dimensions, and can
+easily be modified or extended. It does not support distributed memory
+parallelism, and is
+restricted to conforming meshes that can be mapped to a square (in 2D) or a
+cube (in 3D). While, in practice, matrix assembly for
+high-order discretizations is discouraged, it we use sparse
 assembled operators in this prototype implementation.
 
 % Coarser meshes
