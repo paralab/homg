@@ -78,7 +78,7 @@ in which the polynomial order is reduced while the mesh remains
 unchanged, and the interpolation and restriction incorporate the
 different-order basis functions; and (3), a first-order
 approximation multigrid preconditioner constructed using the
-quadrature nodes of the high-order discretization.  This latter
+nodes of the high-order discretization.  This latter
 approach is often combined with algebraic multigrid for the low-order
 operator and is attractive for high-order discretizations on
 unstructured meshes, where geometric coarsening is difficult.  Based
@@ -118,41 +118,62 @@ accuracy, and allow for better performance on modern hardware.
 %if matrix-free methods are used, i.e., system matrices are not
 %assembled, but their application to vectors is implemented through
 %elemental loops.  Besides the loss of sparsity,
-The main challenge in high-order discretizations is that the matrices
-become denser and loose structural properties such as the M-matrix
+The main challenges in high-order discretizations are that matrices
+are denser compared to low-order methods, and that they loose structural
+properties such as the M-matrix
 property, which often allows to prove convergence of iterative
 solvers.
 
-We use high-order discretizations based on Legende-Gauss-Lobotto (LGL) nodal
-basis functions. For the polynomial orders $1\le p\le 16$, we compare different approaches for the multigrid hierarchy, different smoothers and the use of multigrid as a solver
-and as a preconditioner in a Krylov subspace method.  While we use moderate
-size model problems (up to about $2$~million unknowns in 3D) for the comparisons in this
-paper, we also discuss our findings with regard to parallel implementations on
-high performance computing platforms. Systems
-arising upon high-order discretization often allow better
-performance and are thus able to capitalize on high performance platforms.
-We also discuss parallelization aspects relevant for implementations on
-shared or distributed memory architectures. For instance, the implementation of
-Gauss-Seidel smoothers can be challenging in
+As illustrated in Figure~\ref{fig:approaches}, there are several
+possibilities for constructing a multigrid hierarchy for high-order
+discretizations: (1) high-order geometric $h$-multigrid, where the
+mesh is coarsened geometrically and high-order interpolation and
+prolongation operators are used; (2) $p$-multigrid, in which the
+problem is coarsened by reducing the polynomial order, and the
+interpolation and prolongation take into account the different order
+basis functions; and (3) a first-order approximation as
+preconditioner, constructed from the nodes of the high-order
+discretization.
+For the polynomial orders $1\le p\le 16$, we
+compare different approaches for the multigrid hierarchy, different
+smoothers and the use of multigrid as a solver and as a preconditioner
+in a Krylov subspace method.  While we use moderate size model
+problems (up to about $2$~million unknowns in 3D) for the comparisons
+in this paper, we also discuss our findings with regard to parallel
+implementations on high performance computing platforms. Systems
+arising upon high-order discretization often allow better performance
+and are thus able to capitalize on high performance platforms.  We
+also discuss parallelization aspects relevant for implementations on
+shared or distributed memory architectures. For instance, the
+implementation of Gauss-Seidel smoothers can be challenging in
 parallel~\cite{AdamsBrezinaHuEtAl03, BakerFalgoutKolevEtAl11}; for
-this reason, we include
-a Chebyshev-accelerated Jacobi smoother in our comparisons. This Chebyshev
-smoother is easy to implement in parallel, and often is as effective a
-smoother as Gauss-Seidel.
+this reason, we include a Chebyshev-accelerated Jacobi smoother in our
+comparisons. This Chebyshev smoother is easy to implement in parallel,
+and often is as effective a smoother as Gauss-Seidel.
 
-\todo{Some irrelevant stuff in this paragraph.}
-The use of matrix-free methods, i.e., methods that do not require assembled finite element matrices, is critical for high-order methods since the number of nonzero entries in
-finite element matrices increases rapidly as the polynomial order increases.
-For instance, for a three-dimensional hexahedral mesh and finite element
-discretizations with polynomial degree $p$, element matrices are of size
-$(p+1)^3\times (p+1)^3$. Thus, for $p=8$, this amounts to more than
-half a million entries per element. 
-For tensorized nodal basis functions on hexahedral meshes, the
-application of elemental matrices to vectors can be implemented efficiently by
-exploiting the tensor structure of the basis functions, as is common for
-spectral elements, e.g.,~\cite{DevilleFischerMund02}. We use
-geometry-resolving, isoparametric quadrilateral and hexahedral finite elements
-in our comparisons.
+%\todo{Some irrelevant stuff in this paragraph.}  The use of
+%matrix-free methods, i.e., methods that do not require assembled
+%finite element matrices, is critical for high-order methods since the
+%number of nonzero entries in finite element matrices increases rapidly
+%as the polynomial order increases.
+
+We use and high-order discretizations based on Legende-Gauss-Lobotto
+(LGL) nodal basis functions on quadrilateral or hexahedral
+meshes. Tensorized basis functions allow for a fast, matrix-free
+application of element matrices. This is particularly important for
+high polynomial degrees in three dimensions, when element matrices
+become large. For instance, for a three-dimensional hexahedral mesh
+and finite element discretizations with polynomial degree $p$, the
+dense element
+matrices are of size $(p+1)^3\times (p+1)^3$. Thus, for $p=8$, this
+amounts to more than half a million entries per element.  For
+tensorized nodal basis functions on hexahedral meshes, the application
+of elemental matrices to vectors can be implemented efficiently by
+exploiting the tensor structure of the basis functions, as is common
+for spectral elements, e.g.,~\cite{DevilleFischerMund02}.
+% We use geometry-resolving,
+% isoparametric quadrilateral and hexahedral finite elements in our
+% comparisons.
 
 
 \begin{figure}[t]
@@ -281,18 +302,22 @@ high-order elements on simple one and two-dimensional
 geometries. Initial theoretical evidence for this behavior is given
 in~\cite{MadayMunoz88}, where multigrid convergence is studied for
 one-dimensional spectral methods and spectral element problems.
-% This
-%high-order geometric multigrid requires the computation of high-order
-%residuals and the use of high-order interpolation and prolongation
-%operators.
 % Thus, an efficient implementation
 %cannot assemble these operators, i.e., has to be matrix-free.
 %
-An alternative to high-order geometric multigrid is $p$-multigrid, which
-coarsens the polynomial degree while (at least, initially) keeping the mesh
-unchanged, e.g.,~\cite{HelenbrookMavriplisAtkins03}. Here, the
-interpolation and restriction operators are based on the
-different-order basis functions.
+The use of $p$-multigrid is particularly popular in the context of
+high-order discontinuous Galerkin discretizations
+\cite{FidkowskiOliverLuEtAl05, HelenbrookAtkins06}, but $p$-multigrid
+has also been used for continuous finite element discretizations,
+e.g.,~\cite{HelenbrookMavriplisAtkins03}.
+%An alternative to high-order geometric multigrid is $p$-multigrid, which
+%coarsens the polynomial degree while (at least, initially) keeping the mesh
+%unchanged,
+%
+% Here, the
+%interpolation and restriction operators are based on the
+%different-order basis functions. \todo{Why's most of the high order
+%  work for dG?}
 %
 % and are element-local.  We compare the
 %performance of this $p$-multigrid approach
@@ -302,20 +327,40 @@ different-order basis functions.
 %modern hardware, the rapid loss of sparsity of the involved systems as
 %the polynomial order increases represents a significant challenge.
 %
-A popular strategy for high-order discretizations on unstructured meshes, for
-which the application of geometric multigrid is challenging, is to assemble a
-low-order approximation of the high-order system and use an algebraic multigrid
-method to invert the low-order (and thus much sparser) operator~\cite{Brown10,
-Kim07, DevilleMund90, Olson07, CanutoGervasioQuarteroni10}.
-In~\cite{HeysManteuffelMcCormickEtAl05}, this approach is compared with the
-direct application of algebraic multigrid to the high-order operator.
+A popular strategy for high-order discretizations on unstructured
+meshes, for which the application of geometric multigrid is
+challenging, is to assemble a low-order approximation of the
+high-order system and use an algebraic multigrid method to invert the
+low-order (and thus much sparser) operator~\cite{Brown10, Kim07,
+  DevilleMund90, Olson07, CanutoGervasioQuarteroni10}.
+In~\cite{HeysManteuffelMcCormickEtAl05}, this approach is compared
+with the direct application of algebraic multigrid to the high-order
+operator and the authors find that one of the main difficulties is the
+assembly of the high-order matrices required by algebraic multigrid
+methods.
 
 
 %\gsnote{Check Bungartz/Wittum groups if they have anything we should cite.}
 
-{\em Contributions:} We present a comparison of different combinations
-of multigrid hierarchies and smoothers for the solution of high-order
-continuous finite element discretizatized elliptic problems.
+{\em Contributions:} While high-order methods and their analysis have
+obtained significant attention in the literature, efficient solvers
+for the arising matrix systems are less well investigated. In
+particular, results studying the practical behavior of multigrid
+methods for high-order systems are scattered and a systematic
+comparison does not seems to be available.  Thus, here we present a
+comparison of different combinations of multigrid hierarchies and
+smoothers for the solution of elliptic problems, which have been
+discretized by high-order continuous finite elements.  We provide a
+simple and easily extendible implementation, which allows a systematic
+comparison of the different methods in the same framework. While we do
+not use a high performance implementation, we also discuss aspects of
+high-performance and distributed memory parallel implementations.
+
+%study smoothers; 
+%lack of studies in the literature, not immediate 
+%discussing hpc implementation
+
+
 
 
 %Here, we compare
