@@ -135,8 +135,8 @@ basis functions; and (3) a first-order approximation as
 preconditioner, constructed from the nodes of the high-order
 discretization.
 For the polynomial orders $1\le p\le 16$, we
-compare different approaches for the multigrid hierarchy, different
-smoothers and the use of multigrid as a solver and as a preconditioner
+compare these multigrid approaches, combined with different
+smoothers. We also compare the use of multigrid as a solver and as a preconditioner
 in a Krylov subspace method.  While we use moderate size model
 problems (up to about $2$~million unknowns in 3D) for the comparisons
 in this paper, we also discuss our findings with regard to parallel
@@ -161,7 +161,7 @@ We use and high-order discretizations based on Legende-Gauss-Lobotto
 (LGL) nodal basis functions on quadrilateral or hexahedral
 meshes. Tensorized basis functions allow for a fast, matrix-free
 application of element matrices. This is particularly important for
-high polynomial degrees in three dimensions, when element matrices
+high polynomial degrees in three dimensions, where element matrices
 become large. For instance, for a three-dimensional hexahedral mesh
 and finite element discretizations with polynomial degree $p$, the
 dense element
@@ -279,12 +279,13 @@ for spectral elements, e.g.,~\cite{DevilleFischerMund02}.
                   different multigrid hierarchies for high-order
                   finite element discretizations: high-order
                   $h$-multigrid (left), $p$-multigrid (middle) and
-                  sparsified approximation using linear elements based
+                  low-order approximation preconditioner based
                   on the nodes of the high-order discretization
-                  (right); the resulting low-order system, which is
-                  amenable to, e.g., an algebraic multigrid method,
-                  can serve as preconditioner for the high-order
-                  system matrix.}
+                  (right).}
+% the resulting low-order system, which is
+%                  amenable to, e.g., an algebraic multigrid method,
+%                  can serve as preconditioner for the high-order
+%                  system matrix.}
 \end{figure}
 
 
@@ -305,7 +306,7 @@ one-dimensional spectral methods and spectral element problems.
 % Thus, an efficient implementation
 %cannot assemble these operators, i.e., has to be matrix-free.
 %
-The use of $p$-multigrid is particularly popular in the context of
+The use of $p$-multigrid is rather common in the context of
 high-order discontinuous Galerkin discretizations
 \cite{FidkowskiOliverLuEtAl05, HelenbrookAtkins06}, but $p$-multigrid
 has also been used for continuous finite element discretizations,
@@ -352,8 +353,9 @@ comparison of different combinations of multigrid hierarchies and
 smoothers for the solution of elliptic problems, which have been
 discretized by high-order continuous finite elements.  We provide a
 simple and easily extendible implementation, which allows a systematic
-comparison of the different methods in the same framework. While we do
-not use a high performance implementation, we also discuss aspects of
+comparison of the different methods in the same framework. Our
+comparison does
+not use a high performance implementation, but we discuss aspects of
 high-performance and distributed memory parallel implementations.
 
 %study smoothers; 
@@ -376,14 +378,14 @@ scalable parallel simulations on nonconforming meshes derived from
 adaptive octrees (e.g.,\cite{SundarBirosBursteddeEtAl12,
   SampathBiros10, BursteddeGhattasGurnisEtAl10}, for the comparisons
 presented in this paper we restrict ourselves to moderate size
-problems on conforming meshes; as we do not use a high-performance
-implementation, we also do not address time-to-solution.  Recent
+problems on conforming meshes. We do not address time-to-solution, as
+we do not use a high-performance implementation. Recent
 results using a scalable parallel implementation indicate that many of
-our observations generalize to non-conforming meshes and can be
-implemented efficiently in parallel \cite{IPDPS14}. Moreover, while we
+our observations generalize to non-conforming meshes and that the
+methods are scalable to large parallel computers \cite{IPDPS14}. While we
 experiment with problems with strongly varying coefficients, we do not
-study problems with discontinuous or anisotropic coefficients, or with
-ill-shaped or streched elements.
+study problems with discontinuous or anisotropic coefficients, nor consider
+stretched or ill-shaped elements.
 
 
 {\em Organization of this paper:} In \S\ref{sec:problem} we describe
