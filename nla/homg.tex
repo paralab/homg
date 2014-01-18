@@ -645,8 +645,8 @@ multilevel hierarchies in~\S\ref{subsec:hierarchy}, discuss
 smoothers in~\S\ref{subsec:smoothers}, and then compare the
 computational cost of these different approaches in~\S\ref{subsec:complexity}.
 
-\subsection{Hierarchy construction}\label{subsec:hierarchy}
-There are several ways to building a multilevel hierarchy for
+\subsection{Hierarchy construction, restriction and prolongation operators}\label{subsec:hierarchy}
+There are several ways to build a multilevel hierarchy for
 high-order discretized problems; see Figure~\ref{fig:approaches}. One
 option is the construction of a geometric mesh hierarchy while keeping
 the polynomial order unchanged; we refer to this approach as
@@ -665,7 +665,7 @@ these different approaches.
 \subsubsection{$h$-multigrid}\label{subsec:h}
 A straightforward extension of low-order to high-order geometric
 multigrid is to use the high-order discretization of the operator for
-the residual computation on each multigrid level combined with
+the residual computation on each multigrid level, combined with
 high-order restriction and prolongation operators
 (see \S\ref{sub:restriction_&_prolongation}).
 %A potential difficulty in this approach is that it
@@ -675,18 +675,24 @@ high-order restriction and prolongation operators
 %discretizations of scalar elliptic operators are usually not
 %M-matrices, which is a useful property to prove the convergence of
 %smoothers such as Jacobi of Gauss-Seidel.
-Due to the low sparsity of high-order discretized systems, the
-efficient computation of the residual as well as devising efficient
-smoothers can be a challenge. As a remedy, matrix-free methods for the
-residuum computation and the prolongation and restriction operators
-can be used. The corresponding element-local computations can often be
-sped up by using tensorized finite element basis functions as common
-in spectral element methods; see e.g.~\cite{DevilleFischerMund02}.
+%
+%Due to the low sparsity of high-order discretized systems, the
+%efficient computation of the residual as well as devising efficient
+%smoothers can be a challenge. As a remedy, matrix-free methods for the
+%residuum computation and the prolongation and restriction operators
+%can be used.
+For hexahedral (or quadrilateral) meshes, the required high-order residual
+computations can often be accelerated using elementwise computations and
+%The corresponding elementwise computations can often be
+tensorized finite element basis functions, as is common
+in spectral element methods \cite{DevilleFischerMund02}.
 
 \subsubsection{$p$-multigrid}\label{subsec:p}
-In the $p$-multigrid approach, the mesh is (initially) not coarsened
-geometrically, but the polynomial order of the element basis functions
-is reduced. Starting from an order-$p$ polynomial basis (for
+In the $p$-multigrid approach, a multigrid hierarchy is obtained by reducing
+%, the mesh is (initially) not coarsened
+%geometrically, but
+the polynomial order of the element basis functions.
+Starting from an order-$p$ polynomial basis (for
 simplicity, we assume here that $p$ is a power of 2), the coarser
 grids correspond to polynomials of order $p/2, p/4,\ldots,1$, followed
 by geometric coarsening of the $p=1$ grid (i.e., standard low-order
@@ -712,11 +718,13 @@ nature of algebraic multigrid, it is particularly attractive for
 high-order discretizations on unstructured meshes.  Note that even if
 the mesh is structured, using geometric multigrid for the low-order
 system is not straightforward due to the non-evenly spaced node points
-inherited from the high-order discretization.  In principle, this
-approach only requires computation of the residual for the high-order
-discretized operator. Smoothing on the finest level is based on the
-low-order discretized operator, and either the high-order or the
-low-order residual can be used in the smoother.
+inherited from the high-order discretization.
+
+%  In principle, this
+%approach only requires computation of the residual for the high-order
+%discretized operator. Smoothing on the finest level is based on the
+%low-order discretized operator, and either the high-order or the
+%low-order residual can be used in the smoother.
 % Using the high-order
 %residual in the smoother requires an additional high-order residual
 %computation per smoothing step.
@@ -763,7 +771,7 @@ low-order residual can be used in the smoother.
 \subsection{Smoothers}\label{subsec:smoothers}
 Next, we summarize different smoothers. Point smoothers are reviewed
 in \S\ref{subsec:ptsmoothers}. In \S\ref{subsec:schwarz}, we discuss
-Schwarz domain decomposition-based smoothers.
+Schwarz domain-decomposition-based smoothers.
 
 
 \subsubsection{Point smoothers}\label{subsec:ptsmoothers}
@@ -775,7 +783,7 @@ these diagonal entries must be computed in a setup step.  Note that the
 parallelization of Gauss-Seidel smoothers (such as SSOR) requires coloring of
 unknowns at parallel boundaries, and, compared to Jacobi smoothing, more
 complex communication in a distributed memory implementation. The
-Chebyshev-accelerated Jacobi method is an attractive alternative to SSOR; it
+Chebyshev-accelerated Jacobi method is an alternative to SSOR; it
 can significantly improve over Jacobi smoothing, while being as simple to
 implement~\cite{AdamsBrezinaHuEtAl03}. The acceleration of Jacobi smoothing
 with Chebyshev polynomials requires estimation of the maximum eigenvalue of
@@ -784,19 +792,22 @@ estimate the largest eigenvalue using 10 iterations of the Arnoldi algorithm.
 
 In Figures~\ref{fig:smoothers} and~\ref{fig:smoothers-var}, we compare
 the efficiency of these point smoothers for different polynomial
-orders. We compute the eigenvectors of the system matrix, choose a
+orders and constant and varying coefficient. For that purpose, we
+compute the eigenvectors of the system matrix, choose a
 zero right hand side and an initialization that has all unit
 coefficients in the basis given by these eigenvectors. For the
 polynomial orders $p=1,4,16$, we compare the performance of point
-smoothers without and with a multilevel step.  We depict the
-coefficients after 6 smoothing steps on the left, and the results
+smoothers without and with a 2-level v-cycle with exact coarse solve. We depict the
+coefficients after six smoothing steps on the left, and the results
 obtained for a two-grid method\footnote{For simplicity, we chose two
   grids in our tests; the results for a multigrid v-cycle are
-  similar.} with 3 pre and 3 post smoothing steps (and thus overall 6
+  similar.} with three pre and three post smoothing steps (and thus overall six
 smoothing steps on the finest grid) on the right. The SSOR smoother
-uses a lexicographic ordering of the unknowns, and we employ 2 pre and 1
-post smoothing steps, which again amounts to overall 6 smoothing steps
-on the finest grid. The Chebyshev smoother targets the part of the
+uses a lexicographic ordering of the unknowns, and we employ two pre and one
+post smoothing steps, which again amounts to overall six smoothing steps
+on the finest grid. \todo{The damping factors for Jacobi and SSOR smoothing
+are $\omega = 2/3$ and $\omega=1$, respectively.} The Chebyshev
+smoother targets the part of the
 spectrum given by $[\lambda_\text{max}/4,\lambda_\text{max}]$, where
 $\lambda_\text{max}$ is the maximum eigenvalue of the system matrix.
 
