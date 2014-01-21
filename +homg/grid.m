@@ -156,10 +156,18 @@ classdef grid < handle
         u = zeros(size(rhs));
       end
 
+			if ( grid.is_hDG_solve && size(u,1) ~= size(grid.K, 2))
+				u_hat = grid.VtoF * u;
+				r = grid.K*u_hat - rhs;
+			else
+				r = grid.K*u - rhs;
+			end
+
+
       % r = Au - f
       % r = grid.ZeroBoundary * (grid.K*(grid.ZeroBoundary*u+grid.Ud) - rhs) + (u - grid.ZeroBoundary*u - grid.Ud);
       % u(grid.Boundary) = 0;
-      r = grid.K*u - rhs;
+      % r = grid.K*u - rhs;
       % r(grid.Boundary) = 0;
     end
 
@@ -256,7 +264,7 @@ classdef grid < handle
       grid.set_smoother(smoother);
       % bdy conditions ...
       % u = grid.ZeroBoundary*u;
-      
+      keyboard
       r = grid.residual(rhs, u);
       disp(['Initial residual is ' num2str(norm(r))]);
       disp('------------------------------------------');
@@ -288,6 +296,9 @@ classdef grid < handle
 				else
 					if ( grid.is_hDG_solve )
 						
+						K = prod(self.Mesh.nelems);	
+						Nfp = self.refel.Nrp ^ (self.refel.dim - 1);
+						
 						lamInterior = zeros(size(self.SkelInterior2All));
 			
 						rhs_skel = -self.hdg_residual(lamInterior, rhs, BData);  
@@ -312,45 +323,61 @@ classdef grid < handle
         return;
       end
       
-			% 0. extract u_hat from u if is hdg solve 
-			u_hat = self.VtoF * u;
-			
-      % 1. pre-smooth
-      u_hat = grid.smooth ( v1, rhs, u_hat );
-      
-      % 2. compute residual
-			if (grid.linear_smoother && ~grid.is_finest)
-        % disp('linear residual');
-				res = grid.residual_lin(rhs, u);
-      else
-        % disp('high-order residual');
-				res = grid.residual(rhs, u);
-			end
-			
-      % 3. restrict
-      if ( grid.is_hDG_solve )
+			if ( grid.is_hDG_solve )
+				% 0. extract u_hat from u if is hdg solve 
+				u_hat = grid.VtoF * u;
+					
+	      % 1. pre-smooth
+	      u_hat = grid.smooth ( v1, rhs, u_hat );
+				
+				% 2. compute residual
+				res = grid.residual(rhs, u_hat);
+				
+				% 3. restrict
 				res_coarse = grid.hdg_restrict(res);
 			else
+			
+      	% 1. pre-smooth
+      	u = grid.smooth ( v1, rhs, u );
+      
+      	% 2. compute residual
+				if (grid.linear_smoother && ~grid.is_finest)
+        	% disp('linear residual');
+					res = grid.residual_lin(rhs, u);
+      	else
+        	% disp('high-order residual');
+					res = grid.residual(rhs, u);
+				end
+			
+				% 3. restrict
 				res_coarse = grid.R * res;
-				% res_coarse(grid.Coarse.Boundary) = 0;
+				% res_coarse(grid.Coarse.Boundary) = 0;		
 			end
       
-      % 4. recurse
+      % 4. ---------- recurse -----------
       u_corr_coarse = grid.Coarse.vcycle(v1, v2, res_coarse, zeros(size(res_coarse)));
       
-      % 5. prolong and correct
-      if ( grid.is_hDG_solve )
+			if ( grid.is_hDG_solve )
+				K = prod(self.Mesh.nelems);	
+				Nfp = self.refel.Nrp ^ (self.refel.dim - 1);
+				
+				% 5. prolong and correct
+				u = u - grid.hdg_prolong(u_corr_coarse);
+				% 6. post-smooth
+				u_hat = self.VtoF * u;
+				u_hat = grid.smooth ( v2, rhs, u_hat );
+				
+      	for e = 1:K
+					u(:,e) = self.localSolver(e, u_hat, rhs);
+				end
 				
 			else
+      	% 5. prolong and correct
 				u = u - grid.P * u_corr_coarse;
+				% 6. post-smooth
+	      u = grid.smooth ( v2, rhs, u );
+				% grid.plot_spectrum(u, 'g', rhs);
 			end
-			% grid.plot_spectrum(u, 'r', rhs);
-      
-			
-			% 6. post-smooth
-      u = grid.smooth ( v2, rhs, u );
-      
-			% grid.plot_spectrum(u, 'g', rhs);
       
     end % v-cycle
     

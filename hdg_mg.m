@@ -102,6 +102,9 @@ Bdata = grid.Mesh.get_boundary_data(grid.refel, Uexact);
 
 [u, qx, qy] = grid.solve_hdg (forcing, Bdata);
 
+
+u = grid.solve(10, 'jacobi', 3, 3, forcing, zeros(size(Uexact)));
+
 %% test errors ... 
 
 L2eu = 0;
