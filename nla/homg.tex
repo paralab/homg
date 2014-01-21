@@ -769,13 +769,14 @@ inherited from the high-order discretization.
 
 % **********************************************************
 \subsection{Smoothers}\label{subsec:smoothers}
-Next, we summarize different smoothers. Point smoothers are reviewed
-in \S\ref{subsec:ptsmoothers}. In \S\ref{subsec:schwarz}, we discuss
-Schwarz domain-decomposition-based smoothers.
+In our numerical comparisons, we focus on point smoothers and compare
+the results with an element-wise block-Jacobi smoother. Properties of
+these different smoothers for high-order discretizations are
+summarized next.
 
-
-\subsubsection{Point smoothers}\label{subsec:ptsmoothers}
-In our numerical tests, we compare the Jacobi and the symmetric successive over
+\subsubsection{Point smoothers}
+%\subsubsection{Point smoothers}\label{subsec:ptsmoothers}
+We compare the Jacobi and the symmetric successive over
 relaxation (SSOR) smoothers, as well as a Chebyshev-accelerated Jacobi
 smoother~\cite{Brandt77}. All of these smoothers require the diagonal of the
 system matrix; if matrices are not assembled (i.e., in a matrix-free approach),
@@ -787,9 +788,11 @@ Chebyshev-accelerated Jacobi method is an alternative to SSOR; it
 can significantly improve over Jacobi smoothing, while being as simple to
 implement~\cite{AdamsBrezinaHuEtAl03}. The acceleration of Jacobi smoothing
 with Chebyshev polynomials requires estimation of the maximum eigenvalue of
-the system matrix, which has to be estimated in the setup. For our experiments, we
-estimate the largest eigenvalue using 10 iterations of the Arnoldi algorithm.
+the system matrix, which has to be estimated in the setup.
+% For our experiments, we
+%estimate the largest eigenvalue using 10 iterations of the Arnoldi algorithm.
 
+\subsubsection{Comparison of smoothing properties}
 In Figures~\ref{fig:smoothers} and~\ref{fig:smoothers-var}, we compare
 the efficiency of these point smoothers for different polynomial
 orders and constant and varying coefficient. For that purpose, we
@@ -809,40 +812,41 @@ on the finest grid. \todo{The damping factors for Jacobi and SSOR smoothing
 are $\omega = 2/3$ and $\omega=1$, respectively.} The Chebyshev
 smoother targets the part of the
 spectrum given by $[\lambda_\text{max}/4,\lambda_\text{max}]$, where
-$\lambda_\text{max}$ is the maximum eigenvalue of the system matrix.
+$\lambda_\text{max}$ is the maximum eigenvalue of the system matrix which is estimated using 10 iterations of the Arnoldi algorithm.
 
 The results for the constant coefficient Laplacian operator on the
-unit square (Figure~\ref{fig:smoothers}) show that all point
-smoothers decrease the error components in the upper half of the
-spectrum; however,  the decrease is smaller for high-order
-elements. Note that Chebyshev accelerated Jacobi smoothing results in
-a uniform damping of a larger part of the spectrum than Jacobi
-smoothing.  Both, the Chebyshev and SSOR methods outperform Jacobi
-smoothing, in particular for higher orders. Combining the smoothers
-with a two-grid cycle, all error components are decreased for all
-smoothers (and thus the resulting two-grid methods converge, see
-Table~\ref{tab:box} in the section summarizing our numerical tests),
-but the error decreases slower for higher polynomial orders. For high
-polynomial order, a two-grid iteration with SSOR smoothing results in a
-significantly better error reduction than Jacobi or Chebyshev
-smoothing.
+unit square (see Figure~\ref{fig:smoothers}) show that all point smoothers
+decrease the error components in the upper half of the spectrum;
+\todo{GB: mention this before you describe smoothing steps.} however,
+the decrease is smaller for high-order elements. Observe that compared to Jacobi smoothing, Chebyshev accelerated Jacobi smoothing dampens a larger
+part of the spectrum.  Both, the Chebyshev and
+SSOR methods outperform Jacobi smoothing, in particular for higher
+orders. Combining the smoothers with a two-grid cycle, all error
+components are decreased for all smoothers (and thus the resulting
+two-grid methods converge, see Table~\ref{tab:box} in the section
+summarizing our numerical tests), but the error decreases slower for
+higher polynomial orders. For high polynomial order, a two-grid
+iteration with SSOR smoothing results in a significantly better error
+reduction than Jacobi or Chebyshev smoothing.
 
-In Figure~\ref{fig:smoothers-var}, we study the solution of
+In Figure~\ref{fig:smoothers-var}, we study the performance of
+different smoothers for the test problem {\bf 2d-var}, defined in
+\S\ref{subsec:tests}. In this problem, we solve
 \eqref{eq:Poisson} with a smoothly (but strongly) varying coefficient
-$\mu$ on the deformed geometry. Compared to the constant coefficient
-case, Jacobi smoothing performs significantly worse, both, when used
-as a solver and as a smoother. Let us focus on the two-grid correction
-for polynomial order $p=16$ and compare with the results obtained when
-using multigrid as a solver from Table~\ref{tab:2d-fan}.  Jacobi
-smoothing does not lead to a converging two-grid algorithm, as many
-coefficients are amplified by the two-grid cycle. For Chebyshev
-smoothing, the multigrid v-cycle converges (although slowly) although
-one or two coefficients appear amplified in the two-grid
+$\mu$ on a deformed domain $\Omega$.  Compared to the constant
+coefficient case, Jacobi smoothing performs significantly worse, both,
+when used as a solver and as a smoother. Let us focus on the two-grid
+correction for polynomial order $p=16$ and compare with the results
+obtained when using multigrid as a solver from Table~\ref{tab:2d-fan}.
+Jacobi smoothing does not lead to a converging two-grid algorithm, as
+several coefficients are amplified by the two-grid cycle. For
+Chebyshev smoothing, the multigrid v-cycle converges (although slowly)
+although one or two coefficients appear amplified in the two-grid
 iteration. This convergence can be explained by the fact that errors
 can be interchanged between different eigenvectors in the v-cycle.
 SSOR smoothing combined with the two-grid method retains a significant
 error reduction and, as a consequence, converges at a satisfactory
-rate.
+rate. \todo{GB: But then what is the case for the Chebyshev method?}
 
 \begin{figure}
 	\centering
@@ -927,17 +931,21 @@ rate.
           a single two-grid step with exact coarse grid solution
           (right column) for a two-dimensional, constant coefficient
           Laplace problem on a unit square (problem {\bf 2d-const}
-          specified in \S\ref{subsec:tests}). To keep the number of
-          unknowns the same accross all polynomial orders, meshes of
-          $32\times 32$, $8\times 8$ and $2\times 2$ elements are used
-          for polynomial orders $p=1$, $p=4$ and $p=16$, respectively.
-          Plotted are the coefficients of the error expanded in the
-          eigenvectors of the system matrix $\mathbf{A}_k$.  The
-          eigenvectors are ordered such that the corresponding
-          eigenvalues are descending; thus, the smoothness of the
-          eigenvectors decays from left to right.  The system right
-          hand side is zero and the initialization is chosen to have
-          all unit coefficients in the eigenvector expansion.}
+          specified in \S\ref{subsec:tests}). \todo{GB} To keep the
+          number of unknowns the same accross all polynomial orders,
+          meshes of $32\times 32$, $8\times 8$ and $2\times 2$
+          elements are used for polynomial orders $p=1$, $p=4$ and
+          $p=16$, respectively.  The horizontal axis is the
+          eigenvector index for the system matrix $\mathbf{A}_k$, and
+          the vertical axis is the magnitude of the error component
+          for each eigenvector. The eigenvectors are ordered such that
+          the corresponding eigenvalues are descending; thus, the
+          smoothness \todo{GB} of the eigenvectors decays from left to
+          right.  The system right hand side is zero and the
+          initialization is chosen to have all unit coefficients in
+          the eigenvector expansion. A total of six smoothing steps is
+          used for all methods, and the coarse problem in the two-grid
+          step is solved by a direct solver.}
 \end{figure}
 
 %% Variable Coefficients ----- SHELL
@@ -1025,7 +1033,7 @@ rate.
 \end{figure}
 
 
-\subsubsection{Schwarz-based smoothers}\label{subsec:schwarz}
+\subsubsection{Block-Jacobi smoothing}\label{subsec:schwarz}
 An alternative smoothing approach for high-order discretizations is
 based on local block solves.  Since for high polynomial orders many
 unknowns lie in the element interiors, Schwarz-type domain
@@ -1034,11 +1042,13 @@ stable for anisotropic meshes than point smoothers. A main challenge
 of Schwarz-type smoothers is that they require the solution of dense
 local systems.  This is either done by using direct methods or
 approximations that allow for a fast iterative solution on hexahedral
-meshes \cite{LottesFischer05, FischerLottes05}. However, these
-coarse-grid solves can become fairly expensive. Moreover, depending on
-how much overlap between the domains is used, it is not
-straightforward to achieve good parallel scalability. In
-Section~\ref{sec:numerics}, we compare the performance of point
+meshes \cite{LottesFischer05, FischerLottes05}.
+% However, these
+%coarse-grid solves can become fairly expensive. Moreover, depending on
+%how much overlap between the domains is used, it is not
+%straightforward to achieve good parallel scalability.
+In
+\S\ref{sec:numerics}, we compare the performance of point
 smoothers with a element-wise block Jacobi smoothing.
 
 
