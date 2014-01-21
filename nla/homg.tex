@@ -1054,14 +1054,14 @@ smoothers with a element-wise block Jacobi smoothing.
 
 \subsection{Comparing the computational cost}\label{subsec:complexity}
 To compare the computational cost of the different methods, we focus
-on the matrix-vector multiplications on the finest multigrid level, which
-dominate the overall computation. Denoting the number of unknowns on
-the finest level by $N$, the cost for a matrix-vector product is
-$Ng_p$, where $g_p>0$ is the cost per unknown for the application of
-an operator originating from a discretization with polynomial order
-$p$. Since high-order discretizations result in less sparse operators,
+on the matrix-vector multiplications on the finest multigrid level,
+which dominate the overall computation. Denoting the number of
+unknowns on the finest level by $N$, the computational cost---measured in floating point operations (flops)---for a matrix-vector
+product is $Ng_p$, where $g_p$ is the number of flops per unknown and the
+subscript $p$ indicates the polynomial order used in the FEM basis.
+Since high-order discretizations result in less sparse operators,
 we have $g_1\le g_2\le \ldots$. The actual value of $g_p$ depends
-strongly on the implementation and on the system architecture.
+strongly on the implementation. Also note that the wall-clock timings depend on caching , vectorization and blocking and other effects so the conversion from $g_p$ to wall-clock time is not trivial. Thus, although $g_p$ can seen to increase significantly with $p$, wall-clock times are not. This, however, is beyond our scope.
 % To
 %illustrate this, consider an elemental matrix for a hexahedral mesh in
 %three dimensions, which is dense and of size $(p+1)^3\times
@@ -1071,9 +1071,10 @@ strongly on the implementation and on the system architecture.
 %operations \cite{DevilleFischerMund02}.
 In general, high-order implementations allow more memory locality,
 which often results in higher performance compared to low order
-methods. As a consequence, $g_p$ grows significantly slower with $p$
-than the number of nonzero entries in each row of the assembled system
-matrix.
+methods.
+% As a consequence, $g_p$ grows significantly slower with $p$
+%than the number of nonzero entries in each row of the assembled system
+%matrix.
 
 The dominant computational cost per iteration of the high-order
 multigrid approaches discussed in \S\ref{sec:approaches} can
@@ -1082,14 +1083,14 @@ thus be summarized as
   g_p(1+m(s_\text{pre}+s_\text{post})).
 \end{equation}
 Here, we denote by $s_\text{pre}$ and $s_\text{post}$ the number of
-pre and post smoothing steps on the finest multigrid level,
+pre- and post-smoothing steps on the finest multigrid level,
 respectively. Moreover, $m$ denotes the number of necessary residual
 computations (and thus matrix-vector computations) per smoothing step.
 Jacobi smoothing and Chebyshev-accelerated Jacobi require $m=1$
 matrix-vector multiplication per smoothing step, while SSOR requires
 $m=2$ matrix-vector operations. If, in the approach discussed in
 \S\ref{subsec:low}, the sparsified linear-element residual is used in the
-smoother, the cost \eqref{eq:compcost} reduces to
+smoother, the cost \eqref{eq:compcost} reduces to \todo{Use results later.}
 \begin{equation}\label{eq:compcost2}
   g_p+g_1m(s_\text{pre}+s_\text{post}).
 \end{equation}
@@ -1122,7 +1123,7 @@ solution time.
 %\end{itemize}
 
 
-If the overall number of unknowns $N$ is kept fixed and the problem
+If the overall number of unknowns $N$ is kept fixed and the
 solution is smooth, it is well known that the accuracy increases for
 high-order discretizations. Due to the decreased sparsity of the
 discretized operators, this does not automatically translate to more
@@ -1135,6 +1136,7 @@ the order of the discretization. Even if these $\mathcal{O}(N)$ steps
 do not dominate the computation, they contribute to making high-order
 discretizations favorable not only in terms of accuracy per unknown,
 but also in terms of accuracy per computation time.
+\todo{Fisher's point\ldots}
 
 \begin{algorithm}[ht] 
   % v-cycle 
