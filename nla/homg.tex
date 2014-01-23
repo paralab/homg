@@ -1181,11 +1181,13 @@ precise, we consider the following four problems:
 \begin{itemize}
 \item[] {\bf 2d-const:} The domain $\Omega$ for the problem is the unit square, and $\mu\equiv
   1$.
-\item[] {\bf 2d-var:} The warped two-dimensional domain $\Omega$
-  is shown on the left in Figure~\ref{fig:mesh}, and the
-  varying coefficient is $\mu(x,y) = 1 + 10^6(\cos^2(2\pi x) +
-  \cos^2(2\pi y))$.
-\item[] {\bf 3d-const:} The domain $\Omega$ for this problem is the unit cube,
+\item[] {\bf 2d-var:} The warped two-dimensional domain $\Omega$ is
+  shown on the left in Figure~\ref{fig:mesh}, and the varying
+  coefficient is $\mu(x,y) = 1 + 10^6(\cos^2(2\pi x) + \cos^2(2\pi
+  y))$. We also study a modification of this problem with stronger
+  varying coefficient $\mu(x,y) = 1 + 10^6(\cos^2(10\pi x) +
+  \cos^2(10\pi y))$, which we refer to as {\bf 2d-var$'$}.
+\item[] {\bf 3d-const:} For this problem, $\Omega$ is the unit cube,
   and we use the constant coefficient $\mu\equiv 1$.
 \item[] {\bf 3d-var:} The warped three-dimensional domain $\Omega$
   shown on the right of Figure~\ref{fig:mesh} is used; the
@@ -1451,7 +1453,12 @@ convergence.
 
 \begin{table}
   \caption{\label{tab:2d-fan2} Results for two-dimensional
-    warped-geometry, varying coefficient problem $\cos(10 \pi x)$.}
+    warped-geometry, varying coefficient problem {\bf 2d-var$'$}
+    defined in \S\ref{subsec:tests}. This problem is idential to {\bf
+      2d-var} (see Table~\ref{tab:2d-fan}),
+    but the veriations in the coefficient $\mu$ have a smaller wave length.
+    For a detailed description of the different experiments
+    reported in this table we refer to \S\ref{subsec:measures}. \gsnote{Hari, just for consistency with the other tables, can we add the case $p=16$?}}
   \centering
   \begin{tabular}{|r|c c|c c|c c||c c|c c|c c||c c|} 
     \hline
