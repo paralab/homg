@@ -603,13 +603,14 @@ diffeomorphism is approximated using the same basis
 functions as the
 finite element approximation. The Jacobians for this transformation
 are computed at every quadrature point, and Gauss quadrature is used
-to numerically approximate integrals.  Although this paper is partly
+to numerically approximate integrals.
+We assume that the coefficient $\mu$ is a given function, which, at each level, can be evaluated at the respective quadrature points.
+Although this paper is partly
 motivated by our interest in fast elliptic solvers on adaptively
 refined nonconforming octree-based
 meshes~\cite{SundarBirosBursteddeEtAl12, SampathBiros10}, 
 we restrict our comparisons to uniformly refined conforming meshes.
-Our implementation is written in Matlab and made available from
-\todo{XXX}. It allows comparisons of different smoothing and
+Our implementation is written in Matlab and made available.\footnote{\url{http://hsundar.github.io/homg/}} It allows comparisons of different smoothing and
 coarsening methods for high-order discretized problems in two and three dimensions, and can
 easily be modified or extended. It does not support distributed memory
 parallelism, and is
@@ -1179,17 +1180,17 @@ and, with varying coefficients $\mu(\bs x)$, on the warped two and
 three-dimensional domains shown in Figure~\ref{fig:mesh}. To be
 precise, we consider the following four problems:
 \begin{itemize}
-\item[] {\bf 2d-const:} The domain $\Omega$ for the problem is the unit square, and $\mu\equiv
+\item {\bf 2d-const:} The domain $\Omega$ for the problem is the unit square, and $\mu\equiv
   1$.
-\item[] {\bf 2d-var:} The warped two-dimensional domain $\Omega$ is
+\item {\bf 2d-var:} The warped two-dimensional domain $\Omega$ is
   shown on the left in Figure~\ref{fig:mesh}, and the varying
   coefficient is $\mu(x,y) = 1 + 10^6(\cos^2(2\pi x) + \cos^2(2\pi
   y))$. We also study a modification of this problem with stronger
   varying coefficient $\mu(x,y) = 1 + 10^6(\cos^2(10\pi x) +
   \cos^2(10\pi y))$, which we refer to as {\bf 2d-var$'$}.
-\item[] {\bf 3d-const:} For this problem, $\Omega$ is the unit cube,
+\item {\bf 3d-const:} For this problem, $\Omega$ is the unit cube,
   and we use the constant coefficient $\mu\equiv 1$.
-\item[] {\bf 3d-var:} The warped three-dimensional domain $\Omega$
+\item {\bf 3d-var:} The warped three-dimensional domain $\Omega$
   shown on the right of Figure~\ref{fig:mesh} is used; the
   varying coefficient is $\mu(x,y,z) = 1 + 10^6(\cos^2(2\pi x) +
   \cos^2(2\pi y) + \cos^2(2\pi z))$.
@@ -1247,7 +1248,7 @@ information:
 			a lexicographic ordering of  the unknowns. \todo{damping factor}
   \end{itemize}
     For the two-dimensional problems reported in
-    Tables~\ref{tab:box} and \ref{tab:2d-fan}, we use a multigrid
+    Tables~\ref{tab:box}--\ref{tab:2d-fan2}, we use a multigrid
     hierarchy with three levels corresponding to meshes with
     $32\times32$, $16\times16$ and $8\times8$ elements.
     The multigrid hierarchy for the three-dimensional
@@ -1261,7 +1262,7 @@ information:
     ourselves to orders that are powers of 2. After coarsening in $p$
     till $p=1$, we coarsen in $h$. For example, for the
     two-dimensional problems and $p=16$, we use a total of 7 grids;
-    the first five all use meshes with $32\times32\times32$ elements,
+    the first five all use meshes with $32\times32$ elements,
     and $p=16,8,4,2,1$, respectively, followed by two additional
     coarse grids of size $16\times16$ and $8\times8$, and
     $p=1$. \todo{repeat info at the tables.}
@@ -1303,10 +1304,8 @@ information:
 \end{itemize}
 %In the next section, we summarize our numerical comparisons.
 
-\todo{Glue}
-The coefficient $\mu$ at the coarse grid quadrature points is computed
-using linear interpolation of the coefficient at the fine grid
-quadrature points. For the different test problems, we change the
+
+ For the different test problems, we change the
 polynomial degree of the finite element functions but retain the same
 mesh. This results in an increasing number of unknowns as $p$
 increases. Since, as illustrated in \S\ref{subsec:num_mesh}, we
@@ -1330,12 +1329,12 @@ polynomial orders $p=8$ and $p=16$.
 
 \begin{table}
   \caption{\label{tab:box} Results for two-dimensional unit square
-    problem {\bf 2d-const} defined in \S\ref{subsec:tests}.
-%  A total
-%    of 3 grids were used, the finest grid was $32\times 32$, and the
-%    coarsest was $8\times 8$.
-    For a detailed description of the
-    different experiments reported in this table we refer to
+    problem {\bf 2d-const} defined in \S\ref{subsec:tests}.  A total
+    of three geometric grids with $32\times 32$, $16\times 16$ and
+    $8\times 8$ elements were used. For $p$-multigrid, the polynomial
+    order is reduced to $p=1$, followed by coarsening of the geometric
+    mesh to the coarse $8\times 8$ mesh.  For a detailed description
+    of the different experiments reported in this table we refer to
     \S\ref{subsec:measures}.}  \centering
   \begin{tabular}{|r|c c|c c|c c||c c|c c|c c||c c|} 
     \hline
@@ -1360,7 +1359,7 @@ l-res & h-res\\
   \end{tabular}
 \end{table}
 
-\subsubsection{Comparison of point smoothers}\label{subsec:num_point}
+\subsubsection{Comparison of different multigrid/smoothing combinations}\label{subsec:num_point}
 Tables \ref{tab:box} and \ref{tab:2d-fan} present the number of
 iterations obtained for various point smoothers and different
 polynomial orders for the two-dimensional test problems. As can be
@@ -1391,14 +1390,21 @@ solver for the low-order system, rather than an approximate solution
 based on an algebraic multigrid method.
 
 Let us now contrast these observations with the results for the
-variable coefficient problem {\bf 2d-var} summarized in Table~\ref{tab:2d-fan}. First,
-note that all variants of the solver perform reasonably for discretizations up to
-order $p=4$. When used as a solver, multigrid either diverges or
-converges very slowly for orders $p>4$. Convergence is reestablished
-when multigrid is combined with CG. Using multigrid with SSOR
-smoothing as preconditioner in CG results, for orders up to $p=8$ in a
-convergence factor of at least $0.1$ in each iteration, and in a
-factor of $0.25$ for order $p=16$.
+variable coefficient problems {\bf 2d-var} and {\bf 2d-var$'$}
+summarized in Tables~\ref{tab:2d-fan} and \ref{tab:2d-fan2}. First,
+note that all variants of the solver perform reasonably for
+discretizations up to order $p=4$. When used as a solver, multigrid
+either diverges or converges very slowly for orders $p>4$. Convergence
+is reestablished when multigrid is combined with CG. Using multigrid
+with SSOR smoothing as preconditioner in CG yields, for orders up to
+$p=8$, convergence with a factor of at least $0.1$ in each iteration.
+Comparing the results for {\bf 2d-var} shown in Table~\ref{tab:2d-fan}
+with the results for {\bf 2d-var$'$} in Table~\ref{tab:2d-fan2} shows
+that the convergence does not degrade significantly for the
+coefficient with 5-times smaller wavelength.
+
+% and
+%in a factor of $0.25$ for order $p=16$.
 
 Next, we turn to the results for {\bf 3d-const} and {\bf 3d-var},
 which we report in Tables~\ref{tab:3d-box} and \ref{tab:3d-fan},
