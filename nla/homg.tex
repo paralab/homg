@@ -544,8 +544,7 @@ where, for $i,j = 1,2,\ldots,N_k$, the components of $\mathbf A_k$, $\mathbf u_k
 (\mathbf{M}_k)_{ij} =& (\phi_i^k,\phi_j^k)_{L^2(\Omega)},
 \end{align*}
 where the integrals on the right hand sides are often approximated
-using numerical quadrature. \todo{George, did you want a longer
-  discussion about the quadrature?}
+using numerical quadrature.
 Here, $\mathbf{M}_k$ is the mass matrix, which appears in the
 approximation of the $L^2$-inner product in $V_k$ since
 $(u_k,v_k)_{L^2(\Omega)} = \mathbf{u}_k^T\mathbf{M}_k\mathbf{v}_k$ for
@@ -648,7 +647,7 @@ smoothers in~\S\ref{subsec:smoothers}.
 %computational cost of these different approaches in~\S\ref{subsec:complexity}.
 
 \subsection{Hierarchy construction, restriction and prolongation operators}\label{subsec:hierarchy}
-There are several ways to build a multilevel hierarchy for
+There are several possibilities to build a multilevel hierarchy for
 high-order discretized problems; see Figure~\ref{fig:approaches}. One
 option is the construction of a geometric mesh hierarchy while keeping
 the polynomial order unchanged; we refer to this approach as
@@ -772,9 +771,11 @@ inherited from the high-order discretization.
 % **********************************************************
 \subsection{Smoothers}\label{subsec:smoothers}
 In our numerical comparisons, we focus on point smoothers and compare
-the results with an element-wise block-Jacobi smoother. Properties of
-these different smoothers for high-order discretizations are
-summarized next.
+the results with an element-wise block-Jacobi smoother. In a multigrid
+framework, point smoothers must decrease the error components in the
+upper half of the spectrum.  In this section, we summarize different
+smoothers and numerically study their behavior for high-order
+discretizations.
 
 \subsubsection{Point smoothers}
 %\subsubsection{Point smoothers}\label{subsec:ptsmoothers}
@@ -782,7 +783,7 @@ We compare the Jacobi and the symmetric successive over
 relaxation (SSOR) smoothers, as well as a Chebyshev-accelerated Jacobi
 smoother~\cite{Brandt77}. All of these smoothers require the diagonal of the
 system matrix; if matrices are not assembled (i.e., in a matrix-free approach),
-these diagonal entries must be computed in a setup step.  Note that the
+these diagonal entries must be computed in a setup step; for high-order discretizations on deformed meshes, this can be a significant computation.  Note that the
 parallelization of Gauss-Seidel smoothers (such as SSOR) requires coloring of
 unknowns at parallel boundaries, and, compared to Jacobi smoothing, more
 complex communication in a distributed memory implementation. The
@@ -794,7 +795,7 @@ the system matrix, which has to be estimated in the setup.
 % For our experiments, we
 %estimate the largest eigenvalue using 10 iterations of the Arnoldi algorithm.
 
-\subsubsection{Comparison of point smoothers}
+\subsubsection{Comparison of point smoothers}\label{subsubsec:ptsmoothcomparison}
 In Figures~\ref{fig:smoothers} and~\ref{fig:smoothers-var}, we compare
 the efficiency of these point smoothers for different polynomial
 orders and constant and varying coefficient. For that purpose, we
@@ -819,7 +820,7 @@ $\lambda_\text{max}$ is the maximum eigenvalue of the system matrix which is est
 The results for the constant coefficient Laplacian operator on the
 unit square (see Figure~\ref{fig:smoothers}) show that all point smoothers
 decrease the error components in the upper half of the spectrum;
-\todo{GB: mention this before you describe smoothing steps.} however,
+however,
 the decrease is smaller for high-order elements. Observe that compared to Jacobi smoothing, Chebyshev accelerated Jacobi smoothing dampens a larger
 part of the spectrum.  Both, the Chebyshev and
 SSOR methods outperform Jacobi smoothing, in particular for higher
@@ -942,7 +943,7 @@ rate.
           the vertical axis is the magnitude of the error component
           for each eigenvector. The eigenvectors are ordered such that
           the corresponding eigenvalues are descending; thus, the
-          smoothness \todo{GB} of the eigenvectors decays from left to
+          smoothness in every eigenvectors decays from left to
           right.  The system right hand side is zero and the
           initialization is chosen to have all unit coefficients in
           the eigenvector expansion. A total of six smoothing steps is
@@ -1028,14 +1029,14 @@ rate.
 		\draw[black, fill=white] (3.95, 5.375) rectangle +(2.9,0.325);
 		\node at (5.35, 5.53) {\bf \small{v-cycle, $p=16$}};
 		\end{tikzpicture}
-	\caption{\label{fig:smoothers-var} Same as
-          Figure~\ref{fig:smoothers}, but for the two-dimensional
+	\caption{\label{fig:smoothers-var} Shown is the same comparison as
+          in Figure~\ref{fig:smoothers}, but for the two-dimensional
           warped geometry, variable coefficient problem {\bf 2d-const}
           specified in \S\ref{subsec:tests}.}
 \end{figure}
 
 
-\subsubsection{Block-Jacobi smoothing}\label{subsec:schwarz}
+\subsubsection{Block-Jacobi smoothing}\label{subsubsec:schwarz}
 An alternative smoothing approach for high-order discretizations is
 based on local block solves.  Since for high polynomial orders many
 unknowns lie in the element interiors, Schwarz-type domain
@@ -1110,12 +1111,17 @@ precise, we consider the following four problems:
 To compare the computational cost of the different methods, we focus
 on the matrix-vector multiplications on the finest multigrid level,
 which dominate the overall computation. Denoting the number of
-unknowns on the finest level by $N$, the computational cost---measured in floating point operations (flops)---for a matrix-vector
-product is $Ng_p$, where $g_p$ is the number of flops per unknown and the
+unknowns on the finest level by $N$, the computational cost---measured
+in floating point operations (flops)---for a matrix-vector product is
+$Ng_p$, where $g_p$ is the number of flops per unknown and the
 subscript $p$ indicates the polynomial order used in the FEM basis.
-Since high-order discretizations result in less sparse operators,
-we have $g_1\le g_2\le \ldots$. The actual value of $g_p$ depends
-strongly on the implementation. Also note that the wall-clock timings depend on caching , vectorization and blocking and other effects so the conversion from $g_p$ to wall-clock time is not trivial. Thus, although $g_p$ can seen to increase significantly with $p$, wall-clock times are not. This, however, is beyond our scope.
+Since high-order discretizations result in less sparse operators, we
+have $g_1\le g_2\le \ldots$. The actual value of $g_p$ depends
+strongly on the implementation. Also note that wall-clock timings
+depend on caching, vectorization, blocking and other effects so the
+conversion from $g_p$ to wall-clock time is not trivial. Thus,
+although $g_p$ can seen to increase significantly with $p$, wall-clock
+times are not. This discussion, however, is beyond our scope.
 % To
 %illustrate this, consider an elemental matrix for a hexahedral mesh in
 %three dimensions, which is dense and of size $(p+1)^3\times
@@ -1124,7 +1130,7 @@ strongly on the implementation. Also note that the wall-clock timings depend on 
 %element methods, this can be reduced to $\mathcal O((p+1)^4)$
 %operations \cite{DevilleFischerMund02}.
 In general, high-order implementations allow more memory locality,
-which often results in higher performance compared to low order
+which often results in higher performance compared to low-order
 methods.
 % As a consequence, $g_p$ grows significantly slower with $p$
 %than the number of nonzero entries in each row of the assembled system
@@ -1144,7 +1150,7 @@ Jacobi smoothing and Chebyshev-accelerated Jacobi require $m=1$
 matrix-vector multiplication per smoothing step, while SSOR requires
 $m=2$ matrix-vector operations. If, in the approach discussed in
 \S\ref{subsec:low}, the sparsified linear-element residual is used in the
-smoother, the cost \eqref{eq:compcost} reduces to \todo{Use results later.}
+smoother, the cost \eqref{eq:compcost} reduces to
 \begin{equation}\label{eq:compcost2}
   g_p+g_1m(s_\text{pre}+s_\text{post}).
 \end{equation}
@@ -1182,7 +1188,7 @@ solution is smooth, it is well known that the accuracy increases for
 high-order discretizations. Due to the decreased sparsity of the
 discretized operators, this does not automatically translate to more
 accuracy per computation time; see, e.g.~\cite{Brown10}. However, note
-that the complexity of most computations in, for instance, a multigrid
+that many computations in, for instance, a multigrid
 preconditioned conjugate gradient algorithm are of complexity
 $\mathcal{O}(N)$ (see Algorithm~\ref{alg:pcg}) and thus independent of
 $g_p$. Thus, the computational cost of these steps does not depend on
@@ -1190,7 +1196,6 @@ the order of the discretization. Even if these $\mathcal{O}(N)$ steps
 do not dominate the computation, they contribute to making high-order
 discretizations favorable not only in terms of accuracy per unknown,
 but also in terms of accuracy per computation time.
-\todo{Fisher's point\ldots}
 
 \begin{algorithm}[ht] 
   % v-cycle 
