@@ -1265,7 +1265,7 @@ information:
     the first five all use meshes with $32\times32$ elements,
     and $p=16,8,4,2,1$, respectively, followed by two additional
     coarse grids of size $16\times16$ and $8\times8$, and
-    $p=1$. \todo{repeat info at the tables.}
+    $p=1$.
 \item[$\bullet$] The columns labeled \emph{MG with pCG} present the
   number of conjugate gradient iterations required for the solution,
   where each iteration uses one multigrid v-cycle as preconditioner.
@@ -1328,13 +1328,13 @@ polynomial orders $p=8$ and $p=16$.
 %  might be caused by the direct solves on the coarse level.}
 
 \begin{table}
-  \caption{\label{tab:box} Results for two-dimensional unit square
-    problem {\bf 2d-const} defined in \S\ref{subsec:tests}.  A total
-    of three geometric grids with $32\times 32$, $16\times 16$ and
-    $8\times 8$ elements were used. For $p$-multigrid, the polynomial
-    order is reduced to $p=1$, followed by coarsening of the geometric
-    mesh to the coarse $8\times 8$ mesh.  For a detailed description
-    of the different experiments reported in this table we refer to
+  \caption{\label{tab:box} Results for the two-dimensional unit square
+    problem {\bf 2d-const} defined in \S\ref{subsec:tests}. The finest
+    mesh has $32\times 32$ elements and the multigrid hierarchy
+    consists of overall three meshes.  For $p$-multigrid, the
+    polynomial order is first reduced to $p=1$, followed by two
+    geometric coarsenings of the mesh.  For a detailed description of
+    the different experiments reported in this table we refer to
     \S\ref{subsec:measures}.}  \centering
   \begin{tabular}{|r|c c|c c|c c||c c|c c|c c||c c|} 
     \hline
@@ -1428,7 +1428,11 @@ convergence.
 \begin{table}
   \caption{\label{tab:2d-fan} Results for two-dimensional
     warped-geometry, varying coefficient problem {\bf 2d-var} defined
-    in \S\ref{subsec:tests}.
+    in \S\ref{subsec:tests}.  The finest
+    mesh has $32\times 32$ elements and the multigrid hierarchy
+    consists of overall three meshes.  For $p$-multigrid, the
+    polynomial order is first reduced to $p=1$, followed by two
+    geometric coarsenings of the mesh.
 %  A total of 3 grids were used, the finest
 %    grid was $32\times 32$, and the coarsest was $8\times 8$.
     For a
@@ -1463,6 +1467,11 @@ convergence.
     defined in \S\ref{subsec:tests}. This problem is idential to {\bf
       2d-var} (see Table~\ref{tab:2d-fan}),
     but the veriations in the coefficient $\mu$ have a smaller wave length.
+    The finest
+    mesh has $32\times 32$ elements and the multigrid hierarchy
+    consists of overall three meshes.  For $p$-multigrid, the
+    polynomial order is first reduced to $p=1$, followed by two
+    geometric coarsenings of the mesh.
     For a detailed description of the different experiments
     reported in this table we refer to \S\ref{subsec:measures}. \gsnote{Hari, just for consistency with the other tables, can we add the case $p=16$?}}
   \centering
@@ -1490,7 +1499,13 @@ convergence.
 
 \begin{table}
   \caption{\label{tab:3d-box} Results for three-dimensional unit cube
-    problem  {\bf 3d-const} defined in \S\ref{subsec:tests}. For a
+    problem  {\bf 3d-const} defined in \S\ref{subsec:tests}.
+    The finest
+    mesh has $8\times 8\times 8$ elements and the multigrid hierarchy
+    consists of overall three meshes.  For $p$-multigrid, the
+    polynomial order is first reduced to $p=1$, followed by two
+    geometric coarsenings of the mesh.
+    For a
     detailed description of the different experiments reported in this
     table we refer to \S\ref{subsec:measures}.}  \centering
 	  \begin{tabular}{|r|c c|c c|c c||c c|c c|c c||c c|} 
@@ -1519,7 +1534,12 @@ convergence.
 \begin{table}
   \caption{\label{tab:3d-fan} Results for three-dimensional,
     warped-geometry, varying coefficient problem {\bf 3d-var} defined
-    in \S\ref{subsec:tests}. For a detailed description of the
+    in \S\ref{subsec:tests}.     The finest
+    mesh has $8\times 8\times 8$ elements and the multigrid hierarchy
+    consists of overall three meshes.  For $p$-multigrid, the
+    polynomial order is first reduced to $p=1$, followed by two
+    geometric coarsenings of the mesh.
+    For a detailed description of the
     different experiments reported in this table we refer to
     \S\ref{subsec:measures}.}  \centering
 	  \begin{tabular}{|r|c c|c c|c c||c c|c c|c c||c c|} 
