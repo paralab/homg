@@ -379,7 +379,7 @@ adaptive octrees (e.g.,\cite{SundarBirosBursteddeEtAl12,
   SampathBiros10, BursteddeGhattasGurnisEtAl10}, for the comparisons
 presented in this paper we restrict ourselves to moderate size
 problems on conforming meshes. We do not address time-to-solution, as
-we do not use a high-performance implementation. Recent
+we do not use a high-performance implementation. However, recent
 results using a scalable parallel implementation indicate that many of
 our observations generalize to non-conforming meshes and that the
 methods are scalable to large parallel computers \cite{IPDPS14}. While we
@@ -1380,7 +1380,7 @@ l-res & h-res\\
 \end{table}
 
 \subsubsection{Comparison of different multigrid/smoothing combinations}\label{subsec:num_point}
-Tables \ref{tab:box} and \ref{tab:2d-fan} present the number of
+Tables \ref{tab:box}--\ref{tab:2d-fan2} present the number of
 iterations obtained for various point smoothers and different
 polynomial orders for the two-dimensional test problems. As can be
 seen in Table~\ref{tab:box}, for {\bf 2d-const}
@@ -1639,8 +1639,7 @@ used as a preconditioner in CG rather than as a solver.
           iterations, obtained with 3
           pre and 3 post-smoothing steps. Shown in brackets is the
           number of iterations requires for point Jacobi
-          smoothing. \todo{Smoothing factors; play with smoothing
-            factors in block approach? Add SSOR results for comparison?}}
+          smoothing. \todo{Smoothing factors}}
 \begin{tabular}{|c|c|c|c|c|c|c|}
 	\hline
 	order & \multicolumn{2}{c|}{\bf 2d-const} &
@@ -1677,7 +1676,9 @@ be efficient for finite element discretizations with polynomial orders
 up to $p=16$.  For constant coefficient, all tested multigrid
 hierarchy/smoother combinations (Jacobi, Chebyshev-accelerated Jacobi
 and Gauss-Seidel SSOR smoothing) lead to converging multigrid
-methods. Problems with strongly varying coefficients on deformed
+methods. In general, the difference in the number of iterations
+between $h$- and $p$-multigrid is small.
+Problems with strongly varying coefficients on deformed
 geometries are significantly more challenging. Here, SSOR outperforms
 Jacobi-based smoothers for orders $p>4$. However, in a distributed
 environment, where Gauss-Seidel smoothing is usually more difficult to
@@ -1688,16 +1689,16 @@ but requires significantly less iterations to converge; compared to
 point Jacobi smoothing, it additionally only requires an estimate of
 the largest eigenvalue of the diagonally preconditioned system matrix.
 
-\todo{Cost in terms of matvecs}
 
-
-We find that a low order operator based on the high-order node points
-is an excellent preconditioner for the low-order system, in particular
-when combined with smoothing based on the high-order residual is
-performed on the finest mesh.  When combined with algebraic multigrid
-for the low-order operator, this approach is attractive for high-order
-discretizations on unstructured meshes, as also shown in
-~\cite{Brown10, DevilleMund90, HeysManteuffelMcCormickEtAl05}.
+We find that a low-order operator based on the high-order node points
+is a good preconditioner, and it is particularly attractive for
+high-order discretizations on unstructured meshes, as also observed in
+\cite{Brown10, DevilleMund90, HeysManteuffelMcCormickEtAl05}.  When
+combined with algebraic multigrid for the low-order operator, the
+smoother on the finest mesh can either use the low-order or the
+high-order residual. While using the high-order residual increases the
+computational work, it has the potential to significantly decrease the
+iteration numbers and overall results in faster convergence.
 
 
 %low-order preconditioner competitive w.r. to number of
