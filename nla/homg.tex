@@ -639,12 +639,13 @@ assembled operators in this prototype implementation.
 
 In this section, we summarize different multigrid approaches
 for high-order/spectral finite element
-discretizations. Multigrid can either be used as
+discretizations. These multigrid approaches can either be used as
 solver or can serve as preconditioner within a Krylov method. We
 summarize different approaches for the construction of
-multilevel hierarchies in~\S\ref{subsec:hierarchy}, discuss
-smoothers in~\S\ref{subsec:smoothers}, and then compare the
-computational cost of these different approaches in~\S\ref{subsec:complexity}.
+multilevel hierarchies in~\S\ref{subsec:hierarchy} and discuss
+smoothers in~\S\ref{subsec:smoothers}.
+% and then compare the
+%computational cost of these different approaches in~\S\ref{subsec:complexity}.
 
 \subsection{Hierarchy construction, restriction and prolongation operators}\label{subsec:hierarchy}
 There are several ways to build a multilevel hierarchy for
@@ -793,7 +794,7 @@ the system matrix, which has to be estimated in the setup.
 % For our experiments, we
 %estimate the largest eigenvalue using 10 iterations of the Arnoldi algorithm.
 
-\subsubsection{Comparison of smoothing properties}
+\subsubsection{Comparison of point smoothers}
 In Figures~\ref{fig:smoothers} and~\ref{fig:smoothers-var}, we compare
 the efficiency of these point smoothers for different polynomial
 orders and constant and varying coefficient. For that purpose, we
@@ -1053,6 +1054,57 @@ In
 smoothers with a element-wise block Jacobi smoothing.
 
 
+
+% **************************************************
+% **************************************************
+\section{Numerical results}\label{sec:numerics}
+In this section, we present a comprehensive comparison of our
+algorithms for the solution of high-order discretizations of
+\eqref{eq:Poisson}.  After introducing our test problems in
+\S\ref{subsec:tests}, we present a simple model for the computatonal
+cost of the different approaches in \S\ref{subsec:complexity}. In
+\S\ref{subsec:measures}, we specify settings and metrics for our
+comparisons. The results of these comparisons are presented and
+discussed in \S\ref{subsec:results}.
+
+
+\subsection{Test problems}\label{subsec:tests}
+We compare our algorithms for the solution of~\eqref{eq:Poisson} with
+constant coefficient $\mu\equiv 1$ on the unit square and the unit cube,
+and, with varying coefficients $\mu(\bs x)$, on the warped two and
+three-dimensional domains shown in Figure~\ref{fig:mesh}. To be
+precise, we consider the following four problems:
+\begin{itemize}
+\item {\bf 2d-const:} The domain $\Omega$ for the problem is the unit square, and $\mu\equiv
+  1$.
+\item {\bf 2d-var:} The warped two-dimensional domain $\Omega$ is
+  shown on the left in Figure~\ref{fig:mesh}, and the varying
+  coefficient is $\mu(x,y) = 1 + 10^6(\cos^2(2\pi x) + \cos^2(2\pi
+  y))$. We also study a modification of this problem with stronger
+  varying coefficient $\mu(x,y) = 1 + 10^6(\cos^2(10\pi x) +
+  \cos^2(10\pi y))$, which we refer to as {\bf 2d-var$'$}.
+\item {\bf 3d-const:} For this problem, $\Omega$ is the unit cube,
+  and we use the constant coefficient $\mu\equiv 1$.
+\item {\bf 3d-var:} The warped three-dimensional domain $\Omega$
+  shown on the right of Figure~\ref{fig:mesh} is used; the
+  varying coefficient is $\mu(x,y,z) = 1 + 10^6(\cos^2(2\pi x) +
+  \cos^2(2\pi y) + \cos^2(2\pi z))$.
+\end{itemize}
+
+
+\begin{figure}
+	\includegraphics[width=0.48\textwidth]{figs/fan2d}
+	%\input{tikz/fan.tikz}
+	%\input{tikz/fan-3d.tikz}
+	\includegraphics[width=0.48\textwidth]{figs/fan3d}
+	\caption{\label{fig:mesh} Two and three-dimensional warped
+          meshes used in our numerical experiments. The color
+          illustrates the logarithm of the coefficient field, which
+          varies over six orders of magnitude.}
+% $\mu(\bs x)\in [1.0, d 10^6]$.}
+\end{figure}
+
+
 \subsection{Comparing the computational cost}\label{subsec:complexity}
 To compare the computational cost of the different methods, we focus
 on the matrix-vector multiplications on the finest multigrid level,
@@ -1160,54 +1212,6 @@ but also in terms of accuracy per computation time.
 \end{algorithm}
 
 
-
-
-% **************************************************
-% **************************************************
-\section{Numerical results}\label{sec:numerics}
-In this section, we present a comprehensive comparison of our
-algorithms for the solution of high-order discretizations of
-\eqref{eq:Poisson}.  After introducing our test problems in
-\S\ref{subsec:tests}, we describe how we compare different methods for
-high-order multigrid in \S\ref{subsec:measures}. The results of these
-comparisons are presented and discussed \S\ref{subsec:results}.
-
-
-\subsection{Test problems}\label{subsec:tests}
-We compare our algorithms for the solution of~\eqref{eq:Poisson} with
-constant coefficient $\mu\equiv 1$ on the unit square and the unit cube,
-and, with varying coefficients $\mu(\bs x)$, on the warped two and
-three-dimensional domains shown in Figure~\ref{fig:mesh}. To be
-precise, we consider the following four problems:
-\begin{itemize}
-\item {\bf 2d-const:} The domain $\Omega$ for the problem is the unit square, and $\mu\equiv
-  1$.
-\item {\bf 2d-var:} The warped two-dimensional domain $\Omega$ is
-  shown on the left in Figure~\ref{fig:mesh}, and the varying
-  coefficient is $\mu(x,y) = 1 + 10^6(\cos^2(2\pi x) + \cos^2(2\pi
-  y))$. We also study a modification of this problem with stronger
-  varying coefficient $\mu(x,y) = 1 + 10^6(\cos^2(10\pi x) +
-  \cos^2(10\pi y))$, which we refer to as {\bf 2d-var$'$}.
-\item {\bf 3d-const:} For this problem, $\Omega$ is the unit cube,
-  and we use the constant coefficient $\mu\equiv 1$.
-\item {\bf 3d-var:} The warped three-dimensional domain $\Omega$
-  shown on the right of Figure~\ref{fig:mesh} is used; the
-  varying coefficient is $\mu(x,y,z) = 1 + 10^6(\cos^2(2\pi x) +
-  \cos^2(2\pi y) + \cos^2(2\pi z))$.
-\end{itemize}
-
-
-\begin{figure}
-	\includegraphics[width=0.48\textwidth]{figs/fan2d}
-	%\input{tikz/fan.tikz}
-	%\input{tikz/fan-3d.tikz}
-	\includegraphics[width=0.48\textwidth]{figs/fan3d}
-	\caption{\label{fig:mesh} Two and three-dimensional warped
-          meshes used in our numerical experiments. The color
-          illustrates the logarithm of the coefficient field, which
-          varies over six orders of magnitude.}
-% $\mu(\bs x)\in [1.0, d 10^6]$.}
-\end{figure}
 
 \subsection{Setup of comparisons}\label{subsec:measures}
 We test the different multigrid schemes in two contexts: as solvers
