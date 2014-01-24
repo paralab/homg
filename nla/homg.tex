@@ -1140,7 +1140,7 @@ The dominant computational cost per iteration of the high-order
 multigrid approaches discussed in \S\ref{sec:approaches} can
 thus be summarized as
 \begin{equation}\label{eq:compcost}
-  g_p(1+m(s_\text{pre}+s_\text{post})).
+  Ng_p(1+m(s_\text{pre}+s_\text{post})).
 \end{equation}
 Here, we denote by $s_\text{pre}$ and $s_\text{post}$ the number of
 pre- and post-smoothing steps on the finest multigrid level,
@@ -1152,7 +1152,7 @@ $m=2$ matrix-vector operations. If, in the approach discussed in
 \S\ref{subsec:low}, the sparsified linear-element residual is used in the
 smoother, the cost \eqref{eq:compcost} reduces to
 \begin{equation}\label{eq:compcost2}
-  g_p+g_1m(s_\text{pre}+s_\text{post}).
+  N(g_p + g_1 m(s_\text{pre}+s_\text{post})).
 \end{equation}
 However, since the overall number of iterations increases (see
 \S\ref{subsec:results}), this does not necessarily decrease the
@@ -1227,7 +1227,8 @@ v-cycles or of CG iterations (each of which uses a single multigrid
 v-cycle as preconditioner) required to reduce the norm of the discrete
 residual by a factor of $10^8$, where a ``-'' indicates that the
 method did not converge within the specified maximum number of
-iterations. In particular, these tables report the following
+iterations.
+In particular, these tables report the following
 information:
 \begin{itemize}
 \item[$\bullet$] The first column gives the polynomial \emph{order}
@@ -1314,13 +1315,22 @@ information:
 \end{itemize}
 %In the next section, we summarize our numerical comparisons.
 
-
- For the different test problems, we change the
-polynomial degree of the finite element functions but retain the same
-mesh. This results in an increasing number of unknowns as $p$
-increases. Since, as illustrated in \S\ref{subsec:num_mesh}, we
-observe mesh independent convergence for fixed $p$, this does not
-influence the comparison.
+As can be seen, the number of smoothing steps in the different methods
+is chosen such that, for fixed polynomial order, the computational
+work is comparable. Each multigrid v-cycle requires one residual
+computation and overall six matrix-vector multiplications.  Following
+the simple complexity estimates \eqref{eq:compcost} and
+\eqref{eq:compcost2}, this amounts to a per-iteration cost of $7Ng_p$
+for $h$- and $p$-multigrid, and of $N(g_1+6g_p)$ for the low-order
+multigrid preconditioner. As a consequence, the iteration numbers
+reported in the next section can almost directly be used to compare
+the efficiency of the different methods.
+%
+Note that in these tests, we change the polynomial degree of the
+finite element functions but retain the same mesh. This results in an
+increasing number of unknowns as $p$ increases. Since, as illustrated
+in \S\ref{subsec:num_mesh}, we observe mesh independent convergence
+for fixed $p$, this does not influence the comparison.
 
 
 \subsection{Summary of numerical results}\label{subsec:results}
@@ -1644,9 +1654,6 @@ used as a preconditioner in CG rather than as a solver.
 \end{tabular}
 \end{table}
 In the next section, we summarize our findings and draw conclusions.
-
-\todo{Estimate cost in terms of matvecs using formulas from
-  performance section}
 
 \section{Discussion and conclusions}
 \label{sec:discuss}
