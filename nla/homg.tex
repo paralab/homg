@@ -140,10 +140,11 @@ smoothers. We also compare the use of multigrid as a solver and as a preconditio
 in a Krylov subspace method.  While we use moderate size model
 problems (up to about $2$~million unknowns in 3D) for the comparisons
 in this paper, we also discuss our findings with regard to parallel
-implementations on high performance computing platforms. Systems
-arising upon high-order discretization often allow better performance
-and are thus able to capitalize on high performance platforms.  We
-also discuss parallelization aspects relevant for implementations on
+implementations on high performance computing platforms. 
+% Systems arising upon high-order discretization often allow better performance and are thus able to capitalize on high performance platforms.  
+System arising from high-order discretizations often perform better on 
+modern architectures due to the ever-increasing relative cost of memory access.
+We also discuss parallelization aspects relevant for implementations on
 shared or distributed memory architectures. For instance, the
 implementation of Gauss-Seidel smoothers can be challenging in
 parallel~\cite{AdamsBrezinaHuEtAl03, BakerFalgoutKolevEtAl11}; for
@@ -161,8 +162,8 @@ We use and high-order discretizations based on Legende-Gauss-Lobotto
 (LGL) nodal basis functions on quadrilateral or hexahedral
 meshes. Tensorized basis functions allow for a fast, matrix-free
 application of element matrices. This is particularly important for
-high polynomial degrees in three dimensions, where element matrices
-become large. For instance, for a three-dimensional hexahedral mesh
+high polynomial degrees in three dimensions as element matrices
+can become large. For instance, for a three-dimensional hexahedral mesh
 and finite element discretizations with polynomial degree $p$, the
 dense element
 matrices are of size $(p+1)^3\times (p+1)^3$. Thus, for $p=8$, this
@@ -170,7 +171,7 @@ amounts to more than half a million entries per element.  For
 tensorized nodal basis functions on hexahedral meshes, the application
 of elemental matrices to vectors can be implemented efficiently by
 exploiting the tensor structure of the basis functions, as is common
-for spectral elements, e.g.,~\cite{DevilleFischerMund02}.
+for spectral elements ~\cite{DevilleFischerMund02}.
 % We use geometry-resolving,
 % isoparametric quadrilateral and hexahedral finite elements in our
 % comparisons.
@@ -309,8 +310,7 @@ one-dimensional spectral methods and spectral element problems.
 The use of $p$-multigrid is rather common in the context of
 high-order discontinuous Galerkin discretizations
 \cite{FidkowskiOliverLuEtAl05, HelenbrookAtkins06}, but $p$-multigrid
-has also been used for continuous finite element discretizations,
-e.g.,~\cite{HelenbrookMavriplisAtkins03}.
+has also been used for continuous finite element discretizations ~\cite{HelenbrookMavriplisAtkins03}.
 %An alternative to high-order geometric multigrid is $p$-multigrid, which
 %coarsens the polynomial degree while (at least, initially) keeping the mesh
 %unchanged,
@@ -348,11 +348,11 @@ obtained significant attention in the literature, efficient solvers
 for the arising matrix systems are less well investigated. In
 particular, results studying the practical behavior of multigrid
 methods for high-order systems are scattered and a systematic
-comparison does not seems to be available.  Thus, here we present a
+comparison does not appear to be available.  Thus, here we present a
 comparison of different combinations of multigrid hierarchies and
 smoothers for the solution of elliptic problems, which have been
 discretized by high-order continuous finite elements.  We provide a
-simple and easily extendible implementation, which allows a systematic
+simple and easily extendible Matlab implementation, which allows a systematic
 comparison of the different methods in the same framework. Our
 comparison does
 not use a high performance implementation, but we discuss aspects of
@@ -385,8 +385,7 @@ our observations generalize to non-conforming meshes and that the
 methods are scalable to large parallel computers \cite{IPDPS14}. While we
 experiment with problems with strongly varying coefficients, we do not
 study problems with discontinuous or anisotropic coefficients, nor consider
-stretched or ill-shaped elements.
-
+ill-shaped elements.
 
 {\em Organization of this paper:} In \S\ref{sec:problem} we describe
 the test problem, as well as discretization approach for the different
@@ -447,7 +446,7 @@ implementations on high performance computing platforms.
 \section{Problem statement and preliminaries}
 \label{sec:problem}
 
-As test problem, we target the solution of the Poisson problem with
+As the test problem, we target the solution of the Poisson problem with
 homogeneous Dirichlet boundary conditions on an open bounded domain
 $\Omega\subset\mathbb R^d$ ($d=2$ or $d=3$) with boundary $\partial
 \Omega$, i.e., we search the solution $u(\bs x)$ of:
@@ -583,8 +582,7 @@ via $p$-coarsening; see Figure~\ref{fig:approaches} for an
 illustration of the two cases. The restriction operator is the adjoint
 of the prolongation operator with respect to the mass-weighted inner
 products. This only requires the application of the transpose of the
-prolongation operator to vectors, see for instance
-\cite{SampathBiros10}.
+prolongation operator to vectors, see \cite{SampathBiros10} for additional details.
 
 % subsection restriction_&_prolongation (end)
 
@@ -615,7 +613,7 @@ easily be modified or extended. It does not support distributed memory
 parallelism, and is
 restricted to conforming meshes that can be mapped to a square (in 2D) or a
 cube (in 3D). While, in practice, matrix assembly for
-high-order discretizations is discouraged, it we use sparse
+high-order discretizations is discouraged, we use sparse
 assembled operators in this prototype implementation.
 
 % Coarser meshes
@@ -639,7 +637,7 @@ assembled operators in this prototype implementation.
 In this section, we summarize different multigrid approaches
 for high-order/spectral finite element
 discretizations. These multigrid approaches can either be used as
-solver or can serve as preconditioner within a Krylov method. We
+a solver or can serve as a preconditioner within a Krylov method. We
 summarize different approaches for the construction of
 multilevel hierarchies in~\S\ref{subsec:hierarchy} and discuss
 smoothers in~\S\ref{subsec:smoothers}.
@@ -658,7 +656,7 @@ commonly referred to as \emph{$p$-multigrid}. For unstructured
 high-order element discretizations, where geometric coarsening is
 challenging, using an algebraic multigrid hierarchy of a
 \emph{low-oder approximation to the high-order operator} as a
-preconditioner has been proven efficient. Next, we discuss details of
+preconditioner has proven efficient. Next, we discuss details of
 these different approaches.
 
 
@@ -791,7 +789,7 @@ Chebyshev-accelerated Jacobi method is an alternative to SSOR; it
 can significantly improve over Jacobi smoothing, while being as simple to
 implement~\cite{AdamsBrezinaHuEtAl03}. The acceleration of Jacobi smoothing
 with Chebyshev polynomials requires estimation of the maximum eigenvalue of
-the system matrix, which has to be estimated in the setup.
+the system matrix, which has to be estimated during setup.
 % For our experiments, we
 %estimate the largest eigenvalue using 10 iterations of the Arnoldi algorithm.
 
@@ -803,7 +801,7 @@ compute the eigenvectors of the system matrix, choose a
 zero right hand side and an initialization that has all unit
 coefficients in the basis given by these eigenvectors. For the
 polynomial orders $p=1,4,16$, we compare the performance of point
-smoothers without and with a 2-level v-cycle with exact coarse solve. We depict the
+smoothers with and without a 2-level v-cycle with exact coarse solve. We depict the
 coefficients after six smoothing steps on the left, and the results
 obtained for a two-grid method\footnote{For simplicity, we chose two
   grids in our tests; the results for a multigrid v-cycle are
@@ -811,8 +809,8 @@ obtained for a two-grid method\footnote{For simplicity, we chose two
 smoothing steps on the finest grid) on the right. The SSOR smoother
 uses a lexicographic ordering of the unknowns, and we employ two pre and one
 post smoothing steps, which again amounts to overall six smoothing steps
-on the finest grid. \todo{The damping factors for Jacobi and SSOR smoothing
-are $\omega = 2/3$ and $\omega=1$, respectively.} The Chebyshev
+on the finest grid. The damping factors for Jacobi and SSOR smoothing
+are $\omega = 2/3$ and $\omega=1$, respectively. The Chebyshev
 smoother targets the part of the
 spectrum given by $[\lambda_\text{max}/4,\lambda_\text{max}]$, where
 $\lambda_\text{max}$ is the maximum eigenvalue of the system matrix which is estimated using 10 iterations of the Arnoldi algorithm.
@@ -1120,7 +1118,7 @@ have $g_1\le g_2\le \ldots$. The actual value of $g_p$ depends
 strongly on the implementation. Also note that wall-clock timings
 depend on caching, vectorization, blocking and other effects so the
 conversion from $g_p$ to wall-clock time is not trivial. Thus,
-although $g_p$ can seen to increase significantly with $p$, wall-clock
+although $g_p$ might increase significantly with $p$, wall-clock
 times are not. This discussion, however, is beyond our scope.
 % To
 %illustrate this, consider an elemental matrix for a hexahedral mesh in
@@ -1239,8 +1237,7 @@ information:
   \begin{itemize}
   \item \emph{Jacobi(3,3)} denotes that 3 pre-smoothing and 3
     post-smoothing steps of a pointwise Jacobi smoother are used on
-    each level. We use the damping factors \todo{$\omega=\ldots$ in two and
-    three dimensions, respectively}.
+    each level. We use a damping factor $\omega=2/3$ in all experiments.
   \item \emph{Cheb(3,3)} indicates that Chebyshev-accelerated Jacobi
     smoothing is used, again using 3 pre-smoothing and 3
     post-smoothing steps. An estimate for the maximal eigenvalue of
@@ -1256,7 +1253,7 @@ information:
       environments, where Gauss-Seidel smoothing can
       be challenging to implement and requires more communication in
       distributed memory environments.} The SSOR smoother is based on 
-			a lexicographic ordering of  the unknowns. \todo{damping factor}
+			a lexicographic ordering of  the unknowns.
   \end{itemize}
     For the two-dimensional problems reported in
     Tables~\ref{tab:box}--\ref{tab:2d-fan2}, we use a multigrid
@@ -1356,25 +1353,25 @@ polynomial orders $p=8$ and $p=16$.
     geometric coarsenings of the mesh.  For a detailed description of
     the different experiments reported in this table we refer to
     \S\ref{subsec:measures}.}  \centering
-  \begin{tabular}{|r|c c|c c|c c||c c|c c|c c||c c|} 
+  \begin{tabular}{|r|c c|c c|c c||c c|c c|c c||c|} 
     \hline
     & \multicolumn{6}{c||}{MG as solver} & \multicolumn{6}{c||}{MG
-      with pCG} & \multicolumn{2}{r|}{\!\!low-order MG\!\!} \\
+      with pCG} & \!\!low-order MG\!\! \\
     \cline{2-13}
-    \!\!\! order \!\!\!\! &  \multicolumn{2}{c|}{\!\!\scriptsize  Jacobi(3,3)\!\!} &  \multicolumn{2}{c|}{\!\!\scriptsize Cheb(3,3)\!\!} & \multicolumn{2}{c||}{\!\!\scriptsize  SSOR(2,1)\!\!} & \multicolumn{2}{c|}{\!\!\scriptsize Jacobi(3,3)\!\!} &  \multicolumn{2}{c|}{\!\!\scriptsize Cheb(3,3)\!\!} & \multicolumn{2}{c||}{\!\!\scriptsize SSOR(2,1)\!\!} & \multicolumn{2}{c|}{pCG}\\
+    \!\!\! order \!\!\!\! &  \multicolumn{2}{c|}{\!\!\scriptsize  Jacobi(3,3)\!\!} &  \multicolumn{2}{c|}{\!\!\scriptsize Cheb(3,3)\!\!} & \multicolumn{2}{c||}{\!\!\scriptsize  SSOR(2,1)\!\!} & \multicolumn{2}{c|}{\!\!\scriptsize Jacobi(3,3)\!\!} &  \multicolumn{2}{c|}{\!\!\scriptsize Cheb(3,3)\!\!} & \multicolumn{2}{c||}{\!\!\scriptsize SSOR(2,1)\!\!} & pCG \\
 \hline
  & $h$ & $p$ & $h$ & $p$& $h$ & $p$& $h$ & $p$& $h$ & $p$& $h$ & $p$&
-l-res & h-res\\
- \cline{2-15}
-1 & 6 & & 5 & & 5 & & 5 & & 4 & & 4 & & -  & - \\
-2 & 7 & 7 & 5 & 6 & 5 & 5 & 5 & 5 & 4 & 4 & 4 & 4 & 14 & 4 \\
-3 & 8 & & 6 & & 5 & & 6 & & 5 & & 4 & & 16  & 4 \\
-4 & 9 & 8 & 6 & 6 & 5 & 5 & 6 & 5 & 5 & 5 & 4 & 4 & 16 & 4 \\
-5 & 12 & & 8 & & 7 & & 7 & & 6 & & 5 & & 17 & 4 \\
-6 & 12 & & 9 & & 7 & & 7 & & 6 & & 5 & & 18 & 5\\
-7 & 16 & & 12 & & 8 & & 8 & & 7 & & 6 & & 18 & 5 \\
-8 & 17 & 14 & 13 & 10 & 8 & 7 & 9 & 8 & 7 & 6 & 6 & 5 & 19 & 5\\
-16 & 40 & 33 & 33 & 27 & 17 & 14 & 14 & 12 & 12 & 11 & 9 & 8 & 21 & 8 \\
+~ \\
+ \cline{2-13}
+1 & 6 & & 5 & & 5 & & 5 & & 4 & & 4 & & -   \\
+2 & 7 & 7 & 5 & 6 & 5 & 5 & 5 & 5 & 4 & 4 & 4 & 4 & 14  \\
+3 & 8 & & 6 & & 5 & & 6 & & 5 & & 4 & & 16   \\
+4 & 9 & 8 & 6 & 6 & 5 & 5 & 6 & 5 & 5 & 5 & 4 & 4 & 16  \\
+5 & 12 & & 8 & & 7 & & 7 & & 6 & & 5 & & 17 \\
+6 & 12 & & 9 & & 7 & & 7 & & 6 & & 5 & & 18 \\
+7 & 16 & & 12 & & 8 & & 8 & & 7 & & 6 & & 18  \\
+8 & 17 & 14 & 13 & 10 & 8 & 7 & 9 & 8 & 7 & 6 & 6 & 5 & 19 \\
+16 & 40 & 33 & 33 & 27 & 17 & 14 & 14 & 12 & 12 & 11 & 9 & 8 & 21 \\
 \hline
   \end{tabular}
 \end{table}
@@ -1439,10 +1436,8 @@ summarized in Table~\ref{tab:3d-fan}. As for {\bf 2d-var}, the
 performance of multigrid when used as a solver degrades significantly
 for orders $p>4$. We can also observe that the low-order matrix based on
 the high order node points represents a good preconditioner for the
-high-order system. As in two dimensions, smoothing steps based on the
-high-order residual and the diagonal of the low-order operator
-significantly reduce the number of iterations required for
-convergence.
+high-order system. 
+% As in two dimensions, smoothing steps based on the high-order residual and the diagonal of the low-order operator significantly reduce the number of iterations required for convergence.
 
 
 \begin{table}
@@ -1458,24 +1453,24 @@ convergence.
     For a
     detailed description of the different experiments reported in this
     table we refer to \S\ref{subsec:measures}.}  \centering
-  \begin{tabular}{|r|c c|c c|c c||c c|c c|c c||c c|} 
+  \begin{tabular}{|r|c c|c c|c c||c c|c c|c c||c|} 
     \hline
     & \multicolumn{6}{c||}{MG as solver} & \multicolumn{6}{c||}{MG
-      with pCG} & \multicolumn{2}{r|}{\!\!low-order MG\!\!} \\
+      with pCG} & \!\!low-order MG\!\! \\
     \cline{2-13}
-    \!\!\! order \!\!\!\! &  \multicolumn{2}{c|}{\!\!\scriptsize  Jacobi(3,3)\!\!} &  \multicolumn{2}{c|}{\!\!\scriptsize Cheb(3,3)\!\!} & \multicolumn{2}{c||}{\!\!\scriptsize  SSOR(2,1)\!\!} & \multicolumn{2}{c|}{\!\!\scriptsize Jacobi(3,3)\!\!} &  \multicolumn{2}{c|}{\!\!\scriptsize Cheb(3,3)\!\!} & \multicolumn{2}{c||}{\!\!\scriptsize SSOR(2,1)\!\!} & \multicolumn{2}{c|}{pCG}\\
+    \!\!\! order \!\!\!\! &  \multicolumn{2}{c|}{\!\!\scriptsize  Jacobi(3,3)\!\!} &  \multicolumn{2}{c|}{\!\!\scriptsize Cheb(3,3)\!\!} & \multicolumn{2}{c||}{\!\!\scriptsize  SSOR(2,1)\!\!} & \multicolumn{2}{c|}{\!\!\scriptsize Jacobi(3,3)\!\!} &  \multicolumn{2}{c|}{\!\!\scriptsize Cheb(3,3)\!\!} & \multicolumn{2}{c||}{\!\!\scriptsize SSOR(2,1)\!\!} & pCG\\
 \hline
- & $h$ & $p$ & $h$ & $p$& $h$ & $p$& $h$ & $p$& $h$ & $p$& $h$ & $p$& l-res & h-res\\
- \cline{2-15}
-1 & 14 & & 11 & & 6 & & 8 & & 7 & & 5 & & -  & - \\
-2 & 20 & 19 & 15 & 15 & 7 & 8 & 10 & 10 & 8 & 8 & 5 & 6 & 16  & 5 \\
-3 & 20 & & 16 & & 8 & & 10 & & 9 & & 6 & & 18 & 6 \\
-4 & 22 & 21 & 21 & 19 & 10 & 9 & 11 & 10 & 10 & 10 & 7 & 6 & 19 & 7\\
-5 & -  & & 28 & & 12 & & 14 & & 12 & & 7 & & 21 & 8  \\
-6 & -  & & 35 & & 13 & & 15 & & 13 & & 8 & & 23 &  9 \\
-7 & -  & & 45 & & 16 & & 18 & & 15 & & 9 & & 24 &  9 \\
-8 & -  & - & 52 & 46 & 17 & 15 & 20 & 20 & 16 & 15 & 9 & 8 & 25 & 10 \\
-16 & - & - & 169 & 148 & 37 & 33 & 51 & 45 & 30 & 27 & 13 & 12 & 31 & 13 \\
+ & $h$ & $p$ & $h$ & $p$& $h$ & $p$& $h$ & $p$& $h$ & $p$& $h$ & $p$& ~ \\
+ \cline{2-13}
+1 & 14 & & 11 & & 6 & & 8 & & 7 & & 5 & & -   \\
+2 & 20 & 19 & 15 & 15 & 7 & 8 & 10 & 10 & 8 & 8 & 5 & 6 & 16   \\
+3 & 20 & & 16 & & 8 & & 10 & & 9 & & 6 & & 18  \\
+4 & 22 & 21 & 21 & 19 & 10 & 9 & 11 & 10 & 10 & 10 & 7 & 6 & 19 \\
+5 & -  & & 28 & & 12 & & 14 & & 12 & & 7 & & 21   \\
+6 & -  & & 35 & & 13 & & 15 & & 13 & & 8 & & 23  \\
+7 & -  & & 45 & & 16 & & 18 & & 15 & & 9 & & 24  \\
+8 & -  & - & 52 & 46 & 17 & 15 & 20 & 20 & 16 & 15 & 9 & 8 & 25  \\
+16 & - & - & 169 & 148 & 37 & 33 & 51 & 45 & 30 & 27 & 13 & 12 & 31 \\
 \hline
   \end{tabular}
 \end{table}
@@ -1493,25 +1488,26 @@ convergence.
     polynomial order is first reduced to $p=1$, followed by two
     geometric coarsenings of the mesh.
     For a detailed description of the different experiments
-    reported in this table we refer to \S\ref{subsec:measures}. \gsnote{Hari, just for consistency with the other tables, can we add the case $p=16$?}}
+    reported in this table we refer to \S\ref{subsec:measures}.} 
   \centering
-  \begin{tabular}{|r|c c|c c|c c||c c|c c|c c||c c|} 
+  \begin{tabular}{|r|c c|c c|c c||c c|c c|c c||c|} 
     \hline
     & \multicolumn{6}{c||}{MG as solver} & \multicolumn{6}{c||}{MG
-      with pCG} & \multicolumn{2}{r|}{\!\!low-order MG\!\!} \\
+      with pCG} & \!\!low-order MG\!\! \\
     \cline{2-13}
-    \!\!\! order \!\!\!\! &  \multicolumn{2}{c|}{\!\!\scriptsize  Jacobi(3,3)\!\!} &  \multicolumn{2}{c|}{\!\!\scriptsize Cheb(3,3)\!\!} & \multicolumn{2}{c||}{\!\!\scriptsize  SSOR(2,1)\!\!} & \multicolumn{2}{c|}{\!\!\scriptsize Jacobi(3,3)\!\!} &  \multicolumn{2}{c|}{\!\!\scriptsize Cheb(3,3)\!\!} & \multicolumn{2}{c||}{\!\!\scriptsize SSOR(2,1)\!\!} & \multicolumn{2}{c|}{pCG}\\
+    \!\!\! order \!\!\!\! &  \multicolumn{2}{c|}{\!\!\scriptsize  Jacobi(3,3)\!\!} &  \multicolumn{2}{c|}{\!\!\scriptsize Cheb(3,3)\!\!} & \multicolumn{2}{c||}{\!\!\scriptsize  SSOR(2,1)\!\!} & \multicolumn{2}{c|}{\!\!\scriptsize Jacobi(3,3)\!\!} &  \multicolumn{2}{c|}{\!\!\scriptsize Cheb(3,3)\!\!} & \multicolumn{2}{c||}{\!\!\scriptsize SSOR(2,1)\!\!} & pCG \\
 \hline
- & $h$ & $p$ & $h$ & $p$& $h$ & $p$& $h$ & $p$& $h$ & $p$& $h$ & $p$& l-res & h-res\\
- \cline{2-15}
-					1 & 14 & & 12 & & 8 & & 8 & & 8 & & 6 & & 1 & 1  \\
-					2 & 19 & 19 & 15 & 14 & 7 & 8 & 10 & 10 & 8 & 8 & 6 & 6 & 16 & 9 \\
-					3 & 20 & & 17 & & 8 & & 10 & & 9 & & 6 & & 18 & 9  \\
-					4 & 261 & 333 & 21 & 20 & 10 & 9 & 15 & 15 & 11 & 10 & 7 & 6 & 20 & 11 \\
-					5 & - & & 30 & & 12 & & 19 & & 13 & & 8 & & 21 & 12  \\
-					6 & - & & 39 & & 13 & & 37 & & 15 & & 8 & & 23 & 13  \\
-					7 & - & & 52 & & 16 & & 78 & & 18 & & 9 & & 24 & 14  \\
-					8 & - & - & 63 & 55 & 17 & 16 & 137 & 109 & 19 & 18 & 10 & 9 & 24 & 14 \\
+ & $h$ & $p$ & $h$ & $p$& $h$ & $p$& $h$ & $p$& $h$ & $p$& $h$ & $p$& ~ \\
+ \cline{2-13}
+					1 & 14 & & 12 & & 8 & & 8 & & 8 & & 6 & & -  \\
+					2 & 19 & 19 & 15 & 14 & 7 & 8 & 10 & 10 & 8 & 8 & 6 & 6 & 19 \\
+					3 & 20 & & 17 & & 8 & & 10 & & 9 & & 6 & & 22  \\
+					4 & 261 & 333 & 21 & 20 & 10 & 9 & 15 & 15 & 11 & 10 & 7 & 6 & 26  \\
+					5 & - & & 30 & & 12 & & 19 & & 13 & & 8 & &  29  \\
+					6 & - & & 39 & & 13 & & 37 & & 15 & & 8 & &  35  \\
+					7 & - & & 52 & & 16 & & 78 & & 18 & & 9 & &  36  \\
+					8 & - & - & 63 & 55   & 17 & 16 & 137 & 109 & 19 & 18 & 10 & 9  & 38 \\
+				 16 & - & - & 232 & 201 & 67 & 76 &  -  &  -  & 44 & 37 & 19 & 18 & 56 \\
 \hline
   \end{tabular}
 \end{table}
@@ -1528,25 +1524,25 @@ convergence.
     For a
     detailed description of the different experiments reported in this
     table we refer to \S\ref{subsec:measures}.}  \centering
-	  \begin{tabular}{|r|c c|c c|c c||c c|c c|c c||c c|} 
+	  \begin{tabular}{|r|c c|c c|c c||c c|c c|c c||c|} 
 	    \hline
 	    & \multicolumn{6}{c||}{MG as solver} &
             \multicolumn{6}{c||}{MG with pCG} &
-            \multicolumn{2}{r|}{\!\!low-order MG\!\!} \\
+            \!\!low-order MG\!\! \\
 	    \cline{2-13}
-	    \!\!\! order \!\!\!\! &  \multicolumn{2}{c|}{\!\!\scriptsize  Jacobi(3,3)\!\!} &  \multicolumn{2}{c|}{\!\!\scriptsize Cheb(3,3)\!\!} & \multicolumn{2}{c||}{\!\!\scriptsize  SSOR(2,1)\!\!} & \multicolumn{2}{c|}{\!\!\scriptsize Jacobi(3,3)\!\!} &  \multicolumn{2,1}{c|}{\!\!\scriptsize Cheb(3)\!\!} & \multicolumn{2}{c||}{\!\!\scriptsize SSOR(2,1)\!\!} & \multicolumn{2}{c|}{pCG}\\
+	    \!\!\! order \!\!\!\! &  \multicolumn{2}{c|}{\!\!\scriptsize  Jacobi(3,3)\!\!} &  \multicolumn{2}{c|}{\!\!\scriptsize Cheb(3,3)\!\!} & \multicolumn{2}{c||}{\!\!\scriptsize  SSOR(2,1)\!\!} & \multicolumn{2}{c|}{\!\!\scriptsize Jacobi(3,3)\!\!} &  \multicolumn{2,1}{c|}{\!\!\scriptsize Cheb(3)\!\!} & \multicolumn{2}{c||}{\!\!\scriptsize SSOR(2,1)\!\!} & pCG \\
 	\hline
-	 & $h$ & $p$ & $h$ & $p$& $h$ & $p$& $h$ & $p$& $h$ & $p$& $h$ & $p$& l-res  & h-res\\
-	 \cline{2-15}
-1 & 6 & & 4 & & 4 & & 5 & & 4 & & 3 & & -  & - \\
-2 & 8 & 8 & 4 & 5 & 4 & 5 & 6 & 6 & 4 & 4 & 4 & 4 &  25 &  5 \\
-3 & 10 & & 7 & & 5 & & 6 & & 5 & & 5 & & 27 &  5  \\
-4 & 11 & 10 & 8 & 7 & 6 & 5 & 7 & 7 & 6 & 5 & 5 & 4 & 28 & 6 \\
-5 & 14 & & 10 & & 7 & & 8 & & 7 & & 5 & & 29  & 6 \\
-6 & 16 & & 11 & & 7 & & 9 & & 7 & & 6 & & 32  & 6 \\
-7 & 20 & & 15 & & 9 & & 10 & & 9 & & 6 & & 34 & 7 \\
-8 & 22 & 19 & 17 & 15 & 9 & 8 & 10 & 10 & 9 & 8 & 6 & 6 & 35 & 7 \\
-16 & 47 & 42 & 38 & 34 & 17 & 15 & 16 & 14 & 14 & 13 & 9 & 9 & 39 & 11 \\
+	 & $h$ & $p$ & $h$ & $p$& $h$ & $p$& $h$ & $p$& $h$ & $p$& $h$ & $p$& ~\\
+	 \cline{2-13}
+1 & 6 & & 4 & & 4 & & 5 & & 4 & & 3 & & -   \\
+2 & 8 & 8 & 4 & 5 & 4 & 5 & 6 & 6 & 4 & 4 & 4 & 4 &  25  \\
+3 & 10 & & 7 & & 5 & & 6 & & 5 & & 5 & & 27  \\
+4 & 11 & 10 & 8 & 7 & 6 & 5 & 7 & 7 & 6 & 5 & 5 & 4 & 28 \\
+5 & 14 & & 10 & & 7 & & 8 & & 7 & & 5 & & 29  \\
+6 & 16 & & 11 & & 7 & & 9 & & 7 & & 6 & & 32  \\
+7 & 20 & & 15 & & 9 & & 10 & & 9 & & 6 & & 34 \\
+8 & 22 & 19 & 17 & 15 & 9 & 8 & 10 & 10 & 9 & 8 & 6 & 6 & 35 \\
+16 & 47 & 42 & 38 & 34 & 17 & 15 & 16 & 14 & 14 & 13 & 9 & 9 & 39 \\
 \hline 
  \end{tabular}
 \end{table}
@@ -1562,25 +1558,25 @@ convergence.
     For a detailed description of the
     different experiments reported in this table we refer to
     \S\ref{subsec:measures}.}  \centering
-	  \begin{tabular}{|r|c c|c c|c c||c c|c c|c c||c c|} 
+	  \begin{tabular}{|r|c c|c c|c c||c c|c c|c c||c|} 
 	    \hline
 	    & \multicolumn{6}{c||}{MG as solver} &
             \multicolumn{6}{c||}{MG with pCG} &
-            \multicolumn{2}{r|}{\!\!low-order MG\!\!} \\
+            \!\!low-order MG\!\! \\
 	    \cline{2-13}
-	    \!\!\! order \!\!\!\! &  \multicolumn{2}{c|}{\!\!\scriptsize  Jacobi(3,3)\!\!} &  \multicolumn{2}{c|}{\!\!\scriptsize Cheb(3,3)\!\!} & \multicolumn{2}{c||}{\!\!\scriptsize  SSOR(2,1)\!\!} & \multicolumn{2}{c|}{\!\!\scriptsize Jacobi(3,3)\!\!} &  \multicolumn{2}{c|}{\!\!\scriptsize Cheb(3,3)\!\!} & \multicolumn{2}{c||}{\!\!\scriptsize SSOR(2,1)\!\!} & \multicolumn{2}{c|}{pCG}\\
+	    \!\!\! order \!\!\!\! &  \multicolumn{2}{c|}{\!\!\scriptsize  Jacobi(3,3)\!\!} &  \multicolumn{2}{c|}{\!\!\scriptsize Cheb(3,3)\!\!} & \multicolumn{2}{c||}{\!\!\scriptsize  SSOR(2,1)\!\!} & \multicolumn{2}{c|}{\!\!\scriptsize Jacobi(3,3)\!\!} &  \multicolumn{2}{c|}{\!\!\scriptsize Cheb(3,3)\!\!} & \multicolumn{2}{c||}{\!\!\scriptsize SSOR(2,1)\!\!} & pCG \\
 	\hline
-	 & $h$ & $p$ & $h$ & $p$& $h$ & $p$& $h$ & $p$& $h$ & $p$& $h$ & $p$& l-res  & h-res\\
-	 \cline{2-15}
-1 & 13 & & 7 & & 5 & & 7 & & 5 & & 4 & & - & - \\
-2 & 17 & 18 & 13 & 13 & 7 & 7 & 9 & 9 & 8 & 8 & 5 & 5 & 26  & 7 \\
-3 & 20 & & 16 & & 8 & & 10 & & 9 & & 6 & & 29  & 8 \\
-4 & 23 & 22 & 18 & 18 & 9 & 9 & 11 & 11 & 9 & 9 & 7 & 6 & 31 & 9\\
-5 & 26 & & 21 & & 10 & & 12 & & 10 & & 7 & & 34  & 10  \\
-6 & 30 & & 27 & & 12 & & 13 & & 12 & & 8 & & 37 & 13 \\
-7 & 35 & & 34 & & 14 & & 14 & & 14 & & 8 & & 37 & 13  \\
-8 & - & - & 40 & 38 & 16 & 15 & 18 & 17 & 15 & 14 & 9 & 9 & 38 & 14 \\
-16 & - & - & 117 & 110 & 32 & 29 & 67 & 60 & 27 & 26 & 13 & 13 & 47 & 22 \\
+	 & $h$ & $p$ & $h$ & $p$& $h$ & $p$& $h$ & $p$& $h$ & $p$& $h$ & $p$& ~ \\
+	 \cline{2-13}
+1 & 13 & & 7 & & 5 & & 7 & & 5 & & 4 & & -  \\
+2 & 17 & 18 & 13 & 13 & 7 & 7 & 9 & 9 & 8 & 8 & 5 & 5 & 26 \\
+3 & 20 & & 16 & & 8 & & 10 & & 9 & & 6 & & 29  \\
+4 & 23 & 22 & 18 & 18 & 9 & 9 & 11 & 11 & 9 & 9 & 7 & 6 & 31 \\
+5 & 26 & & 21 & & 10 & & 12 & & 10 & & 7 & & 34  \\
+6 & 30 & & 27 & & 12 & & 13 & & 12 & & 8 & & 37 \\
+7 & 35 & & 34 & & 14 & & 14 & & 14 & & 8 & & 37  \\
+8 & - & - & 40 & 38 & 16 & 15 & 18 & 17 & 15 & 14 & 9 & 9 & 38 \\
+16 & - & - & 117 & 110 & 32 & 29 & 67 & 60 & 27 & 26 & 13 & 13 & 47\\
 \hline
   \end{tabular}
 \end{table}
@@ -1639,7 +1635,7 @@ used as a preconditioner in CG rather than as a solver.
           iterations, obtained with 3
           pre and 3 post-smoothing steps. Shown in brackets is the
           number of iterations requires for point Jacobi
-          smoothing. \todo{Smoothing factors}}
+          smoothing. All experiments used a damping factor of $\omega=2/3$.}
 \begin{tabular}{|c|c|c|c|c|c|c|}
 	\hline
 	order & \multicolumn{2}{c|}{\bf 2d-const} &
@@ -1647,8 +1643,8 @@ used as a preconditioner in CG rather than as a solver.
 	\cline{2-7}
 	 & MG & pCG  & MG & pCG & MG & pCG \\
 	\hline
-	8  & 16(17) & 8(9)   &  31(-)  & 12(20) & 46?(-) & 16?(18) \\
-	16 & 31(40) & 12(14) &  61(-)  & 17(51) &  ? (-)  &  ?(67)  \\
+	8  & 16 (17) & 8 (9)   &  31 (-)  & 12 (20) & 30 (-)  &  13 (18) \\    % 30 & 13
+	16 & 31 (40) & 12 (14) &  61 (-)  & 17 (51) & 52 (-)  &  17 (67)  \\   % 52 & 17
 	\hline
 \end{tabular}
 \end{table}
@@ -1666,7 +1662,7 @@ required by the Krylov method.  This is particularly true for
 high-order methods, where the residual computation is more expensive
 than for low-order methods, thus making the additional vector
 additions and inner products in CG negligible.  For problems with
-varying coefficients, we find that the number of required v-cycles
+varying coefficients, we find that the number of v-cycles
 decreases by up to a factor of three when multigrid is combined with
 the conjugate gradient method.
 
@@ -1696,9 +1692,9 @@ high-order discretizations on unstructured meshes, as also observed in
 \cite{Brown10, DevilleMund90, HeysManteuffelMcCormickEtAl05}.  When
 combined with algebraic multigrid for the low-order operator, the
 smoother on the finest mesh can either use the low-order or the
-high-order residual. While using the high-order residual increases the
+high-order residual. \todo{While using the high-order residual increases the
 computational work, it has the potential to significantly decrease the
-iteration numbers and overall results in faster convergence.
+iteration numbers and overall results in faster convergence.}
 
 
 %low-order preconditioner competitive w.r. to number of
