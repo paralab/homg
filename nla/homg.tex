@@ -88,11 +88,12 @@ dimensions with constant and varying coefficients, we compare the
 performance of the different multigrid approaches for polynomial
 orders up to 16. We find that all smoothers yield good
 performance for constant coefficients; for varying coefficients,
-Chebyshev and SSOR smoothing outperforms Jacobi smoothing. None of the
-tested methods is completely independent of the polynomial order in terms of
-the number of iterations. When multigrid is used as preconditioner in
-a Krylov method, the iteration number decreases significantly (up to a
-factor of three) compared to using multigrid as a solver.
+Chebyshev and SSOR smoothing outperforms Jacobi smoothing.
+While all of the tested methods converge in a mesh-independent number of itations, none of them behaves completely independent of the polynomial order.
+When multigrid is used as preconditioner in
+a Krylov method, the iteration number decreases significantly
+% (up to a factor of three)
+compared to using multigrid as a solver.
 \end{abstract}
 \keywords{high-order, geometric multigrid, algebraic multigrid,
   continuous finite elements, spectral elements, preconditioning.}
@@ -140,7 +141,7 @@ problems (up to about $2$~million unknowns in 3D) for the comparisons
 in this paper, we also discuss our findings with regard to parallel
 implementations on high performance computing platforms. 
 % Systems arising upon high-order discretization often allow better performance and are thus able to capitalize on high performance platforms.  
-System arising from high-order discretizations often perform better on 
+Systems arising from high-order discretizations often allow better performance on 
 modern architectures due to the ever-increasing relative cost of memory access.
 We also discuss parallelization aspects relevant for implementations on
 shared or distributed memory architectures. For instance, the
@@ -156,11 +157,11 @@ and often is as effective a smoother as Gauss-Seidel.
 %number of nonzero entries in finite element matrices increases rapidly
 %as the polynomial order increases.
 
-We use and high-order discretizations based on Legende-Gauss-Lobotto
+We use high-order discretizations based on Legende-Gauss-Lobotto
 (LGL) nodal basis functions on quadrilateral or hexahedral
 meshes. Tensorized basis functions allow for a fast, matrix-free
 application of element matrices. This is particularly important for
-high polynomial degrees in three dimensions as element matrices
+high polynomial degrees in three dimensions, as element matrices
 can become large. For instance, for a three-dimensional hexahedral mesh
 and finite element discretizations with polynomial degree $p$, the
 dense element
@@ -327,7 +328,7 @@ has also been used for continuous finite element discretizations ~\cite{Helenbro
 %the polynomial order increases represents a significant challenge.
 %
 A popular strategy for high-order discretizations on unstructured
-meshes, for which the application of geometric multigrid is
+meshes, for which geometric mesh coarsening is
 challenging, is to assemble a low-order approximation of the
 high-order system and use an algebraic multigrid method to invert the
 low-order (and thus much sparser) operator~\cite{Brown10, Kim07,
@@ -343,7 +344,7 @@ methods.
 
 {\em Contributions:} While high-order methods and their analysis have
 obtained significant attention in the literature, efficient solvers
-for the arising matrix systems are less well investigated. In
+for the arising matrix systems are less investigated. In
 particular, results studying the practical behavior of multigrid
 methods for high-order systems are scattered and a systematic
 comparison does not appear to be available.  Thus, here we present a
@@ -354,7 +355,7 @@ simple and easily extendible Matlab implementation, which allows a systematic
 comparison of the different methods in the same framework. Our
 comparison does
 not use a high performance implementation, but we discuss aspects of
-high-performance and distributed memory parallel implementations.
+high performance and distributed memory parallel implementations.
 
 %study smoothers; 
 %lack of studies in the literature, not immediate 
@@ -374,7 +375,7 @@ high-performance and distributed memory parallel implementations.
 {\em Limitations:} While this work is partly driven by our interest in
 scalable parallel simulations on nonconforming meshes derived from
 adaptive octrees (e.g.,\cite{SundarBirosBursteddeEtAl12,
-  SampathBiros10, BursteddeGhattasGurnisEtAl10}, for the comparisons
+  SampathBiros10, BursteddeGhattasGurnisEtAl10}), for the comparisons
 presented in this paper we restrict ourselves to moderate size
 problems on conforming meshes. We do not address time-to-solution, as
 we do not use a high-performance implementation. However, recent
@@ -392,8 +393,9 @@ the different multilevel approaches for solving the resulting
 high-order systems. In \S\ref{sec:numerics}, we presents a
 comprehensive comparison of different approaches using test problems
 in 2D and 3D. Finally, in \S\ref{sec:discuss} we draw conclusions and
-discuss our findings with a particular emphasis on parallel
-implementations on high performance computing platforms.
+discuss our findings.
+% with a particular emphasis on parallel
+%implementations on high performance computing platforms.
 
 %\gsnote{Unify notion of mesh/grid etc}\\
 % \gsnote{Unify use of high-order vs.\ higher order}\\
@@ -483,8 +485,8 @@ boundary.
 This problem is known to have a unique solution $u^*$ \cite{BrennerScott94}. 
 We now derive discrete equations whose solutions
 approximate the solution of
-(\ref{eqn:weakForm}). First, we define a sequence of $m$ nested conforming {\em finite}
-dimensional spaces, $V_1 \subset V_2 \subset \cdots \subset V_m \subset
+(\ref{eqn:weakForm}). First, we define a sequence of $m$ nested conforming
+{\em finite}-dimensional spaces, $V_1 \subset V_2 \subset \cdots \subset V_m \subset
 H_0^{1}(\Omega)$.
 Here, $V_k$ is the finite element space corresponds to a finite element mesh
 at a specified
@@ -493,7 +495,7 @@ problem,
 % which is obtained either via geometric coarsening of the
 %mesh ($h$-coarsening) or decreasing of the polynomial degree of the
 %finite element basis functions ($p$-coarsening),
-as illustrated  in Figure~\ref{fig:approaches} for different coarsenings.  Then, the discretized problem is to find
+as illustrated  in Figure~\ref{fig:approaches} for different coarsenings.  Then, the discretized problem on $V_k$ is to find
 $u_k \in V_k$ such that
 \begin{equation}
 \label{eqn:galerkinForm}
@@ -556,16 +558,16 @@ $\mathbf{u}_k,\mathbf{v}_k\in \mathbb{R}^{N_k}$.
 
 \subsection{Restriction and prolongation} % (fold)
 \label{sub:restriction_&_prolongation}
-Since the coarse-grid vector space is a subspace of the fine-grid
-vector space, any coarse-grid function $v_{k-1}$ can be expanded in
-terms of the fine basis functions,
+Since the coarse-grid space is a subspace of the fine-grid
+space, any coarse-grid function $v_{k-1}$ can be expanded in
+terms of the fine-grid basis functions,
 \begin{equation} 
   v_{k-1} = \sum_{i=1}^{N_{k-1}} \mathbf v_{i,k-1}\phi_i^{k-1} = \sum_{j=1}^{N_k} \mathbf v_{j,k}\phi_j^k, 
 \end{equation} 
 where, $\mathbf v_{i,k}$ and $\mathbf v_{i,k-1}$ are the coefficients in the basis
 expansion for $v_{k-1}$ on the fine and coarse grids, respectively.
 
-The prolongation operator can be represented as a matrix-vector
+The application of the prolongation operator can be represented as a matrix-vector
 product with the input vector as the coarse grid nodal values and the
 output as the fine grid nodal values \cite{SampathBiros10}. The matrix
 entries of this operator are thus the coarse grid shape functions evaluated at the fine-grid
@@ -580,7 +582,7 @@ via $p$-coarsening; see Figure~\ref{fig:approaches} for an
 illustration of the two cases. The restriction operator is the adjoint
 of the prolongation operator with respect to the mass-weighted inner
 products. This only requires the application of the transpose of the
-prolongation operator to vectors, see \cite{SampathBiros10} for additional details.
+prolongation operator to vectors. % see \cite{SampathBiros10} for additional details.
 
 % subsection restriction_&_prolongation (end)
 
@@ -588,7 +590,7 @@ prolongation operator to vectors, see \cite{SampathBiros10} for additional detai
 \label{sub:meshing}
 
 For the numerical comparisons in this work we consider domains that
-are the image of a square (in 2D) or a cube (in 3D) under a
+are the image of a square or a cube under a
 diffeomorphism, i.e., a smooth mapping from the reference domain
 $S\coloneqq[0,1]^d$ to the physical domain $\Omega$. Hexahedral finite
 element meshes and tensorized nodal basis function based on
@@ -634,7 +636,7 @@ assembled operators in this prototype implementation.
 
 In this section, we summarize different multigrid approaches
 for high-order/spectral finite element
-discretizations. These multigrid approaches can either be used as
+discretizations, which can either be used as
 a solver or can serve as a preconditioner within a Krylov method. We
 summarize different approaches for the construction of
 multilevel hierarchies in~\S\ref{subsec:hierarchy} and discuss
@@ -654,8 +656,8 @@ commonly referred to as \emph{$p$-multigrid}. For unstructured
 high-order element discretizations, where geometric coarsening is
 challenging, using an algebraic multigrid hierarchy of a
 \emph{low-oder approximation to the high-order operator} as a
-preconditioner has proven efficient. Next, we discuss details of
-these different approaches.
+preconditioner has proven efficient. Some details of
+these different approaches are summarized next.
 
 
 
@@ -679,7 +681,8 @@ high-order restriction and prolongation operators
 %residuum computation and the prolongation and restriction operators
 %can be used.
 For hexahedral (or quadrilateral) meshes, the required high-order residual
-computations can often be accelerated using elementwise computations and
+computations and the application of the interpolation and restriction operators
+can often be accelerated using elementwise computations and
 %The corresponding elementwise computations can often be
 tensorized finite element basis functions, as is common
 in spectral element methods \cite{DevilleFischerMund02}.
@@ -701,7 +704,7 @@ polynomial basis \cite{MadayMunoz89}.
 \subsubsection{Preconditioning by lower-order operator} \label{subsec:low}
 In this defect correction approach (see
 \cite{TrottenbergOosterleeSchuller01, Hackbusch85}), the high-order
-residual is iteratively corrected using a low-order operator, which is
+residual is iteratively corrected using a low-order operator,
 obtained by overlaying the high-order nodes with a low-order
 (typically linear) finite element mesh. While the resulting low-order
 operator has the same number of unknowns as the high-order operator,
@@ -715,7 +718,7 @@ nature of algebraic multigrid, it is particularly attractive for
 high-order discretizations on unstructured meshes.  Note that even if
 the mesh is structured, using geometric multigrid for the low-order
 system is not straightforward due to the non-evenly spaced node points
-inherited from the high-order discretization.
+inherited from the high-order discretization (see Figure~\ref{fig:approaches}).
 
 %  In principle, this
 %approach only requires computation of the residual for the high-order
@@ -767,8 +770,8 @@ inherited from the high-order discretization.
 % **********************************************************
 \subsection{Smoothers}\label{subsec:smoothers}
 In our numerical comparisons, we focus on point smoothers and compare
-the results with an element-wise block-Jacobi smoother. In a multigrid
-framework, point smoothers must decrease the error components in the
+the results with an element-wise block-Jacobi smoother. In multigrid, smoothers
+smoothers must target the decrease the error components in the
 upper half of the spectrum.  In this section, we summarize different
 smoothers and numerically study their behavior for high-order
 discretizations.
@@ -800,11 +803,11 @@ zero right hand side and an initialization that has all unit
 coefficients in the basis given by these eigenvectors. For the
 polynomial orders $p=1,4,16$, we compare the performance of point
 smoothers with and without a 2-level v-cycle with exact coarse solve. We depict the
-coefficients after six smoothing steps on the left, and the results
+coefficients after six smoothing steps in the left column, and the results
 obtained for a two-grid method\footnote{For simplicity, we chose two
   grids in our tests; the results for a multigrid v-cycle are
   similar.} with three pre and three post smoothing steps (and thus overall six
-smoothing steps on the finest grid) on the right. The SSOR smoother
+smoothing steps on the finest grid) in the right column. The SSOR smoother
 uses a lexicographic ordering of the unknowns, and we employ two pre and one
 post smoothing steps, which again amounts to overall six smoothing steps
 on the finest grid. The damping factors for Jacobi and SSOR smoothing
@@ -822,8 +825,7 @@ part of the spectrum.  Both, the Chebyshev and
 SSOR methods outperform Jacobi smoothing, in particular for higher
 orders. Combining the smoothers with a two-grid cycle, all error
 components are decreased for all smoothers (and thus the resulting
-two-grid methods converge, see Table~\ref{tab:box} in the section
-summarizing our numerical tests), but the error decreases slower for
+two-grid methods converge, see Table~\ref{tab:box} in \S\ref{subsec:results}), but the error decreases slower for
 higher polynomial orders. For high polynomial order, a two-grid
 iteration with SSOR smoothing results in a significantly better error
 reduction than Jacobi or Chebyshev smoothing.
@@ -836,7 +838,7 @@ $\mu$ on a deformed domain $\Omega$.  Compared to the constant
 coefficient case, Jacobi smoothing performs significantly worse, both,
 when used as a solver and as a smoother. Let us focus on the two-grid
 correction for polynomial order $p=16$ and compare with the results
-obtained when using multigrid as a solver from Table~\ref{tab:2d-fan}.
+obtained when using multigrid as a solver, shown in Table~\ref{tab:2d-fan}.
 Jacobi smoothing does not lead to a converging two-grid algorithm, as
 several coefficients are amplified by the two-grid cycle. For
 Chebyshev smoothing, the multigrid v-cycle converges slowly
@@ -844,7 +846,7 @@ although one or two coefficients appear amplified in the two-grid
 iteration. This convergence can be explained by the fact that errors
 can be interchanged between different eigenvectors in the v-cycle.
 SSOR smoothing combined with the two-grid method retains a significant
-error reduction and, as a consequence, converges at a satisfactory
+error reduction rate and, as a consequence, converges quickly.
 rate.
 
 \begin{figure}
@@ -918,9 +920,9 @@ rate.
 		\begin{tikzpicture}[scale=0.8]
 		\begin{semilogyaxis}[ymajorgrids,ymin=1e-5,ymax=2,xmin=0,xmax=961,yticklabels={,,}]
 		\addplot[color=black]  table[x=dof, y=u]{data/vcycle-const-box.dat};
-		\addplot[color=blue!70,opacity=0.5,only marks, mark=square*,mark size=1pt]   table[x=dof, y=jacobi16]{data/vcycle-const-box.dat};
+		\addplot[color=blue!70,opacity=0.5,only marks, mark=*,mark size=1pt]   table[x=dof, y=jacobi16]{data/vcycle-const-box.dat};
 		\addplot[color=red!70!black,opacity=0.4,only marks, mark=*,mark size=1pt] table[x=dof, y=chebyshev16]{data/vcycle-const-box.dat};
-		\addplot[color=green!70!black,opacity=0.6,only marks, mark=diamond*,mark size=1pt]  table[x=dof, y=ssor16]{data/vcycle-const-box.dat};
+		\addplot[color=green!70!black,opacity=0.6,only marks, mark=*,mark size=1pt]  table[x=dof, y=ssor16]{data/vcycle-const-box.dat};
 		\end{semilogyaxis}
 		\draw[black, fill=white] (3.95, 5.375) rectangle +(2.9,0.325);
 		\node at (5.35, 5.53) {\bf \small{v-cycle, $p=16$}};
@@ -935,11 +937,12 @@ rate.
           meshes of $32\times 32$, $8\times 8$ and $2\times 2$
           elements are used for polynomial orders $p=1$, $p=4$ and
           $p=16$, respectively.  The horizontal axis is the
-          eigenvector index for the system matrix $\mathbf{A}_k$, and
+          index for the eigenvectors of the system matrix $\mathbf{A}_k$, and
           the vertical axis is the magnitude of the error component
           for each eigenvector. The eigenvectors are ordered such that
-          the corresponding eigenvalues are descending; thus, the
-          smoothness in every eigenvectors decays from left to
+          the corresponding eigenvalues are descending; thus, due to
+          the properties of $\mathbf{A}_k$, the
+          smoothness in every eigenvector decays from left to
           right.  The system right hand side is zero and the
           initialization is chosen to have all unit coefficients in
           the eigenvector expansion. A total of six smoothing steps is
@@ -1018,9 +1021,9 @@ rate.
 		\begin{tikzpicture}[scale=0.8]
 		\begin{semilogyaxis}[ymajorgrids,ymin=1e-5,ymax=2,xmin=0,xmax=961,yticklabels={,,}]
 		\addplot[color=black]  table[x=dof, y=u]{data/vcycle-var-shell.dat};
-		\addplot[color=blue!70,opacity=0.5,only marks, mark=square*,mark size=1pt]   table[x=dof, y=jacobi16]{data/vcycle-var-shell.dat};
+		\addplot[color=blue!70,opacity=0.5,only marks, mark=*,mark size=1pt]   table[x=dof, y=jacobi16]{data/vcycle-var-shell.dat};
 		\addplot[color=red!70!black,opacity=0.5,only marks, mark=*,mark size=1pt] table[x=dof, y=chebyshev16]{data/vcycle-var-shell.dat};
-		\addplot[color=green!70!black,opacity=0.5,only marks, mark=diamond*,mark size=1pt]  table[x=dof, y=ssor16]{data/vcycle-var-shell.dat};
+		\addplot[color=green!70!black,opacity=0.5,only marks, mark=*,mark size=1pt]  table[x=dof, y=ssor16]{data/vcycle-var-shell.dat};
 		\end{semilogyaxis}
 		\draw[black, fill=white] (3.95, 5.375) rectangle +(2.9,0.325);
 		\node at (5.35, 5.53) {\bf \small{v-cycle, $p=16$}};
@@ -1048,7 +1051,7 @@ meshes \cite{LottesFischer05, FischerLottes05}.
 %straightforward to achieve good parallel scalability.
 In
 \S\ref{sec:numerics}, we compare the performance of point
-smoothers with a element-wise block Jacobi smoothing.
+smoothers with an element-wise block Jacobi smoothing.
 
 
 
@@ -1111,13 +1114,13 @@ unknowns on the finest level by $N$, the computational cost---measured
 in floating point operations (flops)---for a matrix-vector product is
 $Ng_p$, where $g_p$ is the number of flops per unknown and the
 subscript $p$ indicates the polynomial order used in the FEM basis.
-Since high-order discretizations result in less sparse operators, we
-have $g_1\le g_2\le \ldots$. The actual value of $g_p$ depends
-strongly on the implementation. Also note that wall-clock timings
-depend on caching, vectorization, blocking and other effects so the
-conversion from $g_p$ to wall-clock time is not trivial. Thus,
-although $g_p$ might increase significantly with $p$, wall-clock
-times are not. This discussion, however, is beyond our scope.
+Since high-order discretizations result in less sparse operators,
+$g_1\le g_2\le \ldots$ holds. The actual value of $g_p$ depends
+strongly on the implementation. Also note that the conversion from
+$g_p$ to wall-clock time is not trivial, as wall-clock timings depend
+on caching, vectorization, blocking and other effects. Thus,
+although $g_p$ increases with $p$, wall-clock
+times might not increase as significantly. This discussion, however, is beyond our scope.
 % To
 %illustrate this, consider an elemental matrix for a hexahedral mesh in
 %three dimensions, which is dense and of size $(p+1)^3\times
@@ -1140,13 +1143,13 @@ thus be summarized as
 \end{equation}
 Here, we denote by $s_\text{pre}$ and $s_\text{post}$ the number of
 pre- and post-smoothing steps on the finest multigrid level,
-respectively. Moreover, $m$ denotes the number of necessary residual
+respectively. Moreover, $m$ denotes the number of residual
 computations (and thus matrix-vector computations) per smoothing step.
 Jacobi smoothing and Chebyshev-accelerated Jacobi require $m=1$
 matrix-vector multiplication per smoothing step, while SSOR requires
 $m=2$ matrix-vector operations. If, in the approach discussed in
 \S\ref{subsec:low}, the sparsified linear-element residual is used in the
-smoother, the cost \eqref{eq:compcost} reduces to
+smoother on the finest grid, the cost \eqref{eq:compcost} reduces to
 \begin{equation}\label{eq:compcost2}
   N(g_p + g_1 m(s_\text{pre}+s_\text{post})).
 \end{equation}
@@ -1183,10 +1186,10 @@ If the overall number of unknowns $N$ is kept fixed and the
 solution is smooth, it is well known that the accuracy increases for
 high-order discretizations. Due to the decreased sparsity of the
 discretized operators, this does not automatically translate to more
-accuracy per computation time; see, e.g.~\cite{Brown10}. However, note
+accuracy per computation time; see, e.g.,~\cite{Brown10}. However, note
 that many computations in, for instance, a multigrid
 preconditioned conjugate gradient algorithm are of complexity
-$\mathcal{O}(N)$ (see Algorithm~\ref{alg:pcg}) and thus independent of
+$\mathcal{O}(N)$ (see Algorithm~\ref{alg:pcg}) and are thus independent of
 $g_p$. Thus, the computational cost of these steps does not depend on
 the order of the discretization. Even if these $\mathcal{O}(N)$ steps
 do not dominate the computation, they contribute to making high-order
@@ -1195,7 +1198,7 @@ but also in terms of accuracy per computation time.
 
 \begin{algorithm}[ht] 
   % v-cycle 
-  \caption{Multigrid preconditioned Conjugate Gradient Method} \label{alg:pcg} 
+  \caption{Complexity of individual steps in multigrid-preconditioned CG} \label{alg:pcg} 
   \begin{algorithmic}[1]
     \Require rhs and guess
     \Ensure  solution
@@ -1240,7 +1243,7 @@ information:
     smoothing is used, again using 3 pre-smoothing and 3
     post-smoothing steps. An estimate for the maximal eigenvalue of
     the linear systems on each level, as required by the Chebyshev
-    method, is computed using 10 Arnoldi iterations.
+    method, is computed in a setup step using 10 Arnoldi iterations.
   \item \emph{SSOR(2,1)} denotes that a symmetric successive
     over-relaxation method is employed, with 2 pre-smoothing and 1
     post-smoothing steps. Note that each SSOR
@@ -1321,7 +1324,7 @@ multigrid preconditioner. As a consequence, the iteration numbers
 reported in the next section can almost directly be used to compare
 the efficiency of the different methods.
 %
-Note that in these tests, we change the polynomial degree of the
+Note that in our tests, we change the polynomial degree of the
 finite element functions but retain the same mesh. This results in an
 increasing number of unknowns as $p$ increases. Since, as illustrated
 in \S\ref{subsec:num_mesh}, we observe mesh independent convergence
@@ -1346,7 +1349,7 @@ polynomial orders $p=8$ and $p=16$.
   \caption{\label{tab:box} Results for the two-dimensional unit square
     problem {\bf 2d-const} defined in \S\ref{subsec:tests}. The finest
     mesh has $32\times 32$ elements and the multigrid hierarchy
-    consists of overall three meshes.  For $p$-multigrid, the
+    consists of  three meshes.  For $p$-multigrid, the
     polynomial order is first reduced to $p=1$, followed by two
     geometric coarsenings of the mesh.  For a detailed description of
     the different experiments reported in this table we refer to
@@ -1389,20 +1392,23 @@ multigrid v-cycles, in some cases even by a factor or two. Also, we
 observe that SSOR smoothing generally performs better than the two
 Jacobi-based smoothers. We find that the linear-order operator based
 on the high-order nodes is a good preconditioner for the high-order
-system. \todo{Clean up}
- The convergence of this method is significantly improved when
-smoothing based on the high-order residual (but the low-order
-diagonal) is used on the finest mesh.
-% Note that the Jacobi
-%smoother, which underlies the Chebyshev smoother, uses the diagonal entries
-%of the low-order operator, but the residual computed from the
-%high-order operator.
-In this case, the low-order preconditioning approach proves to
-be efficient, making it particularly attractive for high-order
-discretized problems on unstructured meshes. However, in our tests
-this efficiency partly has to be attributed to the use of a direct
-solver for the low-order system, rather than an approximate solution
-based on an algebraic multigrid method.
+system. Note that if algebraic multigrid is used for the solution of
+the low-order approximation, the smoother on the finest level can
+either use the residual of the low-order or of the high-order
+operator. Initial tests that mimic the use of the high-order residual
+in the fine-grid smoother show that this has the potential to reduce the
+number of iterations.
+
+%
+%The convergence of this method is significantly improved when
+%smoothing based on the high-order residual (but the low-order
+%diagonal) is used on the finest mesh.
+%In this case, the low-order preconditioning approach proves to
+%be efficient, making it particularly attractive for high-order
+%discretized problems on unstructured meshes. However, in our tests
+%this efficiency partly has to be attributed to the use of a direct
+%solver for the low-order system, rather than an approximate solution
+%based on an algebraic multigrid method.
 
 Let us now contrast these observations with the results for the
 variable coefficient problems {\bf 2d-var} and {\bf 2d-var$'$}
@@ -1433,7 +1439,7 @@ Our results for {\bf 3d-var} are
 summarized in Table~\ref{tab:3d-fan}. As for {\bf 2d-var}, the
 performance of multigrid when used as a solver degrades significantly
 for orders $p>4$. We can also observe that the low-order matrix based on
-the high order node points represents a good preconditioner for the
+the high-order node points represents a good preconditioner for the
 high-order system. 
 % As in two dimensions, smoothing steps based on the high-order residual and the diagonal of the low-order operator significantly reduce the number of iterations required for convergence.
 
@@ -1443,7 +1449,7 @@ high-order system.
     warped-geometry, varying coefficient problem {\bf 2d-var} defined
     in \S\ref{subsec:tests}.  The finest
     mesh has $32\times 32$ elements and the multigrid hierarchy
-    consists of overall three meshes.  For $p$-multigrid, the
+    consists of three meshes.  For $p$-multigrid, the
     polynomial order is first reduced to $p=1$, followed by two
     geometric coarsenings of the mesh.
 %  A total of 3 grids were used, the finest
@@ -1482,7 +1488,7 @@ high-order system.
     but the veriations in the coefficient $\mu$ have a smaller wave length.
     The finest
     mesh has $32\times 32$ elements and the multigrid hierarchy
-    consists of overall three meshes.  For $p$-multigrid, the
+    consists of three meshes.  For $p$-multigrid, the
     polynomial order is first reduced to $p=1$, followed by two
     geometric coarsenings of the mesh.
     For a detailed description of the different experiments
@@ -1516,7 +1522,7 @@ high-order system.
     problem  {\bf 3d-const} defined in \S\ref{subsec:tests}.
     The finest
     mesh has $8\times 8\times 8$ elements and the multigrid hierarchy
-    consists of overall three meshes.  For $p$-multigrid, the
+    consists of three meshes.  For $p$-multigrid, the
     polynomial order is first reduced to $p=1$, followed by two
     geometric coarsenings of the mesh.
     For a
@@ -1550,7 +1556,7 @@ high-order system.
     warped-geometry, varying coefficient problem {\bf 3d-var} defined
     in \S\ref{subsec:tests}.     The finest
     mesh has $8\times 8\times 8$ elements and the multigrid hierarchy
-    consists of overall three meshes.  For $p$-multigrid, the
+    consists of three meshes.  For $p$-multigrid, the
     polynomial order is first reduced to $p=1$, followed by two
     geometric coarsenings of the mesh.
     For a detailed description of the
@@ -1584,11 +1590,10 @@ To illustrate the mesh-independence of our multigrid-based solvers, we
 compare the number of v-cycles required for the solution of the
 two-dimensional problems {\bf 2d-const} and {\bf 2d-var} when
 discretized on different meshes. In this comparison, the coarsest mesh
-in the multigrid hierarchy the same; thus, the number of levels in the
+in the multigrid hierarchy is the same; thus, the number of levels in the
 hierarchy increases as the problem is discretized on finer meshes. As
 can be seen in Table~\ref{tab:meshInd}, once the mesh is sufficiently
-fine, for all polynomial orders the required number of iterations
-remains the same.
+fine, the number of iterations remains the same  for all polynomial orders.
 \begin{table}[h]\centering
 \caption{\label{tab:meshInd} Number of v-cycles required for the
   solution of the two-dimensional problems {\bf 2d-const} and {\bf
@@ -1621,9 +1626,11 @@ for high polynomial orders, such as order 8 or higher. Results
 obtained with an element-wise block Jacobi preconditioner for orders 8
 and 16 are summarized in Table~\ref{tab:block-jac}. For this
 comparison, we invert the element matrices exactly, which can be
-problematic with respect to computational time as well as storage in
+problematic with respect to computational time as well as storage for
 realistic problems, in particular for warped meshes and very high
-polynomial orders. As can be seen in Table~\ref{tab:block-jac}, the
+polynomial orders. One remedy is to use approximate inverse element
+matrices \cite{LottesFischer05}. As can be seen in
+Table~\ref{tab:block-jac}, the
 number of iterations is reduced compared to pointwise Jacobi
 smoothing; however, the gained speed up reduces when multigrid is
 used as a preconditioner in CG rather than as a solver.
@@ -1690,9 +1697,10 @@ high-order discretizations on unstructured meshes, as also observed in
 \cite{Brown10, DevilleMund90, HeysManteuffelMcCormickEtAl05}.  When
 combined with algebraic multigrid for the low-order operator, the
 smoother on the finest mesh can either use the low-order or the
-high-order residual. \todo{While using the high-order residual increases the
-computational work, it has the potential to significantly decrease the
-iteration numbers and overall results in faster convergence.}
+high-order residual. Initial numerical tests indicate that the latter
+choice is advantageous, but this should be studied more systematically.
+
+
 
 
 %low-order preconditioner competitive w.r. to number of
