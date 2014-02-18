@@ -19,7 +19,7 @@
 \usepgfplotslibrary{external} 
 \tikzexternalize
 \tikzset{external/system call={lualatex \tikzexternalcheckshellescape -halt-on-error -interaction=batchmode -jobname "\image" "\texsource"}}
-\usepackage{caption,subcaption}
+%\usepackage{caption,subcaption}
 % \usetkzobj{all} 
 \usepackage{amsmath,amsfonts,amssymb}
 \usepackage{cite}
@@ -53,13 +53,22 @@ T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
   Continuous Finite Element Discretizations}
 \titlerunning{Comparison of multigrid algorithms for high-order discretizations}
 % GS: Should we add "geometric'' to the title?
-\author{Hari Sundar$^1$, Georg Stadler$^1$ and George Biros$^{1,2}$}
+\author{Hari Sundar \and Georg Stadler \and George Biros}
 \authorrunning{Hari Sundar, Georg Stadler and George Biros}
 
-\institute{$^1$Institute for Computational Engineering \& Sciences, The
-  University of Texas at Austin, Austin, TX,\\
-$^2$Department of Mechanical Engineering, The University of Texas at Austin, Austin, TX.
+\institute{Hari Sundar \and Georg Stadler \at
+Institute for Computational Engineering and Sciences\\
+The  University of Texas at Austin, Austin, TX\\
+Tel: +1-512-471-4207\\
+\email{hari@ices.utexas.edu}\\
+\email{georgst@ices.utexas.edu}\and
+George Biros\at
+Institute for Computational Engineering and Sciences and\\
+Department of Mechanical Engineering\\
+The University of Texas at Austin, Austin, TX\\
+\email{biros@ices.utexas.edu}
 }
+\date{}
 
 %\corraddr{\texttt{hari@ices.utexas.edu}}
 \maketitle
@@ -90,15 +99,16 @@ $p$-multigrid work well; the first-order approximation is less
 efficient. For constant coefficients, all smoothers work well. For
 variable coefficients, Chebyshev and SSOR smoothing outperforms Jacobi
 smoothing.  While all of the tested methods converge in a
-mesh-independent number of itations, none of them behaves completely
+mesh-independent number of iterations, none of them behaves completely
 independent of the polynomial order.  When multigrid is used as
 preconditioner in a Krylov method, the iteration number decreases
 significantly
 % (up to a factor of three)
 compared to using multigrid as a solver.
-\end{abstract}
 \keywords{high-order, geometric multigrid, algebraic multigrid,
   continuous finite elements, spectral elements, preconditioning.}
+\end{abstract}
+
 \section{Introduction}
 
 This paper presents a comparison of geometric multigrid
@@ -352,7 +362,7 @@ comparison does not appear to be available.  Thus, here we present a
 comparison of different combinations of multigrid hierarchies and
 smoothers for the solution of elliptic problems, which have been
 discretized by high-order continuous finite elements.  We provide a
-simple and easily extendible Matlab implementation,\footnote{\url{http://hsundar.github.io/homg/}} which allows a systematic
+simple and easily extendable Matlab implementation,\footnote{\url{http://hsundar.github.io/homg/}} which allows a systematic
 comparison of the different methods in the same framework. Our
 comparison does
 not use a high performance implementation, but we discuss aspects of
@@ -656,7 +666,7 @@ functions, possibly followed by standard geometric multigrid; this is
 commonly referred to as \emph{$p$-multigrid}. For unstructured
 high-order element discretizations, where geometric coarsening is
 challenging, using an algebraic multigrid hierarchy of a
-\emph{low-oder approximation to the high-order operator} as a
+\emph{low-order approximation to the high-order operator} as a
 preconditioner has proven efficient. Some details of
 these different approaches are summarized next.
 
@@ -844,7 +854,7 @@ reduction than Jacobi or Chebyshev smoothing.
 In Figure~\ref{fig:smoothers-var}, we study the performance of
 different smoothers for the test problem {\bf 2d-var}, defined in
 \S\ref{subsec:tests}. In this problem, we solve
-\eqref{eq:Poisson} with a stronlgy (but smoothly) varying coefficient
+\eqref{eq:Poisson} with a strongly (but smoothly) varying coefficient
 $\mu$ on a deformed domain $\Omega$.  Compared to the constant
 coefficient case, Jacobi smoothing performs significantly worse, both,
 when used as a solver and as a smoother. Let us focus on the two-grid
@@ -951,7 +961,7 @@ rate.
           index for the eigenvectors of the system matrix $\mathbf{A}_k$, and
           the vertical axis is the magnitude of the error component
           for each eigenvector. The eigenvectors are ordered such that
-          the corresponding eigenvalues are descending; thus, due to
+          the corresponding eigenvalues are ascending; thus, due to
           the properties of $\mathbf{A}_k$, the
           smoothness in every eigenvector decays from left to
           right.  The system right hand side is zero and the
@@ -1072,7 +1082,7 @@ smoothers with an elementwise block Jacobi smoothing.
 In this section, we present a comprehensive comparison of our
 algorithms for the solution of high-order discretizations of
 \eqref{eq:Poisson}.  After introducing our test problems in
-\S\ref{subsec:tests}, we present a simple model for the computatonal
+\S\ref{subsec:tests}, we present a simple model for the computational
 cost of the different approaches in terms of matrix-vector
 applications in \S\ref{subsec:complexity}. In \S\ref{subsec:measures},
 we specify settings and metrics for our comparisons. The results of
@@ -1497,9 +1507,9 @@ high-order system.
 \begin{table}
   \caption{\label{tab:2d-fan2} Results for two-dimensional
     warped-geometry, varying coefficient problem {\bf 2d-var$'$}
-    defined in \S\ref{subsec:tests}. This problem is idential to {\bf
+    defined in \S\ref{subsec:tests}. This problem is identical to {\bf
       2d-var} (see Table~\ref{tab:2d-fan}),
-    but the veriations in the coefficient $\mu$ have a smaller wave length.
+    but the variations in the coefficient $\mu$ have a smaller wave length.
     The finest
     mesh has $32\times 32$ elements and the multigrid hierarchy
     consists of three meshes.  For $p$-multigrid, the
