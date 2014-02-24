@@ -1311,15 +1311,38 @@ end
 			end
 		end
 		
-		function Bdata = get_boundary_data(self, refel, Uexact)
-			Nfp = refel.Nrp ^ (refel.dim-1);
-			
-			Bdata = zeros(Nfp,1);
-			iindex = 0;
-			for  sf=1:self.Ns_faces
-		    [e1, f1, e2, f2]  = self.get_face_elements(sf);
+    function u_hat = extract_skeletal_data(self, refel, u)
+      
+      % first approximation - average ...
+      for  sf=1:self.Ns_faces
+        [e1, f1, e2, f2]  = self.get_face_elements(sf);
 
-		    if (e1 < 0) || (e2 < 0), % boundary faces
+        %    if (e1 > 0) && (e2 > 0), % interior faces
+        if (f1 > 0)
+          pts = self.element_nodes(e1, refel);
+          idxf = self.get_skeletal_face_indices(refel, e1, f1);      
+          idxv = self.get_discontinuous_face_indices(refel, 1, f1);
+          lam(idxf) = uexact(pts(idxv,:));
+        end
+        if (f2 > 0)
+          pts = self.element_nodes(e2, refel);
+          idxf = self.get_skeletal_face_indices(refel, e2, f2);      
+          idxv = self.get_discontinuous_face_indices(refel, 1, f2);
+          lam(idxf) = uexact(pts(idxv,:));
+        end
+      end
+      lam = 0.5.*lam;
+    end
+
+    function Bdata = get_boundary_data(self, refel, Uexact)
+    Nfp = refel.Nrp ^ (refel.dim-1);
+
+    Bdata = zeros(Nfp,1);
+    iindex = 0;
+    for  sf=1:self.Ns_faces
+        [e1, f1, e2, f2]  = self.get_face_elements(sf);
+
+        if (e1 < 0) || (e2 < 0), % boundary faces
 		      if e1 < 0, 
 		        e = e2; f = f2;
 		      else
