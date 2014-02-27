@@ -66,7 +66,7 @@ George Biros\at
 Institute for Computational Engineering and Sciences and\\
 Department of Mechanical Engineering\\
 The University of Texas at Austin, Austin, TX\\
-\email{biros@ices.utexas.edu}
+\email{gbiros@acm.org}
 }
 \date{}
 
@@ -100,7 +100,7 @@ efficient. For constant coefficients, all smoothers work well. For
 variable coefficients, Chebyshev and SSOR smoothing outperforms Jacobi
 smoothing.  While all of the tested methods converge in a
 mesh-independent number of iterations, none of them behaves completely
-independent of the polynomial order.  When multigrid is used as
+independent of the polynomial order.  When multigrid is used as a
 preconditioner in a Krylov method, the iteration number decreases
 significantly
 % (up to a factor of three)
@@ -147,7 +147,7 @@ preconditioner, constructed from the nodes of the high-order
 discretization.
 For the polynomial orders $1\le p\le 16$, we
 compare these multigrid approaches, combined with different
-smoothers. We also compare the use of multigrid as a solver and as a preconditioner
+smoothers. We also compare the use of multigrid as a solver as well as a preconditioner
 in a Krylov subspace method.  While we use moderate size model
 problems (up to about $2$~million unknowns in 3D), we also discuss our findings with regard to parallel
 implementations on high performance computing platforms. 
@@ -618,7 +618,7 @@ motivated by our interest in fast elliptic solvers on adaptively
 refined nonconforming octree-based
 meshes~\cite{SundarBirosBursteddeEtAl12, SampathBiros10}, 
 we restrict our comparisons to uniformly refined conforming meshes.
-Our implementation is written in Matlab and made available. It allows comparisons of different smoothing and
+Our implementation is written in Matlab and is publicly available. It allows comparisons of different smoothing and
 coarsening methods for high-order discretized problems in two and three dimensions, and can
 easily be modified or extended. It does not support distributed memory
 parallelism, and is
@@ -898,7 +898,7 @@ rate.
 		\end{semilogyaxis}
 		\draw[black, fill=white] (3.7, 3.7) rectangle +(3.15,2);
 		%\draw[black] (4.0, 5.375) -- (6.85,5.375);
-		\node at (5.35, 5.53) {\bf \small{2-cycle, $p=1$}}; 
+		\node at (5.35, 5.53) {\bf \small{v-cycle, $p=1$}}; 
 		\node[fill=blue!70, draw, circle,minimum width=0.1cm] at (4.0, 5.0) {}; 
 		\node[fill=red!70!black, draw, circle,minimum width=0.1cm] at (4.0, 4.5) {};
 		\node[fill=green!70!black, draw, circle,minimum width=0.1cm] at (4.0, 4.0) {};
@@ -925,7 +925,7 @@ rate.
 		\addplot[color=green!70!black,only marks,opacity=0.5, mark=*,mark size=1pt]  table[x=dof, y=ssor4]{data/vcycle-const-box.dat};
 		\end{semilogyaxis}
 			\draw[black, fill=white] (4.0, 5.375) rectangle +(2.85,0.325);
-			\node at (5.35, 5.53) {\bf \small{2-cycle, $p=4$}};
+			\node at (5.35, 5.53) {\bf \small{v-cycle, $p=4$}};
 		\end{tikzpicture}
 	\\
 		\begin{tikzpicture}[scale=0.8]
@@ -946,7 +946,7 @@ rate.
 		\addplot[color=green!70!black,opacity=0.6,only marks, mark=*,mark size=1pt]  table[x=dof, y=ssor16]{data/vcycle-const-box.dat};
 		\end{semilogyaxis}
 		\draw[black, fill=white] (3.95, 5.375) rectangle +(2.9,0.325);
-		\node at (5.35, 5.53) {\bf \small{2-cycle, $p=16$}};
+		\node at (5.35, 5.53) {\bf \small{v-cycle, $p=16$}};
 		\end{tikzpicture}
 	\caption{\label{fig:smoothers} Error decay for different point
           smoothers when used as solver (left column) and when used in
@@ -999,7 +999,7 @@ rate.
 		\addplot[color=green!70!black,opacity=0.5,only marks, mark=*,mark size=1pt]  table[x=dof, y=ssor1]{data/vcycle-var-shell.dat};
 		\end{semilogyaxis}
 		\draw[black, fill=white] (3.7, 3.7) rectangle +(3.15,2);
-		\node at (5.35, 5.53) {\bf \small{2-cycle, $p=1$}}; 
+		\node at (5.35, 5.53) {\bf \small{v-cycle, $p=1$}}; 
 		\node[fill=blue!70, draw, circle,minimum width=0.1cm] at (4.0, 5.0) {}; 
 		\node[fill=red!70!black, draw, circle,minimum width=0.1cm] at (4.0, 4.5) {};
 		\node[fill=green!70!black, draw, circle,minimum width=0.1cm] at (4.0, 4.0) {};
@@ -1026,7 +1026,7 @@ rate.
 		\addplot[color=green!70!black,only marks, mark=*,opacity=0.5,mark size=1pt]  table[x=dof, y=ssor4]{data/vcycle-var-shell.dat};
 		\end{semilogyaxis}
 		\draw[black, fill=white] (4.0, 5.375) rectangle +(2.85,0.325);
-		\node at (5.35, 5.53) {\bf \small{2-cycle, $p=4$}};
+		\node at (5.35, 5.53) {\bf \small{v-cycle, $p=4$}};
 		\end{tikzpicture}
 	\\
 		\begin{tikzpicture}[scale=0.8]
@@ -1047,7 +1047,7 @@ rate.
 		\addplot[color=green!70!black,opacity=0.5,only marks, mark=*,mark size=1pt]  table[x=dof, y=ssor16]{data/vcycle-var-shell.dat};
 		\end{semilogyaxis}
 		\draw[black, fill=white] (3.95, 5.375) rectangle +(2.9,0.325);
-		\node at (5.35, 5.53) {\bf \small{2-cycle, $p=16$}};
+		\node at (5.35, 5.53) {\bf \small{v-cycle, $p=16$}};
 		\end{tikzpicture}
 	\caption{\label{fig:smoothers-var} Shown is the same comparison as
           in Figure~\ref{fig:smoothers}, but for the two-dimensional
