@@ -1,7 +1,8 @@
 % nladoc.tex V2.0, 13 May 2010
 
-\RequirePackage{fix-cm}
-\documentclass[smallcondensed,final]{svjour3}     % onecolumn (ditto)
+%\RequirePackage{fix-cm}
+%\documentclass[smallcondensed,final]{svjour3}     % onecolumn (ditto)
+\documentclass[times]{nlaauth}
 
 \usepackage{moreverb}
 
@@ -16,6 +17,7 @@
 \usetikzlibrary{shapes,arrows,trees,snakes} %,decorations.pathreplacing,fit}
 % \usepackage{tkz-euclide}
 \usepackage{pgfplots}
+\pgfplotsset{compat=1.8}
 \usepgfplotslibrary{external} 
 \tikzexternalize
 \tikzset{external/system call={lualatex \tikzexternalcheckshellescape -halt-on-error -interaction=batchmode -jobname "\image" "\texsource"}}
@@ -49,25 +51,36 @@ T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 \begin{document}
 
 
-\title{Comparison of Multigrid Algorithms for High-order
-  Continuous Finite Element Discretizations}
-\titlerunning{Comparison of multigrid algorithms for high-order discretizations}
+\title{Comparison of Multigrid Algorithms for High-order Continuous Finite Element Discretizations}
+% \titlerunning{Comparison of multigrid algorithms for high-order discretizations}
 % GS: Should we add "geometric'' to the title?
-\author{Hari Sundar \and Georg Stadler \and George Biros}
-\authorrunning{Hari Sundar, Georg Stadler and George Biros}
+\author{Hari Sundar\affil{1}\corrauth, Georg Stadler\affil{1} and George Biros\affil{1,2}}
+% \authorrunning{Hari Sundar, Georg Stadler and George Biros}
 
-\institute{Hari Sundar \and Georg Stadler \at
-Institute for Computational Engineering and Sciences\\
-The  University of Texas at Austin, Austin, TX\\
-Tel: +1-512-471-4207\\
-\email{hari@ices.utexas.edu}\\
-\email{georgst@ices.utexas.edu}\and
-George Biros\at
-Institute for Computational Engineering and Sciences and\\
-Department of Mechanical Engineering\\
-The University of Texas at Austin, Austin, TX\\
-\email{gbiros@acm.org}
+\runningheads{Hari Sundar, Georg Stadler and George Biros}{Comparison of multigrid algorithms for high-order discretizations}
+
+\address{\affilnum{1}
+Institute for Computational Engineering and Sciences,
+The  University of Texas at Austin, Austin, TX\break
+\affilnum{2}
+Department of Mechanical Engineering,
+The University of Texas at Austin, Austin, TX
 }
+\corraddr{Email: hari@ices.utexas.edu}
+
+
+%\institute{Hari Sundar \and Georg Stadler \at
+%Institute for Computational Engineering and Sciences\\
+%The  University of Texas at Austin, Austin, TX\\
+%Tel: +1-512-471-4207\\
+%\email{hari@ices.utexas.edu}\\
+%\email{georgst@ices.utexas.edu}\and
+%George Biros\at
+%Institute for Computational Engineering and Sciences and\\
+%Department of Mechanical Engineering\\
+%The University of Texas at Austin, Austin, TX\\
+%\email{gbiros@acm.org}
+%}
 \date{}
 
 %\corraddr{\texttt{hari@ices.utexas.edu}}
@@ -189,7 +202,7 @@ for spectral elements ~\cite{DevilleFischerMund02}.
 
 \begin{figure}[t]
 		% illustration for p-multigrid
-		\begin{tikzpicture}[scale=0.85]
+		\begin{tikzpicture}[scale=1.0]
 		% homg
 		\draw (-5,4) grid +(4,1);
 		\foreach \e in {-5,...,-2}
@@ -872,7 +885,7 @@ rate.
 
 \begin{figure}
 	\centering
-		\begin{tikzpicture}[scale=0.8]
+		\begin{tikzpicture}[scale=0.9]
 		\begin{semilogyaxis}[ymajorgrids,ymin=1e-5,ymax=2,xmin=0,xmax=961]
 		\addplot[color=black]  table[x=dof, y=u]{data/smoother-const-box.dat};
 		\addplot[color=blue!70, opacity=0.5,only marks, mark=*,mark size=1pt]   table[x=dof, y=jacobi1]{data/smoother-const-box.dat};
@@ -889,7 +902,7 @@ rate.
 		\node[text width=1.9cm] at (5.75, 4.5) {\small Chebyshev$(6)$};
 		\node[text width=1.9cm] at (5.75, 4.0) {\small SSOR$(3)$};
 		\end{tikzpicture}
-		\begin{tikzpicture}[scale=0.8]
+		\begin{tikzpicture}[scale=0.9]
 		\begin{semilogyaxis}[ymajorgrids,ymin=1e-5,ymax=2,xmin=0,xmax=961,yticklabels={,,}]
 		\addplot[color=black]  table[x=dof, y=u]{data/vcycle-const-box.dat};
 		\addplot[color=blue!70,opacity=0.5,only marks, mark=*,mark size=1pt]   table[x=dof, y=jacobi1]{data/vcycle-const-box.dat};
@@ -907,7 +920,7 @@ rate.
 		\node[text width=2.1cm] at (5.55, 4.0) {\small SSOR$(2,1)$};
 		\end{tikzpicture}
 	\\
-		\begin{tikzpicture}[scale=0.8]
+		\begin{tikzpicture}[scale=0.9]
 		\begin{semilogyaxis}[ymajorgrids,ymin=1e-5,ymax=2,xmin=0,xmax=961]
 		\addplot[color=black]  table[x=dof, y=u]{data/smoother-const-box.dat};
 		\addplot[color=blue!70,opacity=0.5,only marks, mark=*,mark size=1pt]   table[x=dof, y=jacobi4]{data/smoother-const-box.dat};
@@ -917,7 +930,7 @@ rate.
 		\draw[black, fill=white] (3.8, 5.375) rectangle +(3.05,0.325);
 		\node at (5.35, 5.53) {\bf \small{smoother, $p=4$}};
 		\end{tikzpicture}
-		\begin{tikzpicture}[scale=0.8]
+		\begin{tikzpicture}[scale=0.9]
 		\begin{semilogyaxis}[ymajorgrids,ymin=1e-5,ymax=2,xmin=0,xmax=961,yticklabels={,,}]
 		\addplot[color=black]  table[x=dof, y=u]{data/vcycle-const-box.dat};
 		\addplot[color=blue!70,only marks,opacity=0.5, mark=*,mark size=1pt]   table[x=dof, y=jacobi4]{data/vcycle-const-box.dat};
@@ -928,7 +941,7 @@ rate.
 			\node at (5.35, 5.53) {\bf \small{v-cycle, $p=4$}};
 		\end{tikzpicture}
 	\\
-		\begin{tikzpicture}[scale=0.8]
+		\begin{tikzpicture}[scale=0.9]
 		\begin{semilogyaxis}[ymajorgrids,ymin=1e-5,ymax=2,xmin=0,xmax=961]
 		\addplot[color=black]  table[x=dof, y=u]{data/smoother-const-box.dat};
 		\addplot[color=blue!70,opacity=0.5,only marks, mark=*,mark size=1pt]   table[x=dof, y=jacobi16]{data/smoother-const-box.dat};
@@ -938,7 +951,7 @@ rate.
 		\draw[black, fill=white] (3.65, 5.375) rectangle +(3.2,0.325);
 		\node at (5.25, 5.53) {\bf \small{smoother, $p=16$}};
 		\end{tikzpicture}
-		\begin{tikzpicture}[scale=0.8]
+		\begin{tikzpicture}[scale=0.9]
 		\begin{semilogyaxis}[ymajorgrids,ymin=1e-5,ymax=2,xmin=0,xmax=961,yticklabels={,,}]
 		\addplot[color=black]  table[x=dof, y=u]{data/vcycle-const-box.dat};
 		\addplot[color=blue!70,opacity=0.5,only marks, mark=*,mark size=1pt]   table[x=dof, y=jacobi16]{data/vcycle-const-box.dat};
@@ -975,7 +988,7 @@ rate.
 
 \begin{figure}
 	\centering
-		\begin{tikzpicture}[scale=0.8]
+		\begin{tikzpicture}[scale=0.9]
 		\begin{semilogyaxis}[ymajorgrids,ymin=1e-5,ymax=2,xmin=0,xmax=961]
 		\addplot[color=black]  table[x=dof, y=u]{data/smoother-var-shell.dat};
 		\addplot[color=blue!70, opacity=0.5,only marks, mark=*,mark size=1pt]   table[x=dof, y=jacobi1]{data/smoother-var-shell.dat};
@@ -991,7 +1004,7 @@ rate.
 		\node[text width=1.9cm] at (5.75, 4.5) {\small Chebyshev$(6)$};
 		\node[text width=1.9cm] at (5.75, 4.0) {\small SSOR$(3)$};
 		\end{tikzpicture}
-		\begin{tikzpicture}[scale=0.8]
+		\begin{tikzpicture}[scale=0.9]
 		\begin{semilogyaxis}[ymajorgrids,ymin=1e-5,ymax=2,xmin=0,xmax=961,yticklabels={,,}]
 		\addplot[color=black]  table[x=dof, y=u]{data/vcycle-var-shell.dat};
 		\addplot[color=blue!70,opacity=0.5,only marks, mark=*,mark size=1pt]   table[x=dof, y=jacobi1]{data/vcycle-var-shell.dat};
@@ -1008,7 +1021,7 @@ rate.
 		\node[text width=2.1cm] at (5.55, 4.0) {\small SSOR$(2,1)$};
 		\end{tikzpicture}
 	\\
-		\begin{tikzpicture}[scale=0.8]
+		\begin{tikzpicture}[scale=0.9]
 		\begin{semilogyaxis}[ymajorgrids,ymin=1e-5,ymax=2,xmin=0,xmax=961]
 		\addplot[color=black]  table[x=dof, y=u]{data/smoother-var-shell.dat};
 		\addplot[color=blue!70,opacity=0.5,only marks, mark=*,mark size=1pt]   table[x=dof, y=jacobi4]{data/smoother-var-shell.dat};
@@ -1018,7 +1031,7 @@ rate.
 		\draw[black, fill=white] (3.8, 5.375) rectangle +(3.05,0.325);
 		\node at (5.35, 5.53) {\bf \small{smoother, $p=4$}};
 		\end{tikzpicture}
-		\begin{tikzpicture}[scale=0.8]
+		\begin{tikzpicture}[scale=0.9]
 		\begin{semilogyaxis}[ymajorgrids,ymin=1e-5,ymax=2,xmin=0,xmax=961,yticklabels={,,}]
 		\addplot[color=black]  table[x=dof, y=u]{data/vcycle-var-shell.dat};
 		\addplot[color=blue!70,only marks, mark=*,opacity=0.5,mark size=1pt]   table[x=dof, y=jacobi4]{data/vcycle-var-shell.dat};
@@ -1029,7 +1042,7 @@ rate.
 		\node at (5.35, 5.53) {\bf \small{v-cycle, $p=4$}};
 		\end{tikzpicture}
 	\\
-		\begin{tikzpicture}[scale=0.8]
+		\begin{tikzpicture}[scale=0.9]
 		\begin{semilogyaxis}[ymajorgrids,ymin=1e-5,ymax=2,xmin=0,xmax=961]
 		\addplot[color=black]  table[x=dof, y=u]{data/smoother-var-shell.dat};
 		\addplot[color=blue!70,opacity=0.5,only marks, mark=*,mark size=1pt]   table[x=dof, y=jacobi16]{data/smoother-var-shell.dat};
@@ -1039,7 +1052,7 @@ rate.
 		\draw[black, fill=white] (3.65, 5.375) rectangle +(3.2,0.325);
 		\node at (5.25, 5.53) {\bf \small{smoother, $p=16$}};
 		\end{tikzpicture}
-		\begin{tikzpicture}[scale=0.8]
+		\begin{tikzpicture}[scale=0.9]
 		\begin{semilogyaxis}[ymajorgrids,ymin=1e-5,ymax=2,xmin=0,xmax=961,yticklabels={,,}]
 		\addplot[color=black]  table[x=dof, y=u]{data/vcycle-var-shell.dat};
 		\addplot[color=blue!70,opacity=0.5,only marks, mark=*,mark size=1pt]   table[x=dof, y=jacobi16]{data/vcycle-var-shell.dat};
@@ -1749,7 +1762,7 @@ low-order preconditioner. Support for this work was
   Biological and Environmental Research.
 
 
-\bibliographystyle{siam}
+\bibliographystyle{unsrt}
 \bibliography{ccgo,mg}
 
 
