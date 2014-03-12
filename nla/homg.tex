@@ -68,24 +68,6 @@ The University of Texas at Austin, Austin, TX
 }
 \corraddr{Email: hari@ices.utexas.edu}
 
-
-%\institute{Hari Sundar \and Georg Stadler \at
-%Institute for Computational Engineering and Sciences\\
-%The  University of Texas at Austin, Austin, TX\\
-%Tel: +1-512-471-4207\\
-%\email{hari@ices.utexas.edu}\\
-%\email{georgst@ices.utexas.edu}\and
-%George Biros\at
-%Institute for Computational Engineering and Sciences and\\
-%Department of Mechanical Engineering\\
-%The University of Texas at Austin, Austin, TX\\
-%\email{gbiros@acm.org}
-%}
-\date{}
-
-%\corraddr{\texttt{hari@ices.utexas.edu}}
-\maketitle
-
 \begin{abstract}
 We present a comparison of different multigrid approaches for the
 solution of systems arising from high-order continuous finite element
@@ -121,6 +103,24 @@ compared to using multigrid as a solver.
 \keywords{high-order, geometric multigrid, algebraic multigrid,
   continuous finite elements, spectral elements, preconditioning.}
 \end{abstract}
+
+%\institute{Hari Sundar \and Georg Stadler \at
+%Institute for Computational Engineering and Sciences\\
+%The  University of Texas at Austin, Austin, TX\\
+%Tel: +1-512-471-4207\\
+%\email{hari@ices.utexas.edu}\\
+%\email{georgst@ices.utexas.edu}\and
+%George Biros\at
+%Institute for Computational Engineering and Sciences and\\
+%Department of Mechanical Engineering\\
+%The University of Texas at Austin, Austin, TX\\
+%\email{gbiros@acm.org}
+%}
+\date{}
+
+%\corraddr{\texttt{hari@ices.utexas.edu}}
+\maketitle
+
 
 \section{Introduction}
 
@@ -366,35 +366,25 @@ methods.
 
 %\gsnote{Check Bungartz/Wittum groups if they have anything we should cite.}
 
-{\em Contributions:} While high-order methods and their analysis have
-obtained significant attention, there is not as much work on efficient solvers.
-In
-particular, results studying the practical behavior of multigrid
-methods for high-order systems are scattered and a systematic
-comparison does not appear to be available.  Thus, here we present a
-comparison of different combinations of multigrid hierarchies and
-smoothers for the solution of elliptic problems, which have been
-discretized by high-order continuous finite elements.  We provide a
-simple and easily extendable Matlab implementation,\footnote{\url{http://hsundar.github.io/homg/}} which allows a systematic
-comparison of the different methods in the same framework. Our
-comparison does
-not use a high performance implementation, but we discuss aspects of
-high performance and distributed memory parallel implementations.
+{\em Contributions:} 
+% While high-order methods and their analysis have obtained significant attention, there is not as much work on efficient solvers. In particular, results studying the practical behavior of multigrid methods for high-order systems are scattered and a systematic comparison does not appear to be available. Thus, here we present a comparison of different combinations of multigrid hierarchies and smoothers for the solution of elliptic problems, which have been discretized by high-order continuous finite elements. We provide a simple and easily extendable Matlab implementation,\footnote{\url{http://hsundar.github.io/homg/}} which allows a systematic comparison of the different methods in the same framework. Our comparison does not use a high performance implementation, but we discuss aspects of high performance and distributed memory parallel implementations.
+There has been a lot of work on high-order discretization methods and on the efficient application of the resulting operators. However, efficient solvers for such
+discretization schemes have received significantly less attention. In particular, theoretical and experimental studies are scattered regarding the actual performance of
+the different schemes under different scenarios. A systematic analysis of such performance is not available.
+In this, paper we address this gap in the existing literature. In particular we (1) consider high-order continuous Galerkin discretization up to 16th order, (2) examine three different multigrid hierarchies ($h$, $p$, and first-order), (3) examine several different smoothers: Jacobi, polynomial, SSOR, and block Jacobi, (4) consider different settings (constant, mildly variable, and highly variable) of coefficients and (5) consider problems in 2D and 3D.
+To our knowledge, this is the first study of this kind. Our results demonstrate significant variability on the performance of the different schemes for the higher-order
+elements, highlighting the need for further research on the smoothers. Finally, we provide an easily extendable Matlab
+implementation,\footnote{\url{http://hsundar.github.io/homg/}} which allows a systematic comparison of the different methods in the same framework.
 
 %study smoothers; 
 %lack of studies in the literature, not immediate 
 %discussing hpc implementation
-
-
-
-
 %Here, we compare
 %different smoothers for such a high-order $h$-multigrid method on two
 %and three-dimensional complex geometries with varying coefficients.
 %  In our
 %test problems, we compare the performance of this low-order preconditioning
 %approach to the performance obtained with $h$-multigrid and $p$-multigrid.
-
 
 {\em Limitations:} While this work is partly driven by our interest in
 scalable parallel simulations on nonconforming meshes derived from
