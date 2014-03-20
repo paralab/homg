@@ -157,8 +157,10 @@ classdef grid < handle
       end
 
 			if ( grid.is_hDG_solve && size(u,1) ~= size(grid.K, 2))
-				u_hat = grid.VtoF * u;
-				r = grid.K*u_hat - rhs;
+				% u_hat = grid.VtoF * u;
+				u_hat = grid.extract_skeletal_data(u);
+				rhs_hat = grid.extract_skeletal_data(rhs);
+        r = grid.K*u_hat - rhs_hat;
 			else
 				r = grid.K*u - rhs;
 			end
@@ -264,7 +266,6 @@ classdef grid < handle
       grid.set_smoother(smoother);
       % bdy conditions ...
       % u = grid.ZeroBoundary*u;
-      keyboard
       r = grid.residual(rhs, u);
       disp(['Initial residual is ' num2str(norm(r))]);
       disp('------------------------------------------');
@@ -296,25 +297,25 @@ classdef grid < handle
 				else
 					if ( grid.is_hDG_solve )
 						
-						K = prod(self.Mesh.nelems);	
-						Nfp = self.refel.Nrp ^ (self.refel.dim - 1);
+						K = prod(grid.Mesh.nelems);	
+						Nfp = grid.refel.Nrp ^ (grid.refel.dim - 1);
 						
-						lamInterior = zeros(size(self.SkelInterior2All));
+						lamInterior = zeros(size(grid.SkelInterior2All));
 			
-						rhs_skel = -self.hdg_residual(lamInterior, rhs, BData);  
+						rhs_skel = -grid.hdg_residual(lamInterior, rhs, BData);  
 			
-						lamInterior = self.K \ rhs_skel;
+						lamInterior = grid.K \ rhs_skel;
 			
-						lamAll = zeros(self.Mesh.Ns_faces * Nfp,1);
-						lamAll(self.Bmaps) = Bdata;
-						lamAll(self.SkelInterior2All) = lamInterior;
+						lamAll = zeros(grid.Mesh.Ns_faces * Nfp,1);
+						lamAll(grid.Bmaps) = Bdata;
+						lamAll(grid.SkelInterior2All) = lamInterior;
 
 						u = zeros(Nv,K);
 						% qx = zeros(Nv,K);
 						% qy = zeros(Nv,K);
 
 						for e = 1:K
-						  [u(:,e), ~, ~] = self.localSolver(e, lamAll, rhs);
+						  [u(:,e), ~, ~] = grid.localSolver(e, lamAll, rhs);
 						end
 					else
 						u = grid.K \ rhs;
@@ -325,13 +326,21 @@ classdef grid < handle
       
 			if ( grid.is_hDG_solve )
 				% 0. extract u_hat from u if is hdg solve 
-				u_hat = grid.VtoF * u;
-					
+				if (length(u) == size(grid.K,1))
+          u_hat = u;
+          rhs_hat = rhs;
+        else
+          u_hat = grid.extract_skeletal_data(u);
+				  % rhs_hat = grid.extract_skeletal_data(rhs);
+          rhs_hat = -grid.hdg_residual(lamInterior, rhs, BData);  
+        
+        end
+
 	      % 1. pre-smooth
-	      u_hat = grid.smooth ( v1, rhs, u_hat );
+	      u_hat = grid.smooth ( v1, rhs_hat, u_hat );
 				
 				% 2. compute residual
-				res = grid.residual(rhs, u_hat);
+        res = grid.K*u_hat - rhs_hat;
 				
 				% 3. restrict
 				res_coarse = grid.hdg_restrict(res);
@@ -787,7 +796,7 @@ classdef grid < handle
 		% to use multigrid, use solve or solve_pcg instead 
 		function [u, qx, qy] = solve_hdg (self, forcing, Bdata)
 			% full solve without multigrid, 
-				
+			disp('in solve HDG');	
 			K = prod(self.Mesh.nelems);	
 			Nfp = self.refel.Nrp ^ (self.refel.dim - 1);
 			Nv = self.refel.Nrp ^ (self.refel.dim);	
@@ -809,8 +818,89 @@ classdef grid < handle
 			for e = 1:K
 			  [u(:,e),qx(:,e),qy(:,e)] = self.localSolver(e, lamAll, forcing);
 			end
+
+      disp('leaving solve HDG');
 		end
 		
+    function u_hat = extract_skeletal_data(self, u)
+      u_hat = zeros(size(self.SkelInterior2All));
+      
+      % first approximation - average ...
+      for  sf=1:self.Mesh.Ns_faces
+        [e1, f1, e2, f2]  = self.Mesh.get_face_elements(sf);
+
+        if (e1 > 0) && (e2 > 0) % interior faces
+          if (f1 > 0)
+            pts = self.Mesh.element_nodes(e1, self.refel);
+            idxf = self.Mesh.get_skeletal_face_indices(self.refel, e1, f1);      
+            idxv = self.Mesh.get_discontinuous_face_indices(self.refel, 1, f1);
+            u_hat(self.SkelAll2Interior(idxf)) = u_hat(self.SkelAll2Interior(idxf)) + u(idxv);
+          end
+          if (f2 > 0)
+            pts = self.Mesh.element_nodes(e2, self.refel);
+            idxf = self.Mesh.get_skeletal_face_indices(self.refel, e2, f2);      
+            idxv = self.Mesh.get_discontinuous_face_indices(self.refel, 1, f2);
+            u_hat(self.SkelAll2Interior(idxf)) = u_hat(self.SkelAll2Interior(idxf)) + u(idxv);
+          end
+        end
+      end
+      u_hat = 0.5 .* u_hat;
+    end
+
+    function uhat_coarse = hdg_restrict(self, uhat_fine)
+      nif_c = self.Coarse.Mesh.Ni_faces;
+      Nrp   = self.refel.Nrp;
+
+			nx = self.Mesh.nelems(1);	
+			ny = self.Mesh.nelems(2);
+			
+      uhat_coarse = zeros(nif_c * Nrp, 1);
+
+     	p = self.refel.p_h_1d;
+		 	r = p';
+			u_f = zeros(2*Nrp-1,1);
+			
+			nyf = (nx-1) * ny;
+			nyc = (nx/2-1) * ny/2;
+			
+			% y-edges
+			for j=1:2:ny
+				for i=2:2:(nx-1)
+					% get the correct fine edges
+					e1 = (j-1)*(nx-1) + i;
+					e2 =     j*(nx-1) + i;
+					
+					u_f(1:Nrp)     = uhat_fine( ((e1-1)*Nrp+1) : e1*Nrp );
+					u_f(Nrp+1:end) = uhat_fine( ((e2-1)*Nrp+2) : e2*Nrp );
+					
+					ec = (j-1)/2*(nx/2-1) + i/2;
+					
+					uhat_coarse( ((ec-1)*Nrp+1):ec*Nrp ) = r * u_f;
+				end
+			end
+
+			% x-edges
+			for j=2:2:(ny-1)
+				for i=1:2:nx
+					% get the correct fine edges
+					e1 = nyf + (j-1)*nx + i;
+					e2 = nyf + (j-1)*nx + i + 1;
+					
+					u_f(1:Nrp)     = uhat_fine( ((e1-1)*Nrp+1) : e1*Nrp );
+					u_f(Nrp+1:end) = uhat_fine( ((e2-1)*Nrp+2) : e2*Nrp );
+					
+					ec = nyc + (j/2-1)*nx/2 + (i+1)/2;
+					
+					uhat_coarse( ((ec-1)*Nrp+1):ec*Nrp ) = r * u_f;
+				end
+			end
+			
+    end
+
+    function u_fine = hdg_prolong(self, u_coarse)
+
+    end
+
 		function res = hdg_residual(self, lamInterior, forcing, Bdata)
 			% InteriorF2AllF = HDG.InteriorF2AllF;
 			

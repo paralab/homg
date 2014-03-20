@@ -1,4 +1,4 @@
-clear all
+%clear all
 % Tan Bui and Hari Sundar, Oct 28, 2013
 % Testing HDG method for 2D Laplace equation
 % modified for multigrid, 02 Jan 2014
@@ -62,12 +62,14 @@ uqx = zeros(Nv,Nv);
 uqy = zeros(Nv,Nv);
 
 % Also compute uexact for testing
-Uexact = zeros(Nv,K);
+Uexact  = zeros(Nv,K);
+Forcing = zeros(Nv,K);
 Qxexact = zeros(Nv,K);
 Qyexact = zeros(Nv,K);
 for k = 1:K
   pts = m.element_nodes(k, refel);
   Uexact(:,k)  = uexact(pts);
+  Forcing(:,k) = forcing(pts);
   Qxexact(:,k) = qxexact(pts);
   Qyexact(:,k) = qyexact(pts);
 end
@@ -100,10 +102,9 @@ end % while
 
 Bdata = grid.Mesh.get_boundary_data(grid.refel, Uexact);
 
-[u, qx, qy] = grid.solve_hdg (forcing, Bdata);
+% [u, qx, qy] = grid.solve_hdg (forcing, Bdata);
 
-
-u = grid.solve(10, 'jacobi', 3, 3, forcing, zeros(size(Uexact)));
+u = grid.solve(10, 'jacobi', 3, 3, Forcing(:), zeros(size(Uexact(:))));
 
 %% test errors ... 
 
