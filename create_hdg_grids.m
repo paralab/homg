@@ -27,6 +27,7 @@ num_grids = num_hgrids + num_pgrids - 1;
 
 m = homg.hexmesh(repmat(nelems(1), 1, dim), xform);
 coarse = homg.grid(m, orders(1));
+grid = coarse;
 %disp('---- created grid ----')
 
 for i=2:num_hgrids

@@ -1,0 +1,8 @@
+*.log
+*.out
+*.dpth
+*.md5
+*.dep
+*.aux*
+*.dat
+

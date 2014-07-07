@@ -12,7 +12,7 @@ order = 4;
 nelems = [8,8];
 
 % generate mesh heirarchy 
-grid = create_hdg_grids(2, @homg.xform.identity, [2 4], [2 4 8]);
+grid = create_hdg_grids(2, @homg.xform.identity, 1, 8);
 
 % generate the hexmesh with identity transform for now
 m = grid.Mesh; % homg.hexmesh(nelems,@homg.xform.identity); 
