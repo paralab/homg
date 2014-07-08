@@ -6,7 +6,7 @@
 % addpath /workspace/tanbui/tanbui/WithHari/homg/
 
 % solution order
-order = 4;
+order = 1;
 
 % number of elements in x and y directions
 nelems = [8,8];

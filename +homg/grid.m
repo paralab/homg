@@ -273,6 +273,7 @@ classdef grid < handle
       r0 = norm(r);
       for i=1:num_vcyc
         u = grid.vcycle(v1, v2, rhs, u);
+        % if hDG - do local solve
         r = grid.residual(rhs, u);
         disp([num2str(i, '%03d\t') ': |res| = ' num2str(norm(r),'\t%8.4e')]);
         if (norm(r)/r0 < 1e-8)
@@ -360,6 +361,7 @@ classdef grid < handle
 					end
         end
         
+        disp('done with coarse solve');
         return;
       end
       
@@ -862,10 +864,6 @@ classdef grid < handle
 			end
 
       disp('leaving solve HDG');
-		end
-		
-		function rhs = get_linear_rhs_from_skeleton (self, rhs_hat)
-			
 		end
 		
     function u_hat = extract_skeletal_data(self, u)

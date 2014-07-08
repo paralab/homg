@@ -476,7 +476,7 @@ else
       end
 end
       tspent = toc;
-      fprintf('Mass: Assembly time: %g\n', tspent);
+      % fprintf('Mass: Assembly time: %g\n', tspent);
       % M = sparse(M);
     end
     
