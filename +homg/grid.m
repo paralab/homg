@@ -79,7 +79,7 @@ classdef grid < handle
             grid.linear_smoother = false;
             grid.is_finest       = false;
             
-            self.is_hDG_solve = false;
+            grid.is_hDG_solve = false;
         end
         
         function assemble_poisson(grid, mu)
@@ -258,9 +258,10 @@ classdef grid < handle
         
         function [u, rr, iter] = solve_hdg_mg (grid, num_vcyc, smoother, v1, v2, rhs, u, BData)
             grid.set_smoother(smoother);
-
+                
             num_elems = prod(grid.Mesh.nelems);
             Nfp = grid.refel.Nrp ^ (grid.refel.dim - 1);
+            Nv = grid.refel.Nrp ^ (grid.refel.dim);
             
             % BData = zeros(size(grid.Bmaps));
             % 1. compute skeletal trace
@@ -290,10 +291,10 @@ classdef grid < handle
 
             % 3. local solve
             lamAll = zeros(grid.Mesh.Ns_faces * Nfp,1);
-            lamAll(grid.Bmaps) = Bdata;
+            lamAll(grid.Bmaps) = BData;
             lamAll(grid.SkelInterior2All) = u_hat;
             
-            % u = zeros(Nv,K);
+            u = zeros(Nv, num_elems);
             
             for e = 1:num_elems
               [u(:,e), ~, ~] = grid.localSolver(e, lamAll, rhs); 
@@ -329,6 +330,7 @@ classdef grid < handle
             % function u = vcycle(grid, v1, v2, rhs, u)
             % solve system using initial guess u, given rhs
             % with v1 pre and v2 post-smoothing steps
+            disp(['CG vcycle: order ' num2str(grid.Mesh.order) ', nelems: ' num2str(grid.Mesh.nelems(1)) 'X' num2str(grid.Mesh.nelems(2))]);
             
             if ( isempty( grid.Coarse ) )
                 if (grid.linear_smoother)
@@ -365,20 +367,19 @@ classdef grid < handle
            % 6. post-smooth
            u = grid.smooth ( v2, rhs, u );
            % grid.plot_spectrum(u, 'g', rhs);
-         end
             
        end % v-cycle
        
        % hDG v-cycle
-        function u = vcycle_hdg (grid, v1, v2, rhs_hat, uhat) % <- u_hat and not u
-          
+        function u_hat = vcycle_hdg (grid, v1, v2, rhs_hat, u_hat) % <- u_hat and not u
+            disp(['hdg vcycle: order ' num2str(grid.refel.N) ', nelems: ' num2str(grid.Mesh.nelems(1)) 'X' num2str(grid.Mesh.nelems(2))]);
             % SMOOTH
             u_hat = grid.smooth ( v1, rhs_hat, u_hat );
 
             % Compute RESIDUAL
             res = grid.residual(rhs_hat, u_hat);
 
-            if ( ~ grid.is_hDG_solve )
+            if ( ~ grid.Coarse.is_hDG_solve )
               BData = zeros(size(grid.Bmaps));
               
               % RESTRICT
@@ -945,7 +946,7 @@ classdef grid < handle
             
             uhat_coarse = zeros(num_faces * Nrp_coarse, 1);
             
-            p = self.refel.p_p_1d;
+            p = self.Coarse.refel.p_p_1d;
             r = p';
  
             for f=1:num_faces
@@ -962,7 +963,7 @@ classdef grid < handle
             
             uhat_fine = zeros(num_faces * Nrp_fine, 1);
             
-            p = self.refel.p_p_1d;
+            p = self.Coarse.refel.p_p_1d;
  
             for f=1:num_faces
               % prolong from coarse to fine face

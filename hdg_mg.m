@@ -12,7 +12,7 @@ order = 4;
 nelems = [16, 16];
 
 % generate mesh heirarchy 
-grid = create_hdg_grids(2, @homg.xform.identity, [4 2 1], [8 16]);
+grid = create_hdg_grids(2, @homg.xform.identity, [1 2 4], [8 16]);
 
 % generate the hexmesh with identity transform for now
 m = grid.Mesh; % homg.hexmesh(nelems,@homg.xform.identity); 
@@ -95,7 +95,7 @@ end
 
 Bdata = grid.Mesh.get_boundary_data(grid.refel, Uexact);
 
-u = grid.solve_hdg(10, 'jacobi', 3, 3, Forcing(:), zeros(size(Uexact(:))), Bdata);
+u = grid.solve_hdg_mg(10, 'jacobi', 3, 3, Forcing(:), zeros(size(Uexact(:))), Bdata);
 
 %% test errors ... 
 
@@ -105,22 +105,22 @@ L2eqy = 0;
 
 for e = 1:K
   eu = u(:,e) - Uexact(:,e);
-  eqx = qx(:,e) - Qxexact(:,e);
-  eqy = qy(:,e) - Qyexact(:,e);
+  %eqx = qx(:,e) - Qxexact(:,e);
+  %eqy = qy(:,e) - Qyexact(:,e);
   
   pts = m.element_nodes(e, refel);
   [Jv, Dv] = m.geometric_factors(refel, pts);
   eMat = m.element_mass(e, refel, Jv);
   
   L2eu = L2eu +  eu' * eMat * eu;
-  L2eqx = L2eqx +  eqx' * eMat * eqx;
-  L2eqy = L2eqy +  eqy' * eMat * eqy;
+  %L2eqx = L2eqx +  eqx' * eMat * eqx;
+  %L2eqy = L2eqy +  eqy' * eMat * eqy;
   
 end
 
 fprintf('L2 norm error for u  = %1.15e \n',sqrt(L2eu));
-fprintf('L2 norm error for qx = %1.15e \n',sqrt(L2eqx));
-fprintf('L2 norm error for qy = %1.15e \n',sqrt(L2eqy));
+%fprintf('L2 norm error for qx = %1.15e \n',sqrt(L2eqx));
+%fprintf('L2 norm error for qy = %1.15e \n',sqrt(L2eqy));
 
 
 

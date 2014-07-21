@@ -22,9 +22,9 @@ num_pgrids = length(orders); % also number of hDG grids
 
 num_grids = num_hgrids + num_pgrids;
 
-disp('Creating linear CG h-grids first');
+% disp('Creating linear CG h-grids first');
 
-disp(['Creating h-grid: ' num2str(1) ' of ' num2str(num_grids) ', order = ' num2str(orders(1)) ', nelem = ' num2str(nelems(1))]);
+disp(['Creating CG-grid: ' num2str(1) ' of ' num2str(num_grids) ', order = ' num2str(orders(1)) ', nelem = ' num2str(nelems(1))]);
 
 m = homg.hexmesh(repmat(nelems(1), 1, dim), xform);
 coarse = homg.grid(m, orders(1));
@@ -32,7 +32,7 @@ grid = coarse;
 % disp('---- created grid ----')
 
 for i=2:num_hgrids
-  disp(['Creating h-grid: ' num2str(i) ' of ' num2str(num_grids) ', order = ' num2str(orders(1)) ', nelem = ' num2str(nelems(i))]);
+  disp(['Creating CG-grid: ' num2str(i) ' of ' num2str(num_grids) ', order = ' num2str(orders(1)) ', nelem = ' num2str(nelems(i))]);
   m = homg.hexmesh(repmat(nelems(i), 1, dim), xform);
   grid = homg.grid(m, orders(1), coarse);
   coarse = grid;
@@ -44,9 +44,9 @@ grid.assemble_poisson(mu);
 
 hfine = nelems(num_hgrids);
 
-disp('Creating p-grids now');
+% disp('Creating p-grids now');
 for i=1:num_pgrids
-  disp(['Creating p-grid: ' num2str(i+num_hgrids-1) ' of ' num2str(num_grids) ', order = ' num2str(orders(i)) ', nelem = ' num2str(hfine)]);
+  disp(['Creating hDG-grid: ' num2str(i+num_hgrids) ' of ' num2str(num_grids) ', order = ' num2str(orders(i)) ', nelem = ' num2str(hfine)]);
   m = homg.hexmesh(repmat(hfine, 1, dim), xform);
   grid = homg.grid(m, orders(i), coarse);
   grid.gen_hdg_matrix(); 
