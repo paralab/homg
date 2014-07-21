@@ -6,13 +6,13 @@
 % addpath /workspace/tanbui/tanbui/WithHari/homg/
 
 % solution order
-order = 1;
+order = 4;
 
 % number of elements in x and y directions
-nelems = [8,8];
+nelems = [16, 16];
 
 % generate mesh heirarchy 
-grid = create_hdg_grids(2, @homg.xform.identity, 1, 8);
+grid = create_hdg_grids(2, @homg.xform.identity, [4 2 1], [8 16]);
 
 % generate the hexmesh with identity transform for now
 m = grid.Mesh; % homg.hexmesh(nelems,@homg.xform.identity); 
@@ -93,18 +93,9 @@ for  sf=1:Nsfaces
     end
 end
 
-%% grid hierarchy 
-coarse = grid;
-while (~ isempty (coarse) )
-  coarse.gen_hdg_matrix(); 
-	coarse = coarse.Coarse;
-end % while 
-
 Bdata = grid.Mesh.get_boundary_data(grid.refel, Uexact);
 
-% [u, qx, qy] = grid.solve_hdg (forcing, Bdata);
-
-u = grid.solve(10, 'jacobi', 3, 3, Forcing(:), zeros(size(Uexact(:))));
+u = grid.solve_hdg(10, 'jacobi', 3, 3, Forcing(:), zeros(size(Uexact(:))), Bdata);
 
 %% test errors ... 
 
