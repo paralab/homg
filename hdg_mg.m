@@ -6,13 +6,13 @@
 % addpath /workspace/tanbui/tanbui/WithHari/homg/
 
 % solution order
-order = 4;
+order = 1;
 
 % number of elements in x and y directions
 nelems = [16, 16];
 
 % generate mesh heirarchy 
-grid = create_hdg_grids(2, @homg.xform.identity, [1 2 4], [8 16]);
+grid = create_hdg_grids(2, @homg.xform.identity, 1, 16);
 
 % generate the hexmesh with identity transform for now
 m = grid.Mesh; % homg.hexmesh(nelems,@homg.xform.identity); 
@@ -95,7 +95,7 @@ end
 
 Bdata = grid.Mesh.get_boundary_data(grid.refel, Uexact);
 
-u = grid.solve_hdg_mg(10, 'jacobi', 3, 3, Forcing(:), zeros(size(Uexact(:))), Bdata);
+u = grid.solve_hdg_mg(10, 'chebyshev', 3, 3, Forcing(:), zeros(size(Uexact(:))), Bdata);
 
 %% test errors ... 
 

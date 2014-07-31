@@ -30,6 +30,8 @@ classdef refel < handle
                % ( Nrp x Nrp )
                % Dr(i,j) = lagrange_i' (r_j)
         
+        q1d       
+               
         Q      % map to gauss points 
     
         Qx
@@ -93,21 +95,21 @@ classdef refel < handle
             iVr         = elem.Vr \ eye(order+1);
 						iVg         = elem.Vg \ eye(order+1);
             
-            q1d         = transpose (elem.Vr \ elem.Vg);  
+            elem.q1d         = transpose (elem.Vr \ elem.Vg);  
             
-						elem.p_h_1d      = transpose (elem.Vr \ Vph);  
+			elem.p_h_1d      = transpose (elem.Vr \ Vph);  
             elem.p_p_1d      = transpose (elem.Vr \ Vpp);  
 						
             elem.W      = zeros(elem.Nrp^elem.dim, 1);
             elem.Wgll   = zeros(elem.Nrp^elem.dim, 1);
             if (d == 2)
-              elem.Q  = kron(q1d, q1d) ;
+              elem.Q  = kron(elem.q1d, elem.q1d) ;
               
 							elem.Ph = kron(elem.p_h_1d, elem.p_h_1d) ;
 							elem.Pp = kron(elem.p_p_1d, elem.p_p_1d) ;
               
-              elem.Qx = kron(q1d, elem.Dg);
-              elem.Qy = kron(elem.Dg, q1d);
+              elem.Qx = kron(elem.q1d, elem.Dg);
+              elem.Qy = kron(elem.Dg, elem.q1d);
               
               sk = 1;
               for i=1:elem.Nrp
@@ -120,14 +122,14 @@ classdef refel < handle
               
               Wfgll = elem.wgll;
             else
-              elem.Q  = kron(kron(q1d, q1d), q1d);
+              elem.Q  = kron(kron(elem.q1d, elem.q1d), elem.q1d);
 							
               elem.Ph = kron(kron(elem.p_h_1d, elem.p_h_1d), elem.p_h_1d);
 							elem.Pp = kron(kron(elem.p_p_1d, elem.p_p_1d), elem.p_p_1d);
               
-              elem.Qx = kron(kron(q1d, q1d), elem.Dg);
-              elem.Qy = kron(kron(q1d, elem.Dg), q1d);
-              elem.Qz = kron(kron(elem.Dg, q1d), q1d);
+              elem.Qx = kron(kron(elem.q1d, elem.q1d), elem.Dg);
+              elem.Qy = kron(kron(elem.q1d, elem.Dg), elem.q1d);
+              elem.Qz = kron(kron(elem.Dg, elem.q1d), elem.q1d);
               
               sk = 1;
               sf = 1;

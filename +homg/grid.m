@@ -266,12 +266,12 @@ classdef grid < handle
             % BData = zeros(size(grid.Bmaps));
             % 1. compute skeletal trace
             u_hat = grid.extract_skeletal_data(u);
-            rhs_hat = -grid.hdg_residual(u_hat, rhs, BData);
+            rhs_hat = grid.hdg_residual(u_hat, rhs, BData);
 
             % 2. iterate - vcycles 
             r = grid.residual(rhs_hat, u_hat);
             
-            disp(['Initial residual is ' num2str(norm(r))]);
+            disp(['Initial residual is ' num2str(norm(r),'\t%8.4e')]);
             disp('------------------------------------------');
             r0 = norm(r);
             
@@ -897,8 +897,8 @@ classdef grid < handle
             ny = self.Mesh.nelems(2);
             
             % TODO: need to replace 1.0 with the actual domain length
-            hx = 1.0/nx; hy = 1.0/nx;
-            fac = hx*hy / 2*(hx+hy);
+            hx = 1.0/nx; hy = 1.0/ny;
+            fac = hx*hy / (2*(hx+hy));
             
             % add Bdata to skel to get linear dg
             lamAll = zeros(self.Mesh.Ns_faces * Nfp,1);
@@ -918,7 +918,10 @@ classdef grid < handle
                     %----Restrict HDG linear skeleton solution to linear CG mesh-------
                     % (Q_0 mu, v)_0 = (mu, I_1 v)_1
                     Jf = self.Mesh.geometric_factors_face(self.refel, e, fid);
-                    rhs = Jf .* (self.refel.Mr * lamAll(idx));
+                    Md = self.refel.w .* Jf;
+                    Mf = self.refel.q1d' * diag(Md) * self.refel.q1d;
+                    rhs = Mf * lamAll(idx);
+                    % rhs = Jf .* (self.refel.Mr * lamAll(idx));
                     
                     if self.SkelAll2Interior(idx(1)) < eps
                         u_cg(cg_idx) = u_cg(cg_idx) + fac * rhs;
