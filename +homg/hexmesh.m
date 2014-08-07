@@ -1,7 +1,15 @@
 classdef hexmesh < handle
   %HEXMESH A container class for homg regular grid meshes
   %      RGRID class for homg meshes, made of hexahedral elements.
-  
+  properties 
+		Ns_faces
+		Ni_faces
+		Nb_faces
+		nx
+		ny
+		taur	
+	end
+	
   properties (SetAccess = private)
     dim=2;
     nelems=[8 8];
@@ -16,7 +24,7 @@ classdef hexmesh < handle
     coeff
 		muvec
     rhs
-  end % properties
+  end % properties	
   
   methods
     function mesh = hexmesh(nelems, X)
@@ -29,7 +37,17 @@ classdef hexmesh < handle
       mesh.Xf = X;
 
       mesh.coeff = @(x,y,z)(1);
-    end
+    
+			% new hDG related metrics ...
+			mesh.Ns_faces = mesh.get_num_faces();
+			mesh.Nb_faces = mesh.get_num_bdy_faces();
+			mesh.Ni_faces = mesh.Ns_faces - mesh.Nb_faces;
+			
+			mesh.nx = [-1, 1, 0, 0];
+			mesh.ny = [0, 0, -1, 1];
+
+			mesh.taur = 1; % HDG.taur; pass as parameter to construction ?
+		end
     
     function plot(self)
       % display the mesh. Needs X.
@@ -458,7 +476,7 @@ else
       end
 end
       tspent = toc;
-      fprintf('Mass: Assembly time: %g\n', tspent);
+      % fprintf('Mass: Assembly time: %g\n', tspent);
       % M = sparse(M);
     end
     
@@ -628,6 +646,54 @@ end
       % M = sparse(M);
     end
     
+		function P = assemble_hdg_interpolation(self)
+			% assemble prolongation operator from coarse (self) to fine mesh on the skeleton mesh
+			refel = homg.refel ( self.dim, self.order );
+			
+			fine_order = self.order*2;
+		
+			num_faces = self.get_num_faces() - self.get_num_bdy_faces();
+		
+			NP_c = self.order + 1;
+			NP_f = fine_order + 1;
+			
+			dof_coarse = num_faces * NP_c;
+			dof_fine   = num_faces * NP_f;
+			
+			Pe = refel.p_p_1d; 
+			
+			% storage for indices and values
+      NPNP = NP_c * NP_f;
+      
+      I = zeros(num_faces * NPNP, 1);
+      J = zeros(num_faces * NPNP, 1);
+      val = zeros(num_faces * NPNP, 1);
+			
+			for f=1:num_faces
+				idx_c = ((f-1)*NP_c+1):(f*NP_c);
+				idx_f = ((f-1)*NP_f+1):(f*NP_f);
+				
+        ind1 = repmat(idx_f, NP_c, 1);
+        ind2 = reshape(repmat(idx_c', NP_f, 1), NPNP, 1);
+        st = (f-1)*NPNP+1;
+        en = f*NPNP;
+				
+        I(st:en) = ind1;
+        J(st:en) = ind2;
+      
+        val(st:en) = Pe(:);
+			end
+			
+			[u_ij,q] = unique([I,J],'rows','first');
+			 u_val   = val(q);
+       I = u_ij(:,1);
+       J = u_ij(:,2);
+       
+			 P = sparse (I,J,u_val,dof_fine,dof_coarse);
+			
+		end
+		
+		
     function P = assemble_interpolation(self, order)
       % assemble prolongation operator from coarse (self) to fine mesh
 			refel = homg.refel ( self.dim, self.order );
@@ -907,6 +973,51 @@ end
         
       end
     end
+
+    function [Kex,Key] = element_stiffness_advection(self, eid, refel, J, D)
+      % element mass matrix
+      
+%             | Q |     | rx sx tx|| Qx |
+%    Kex =        | J W |          | Qy |
+%                                  | Qz |
+
+%             | Q |     | ry sy ty|| Qx |
+%    Key =        | J W |          | Qy |
+%                                  | Qz |
+
+%             | Q |     | rz sz tz|| Qx |
+%    Kez =        | J W |          | Qy |
+%                                  | Qz |
+
+			nn = length(J);
+			
+      factor = zeros(nn, 6);
+
+      %             1  4  5
+      % factor      4  2  6
+      %             5  6  3
+      
+      
+			% idx = self.get_node_indices (eid, r.N);
+			% mu = self.muvec(eid); % *nn:(eid+1)*nn);
+			
+      if (self.dim == 2 )
+          
+        factor (:,1) = D.rx .* J .* refel.W; 
+        factor (:,2) = D.sx .* J .* refel.W; 
+        factor (:,3) = D.ry .* J .* refel.W; 
+        factor (:,4) = D.sy .* J .* refel.W; 
+        
+        Kex =   refel.Qx' * diag(factor(:,1)) * refel.Q ...
+              + refel.Qy' * diag(factor(:,2)) * refel.Q;
+  
+        Key =   refel.Qx' * diag(factor(:,3)) * refel.Q ...
+              + refel.Qy' * diag(factor(:,4)) * refel.Q;
+      else
+        error('not supported for now, come back later');
+      end
+      
+    end
     
     function [J, D] = geometric_factors( self, refel, pts )
       % Np =  refel.Nrp ^ mesh.dim;
@@ -1140,6 +1251,89 @@ end
  
     %% ~~~~~~ functions for dG ... 
 		
+		function [SkelInterior2All, SkelAll2Interior, Bmaps, LIFT, VtoF] = generate_skeleton_maps(self, refel)
+			Nfp = refel.Nrp ^ (refel.dim-1);
+			Nfaces = refel.dim * 2;
+			Nv     = refel.Nrp ^ (refel.dim);
+			
+			% find boundary faces and indices
+			Nbfaces = 0; 
+			Bmaps = zeros(Nfp,1); 
+			Bdata = zeros(Nfp,1);
+			iindex = 0;
+			for  sf=1:self.Ns_faces
+			    [e1, f1, e2, f2]  = self.get_face_elements(sf);
+
+			    if (e1 < 0) || (e2 < 0), % boundary faces
+			      if e1 < 0, 
+			        e = e2; f = f2;
+			      else
+			        e = e1; f = f1;
+			      end
+			      Nbfaces = Nbfaces + 1;
+			      idxf = self.get_skeletal_face_indices(refel, e, f);
+			      idxv = self.get_discontinuous_face_indices(refel, 1, f);
+      
+			      Bmaps(iindex+1:iindex+Nfp) = idxf;
+			      % Bdata(iindex+1:iindex+Nfp) = Uexact(idxv,e);
+			      iindex = iindex + Nfp;
+			    end
+			end
+			% assert(self.Nb_faces == Nbfaces);
+
+			SkelInterior2All = zeros(self.Ni_faces * Nfp,1);
+			SkelAll2Interior = zeros(self.Ns_faces * Nfp,1);
+
+			% Construct the skeleton maps
+			iindex = 0;
+			for  sf=1:self.Ns_faces
+			    [e1, f1, e2, f2]  = self.get_face_elements(sf);
+    
+			    % interior faces
+			    if (e1 > 0) && (e2 > 0), 
+			      % global trace index for f1
+			      idxf = self.get_skeletal_face_indices(refel, e1, f1);
+			      SkelInterior2All(iindex+1:iindex+Nfp) = idxf;
+			      SkelAll2Interior(idxf) = iindex+1:iindex+Nfp;
+			      iindex = iindex + Nfp;
+			    end
+			end
+			
+			% Construct the Lift and VtoF
+			LIFT = zeros(Nv, Nfp, Nfaces);
+			VtoF = zeros(Nfp, Nv, Nfaces);
+			for f = 1:Nfaces
+			  idxv = self.get_discontinuous_face_indices(refel, 1, f);
+			  LIFT(idxv,:,f) = refel.Mr;
+			  for fp = 1:Nfp
+			    VtoF(fp,idxv(fp),f) = 1;
+			  end
+			end
+		end
+
+    function Bdata = get_boundary_data(self, refel, Uexact)
+    Nfp = refel.Nrp ^ (refel.dim-1);
+
+    Bdata = zeros(Nfp,1);
+    iindex = 0;
+    for  sf=1:self.Ns_faces
+        [e1, f1, e2, f2]  = self.get_face_elements(sf);
+
+        if (e1 < 0) || (e2 < 0), % boundary faces
+		      if e1 < 0, 
+		        e = e2; f = f2;
+		      else
+		        e = e1; f = f1;
+		      end
+		      
+					idxv = self.get_discontinuous_face_indices(refel, 1, f);
+				
+	      	Bdata(iindex+1:iindex+Nfp) = Uexact(idxv,e);
+	      	iindex = iindex + Nfp;
+				end
+			end
+		end
+		
 		function nf = get_num_faces(self)
 			% function nf = get_num_faces(self)
 			% 
@@ -1149,6 +1343,17 @@ end
 				nf = nf + sum(self.nelems);
 			else
 				nf = nf + sum(self.nelems .* circshift(self.nelems, [1 1]) );
+			end
+		end
+		
+		function nf = get_num_bdy_faces(self)
+			% function nf = get_num_faces(self)
+			% 
+			% returns the total number of bdy. faces in the mesh ...
+			if (self.dim == 2)
+				nf = 2 * sum(self.nelems);
+			else
+				nf = 2 * sum(self.nelems .* circshift(self.nelems, [1 1]) );
 			end
 		end
 		
@@ -1200,7 +1405,7 @@ end
 					case 3
 						gfid = nxf + sub2ind ([self.nelems(1), self.nelems(2)+1], i, j);
 					case 4
-						gfid = nxf + sub2ind ([self.nelems(1), self.nelems(2)+1], i+1, j);
+						gfid = nxf + sub2ind ([self.nelems(1), self.nelems(2)+1], i, j+1);
 				end
 			
 			else
@@ -1242,7 +1447,7 @@ end
 						gfid = nxf + sub2ind ([self.nelems(1), self.nelems(2)+1], i, j);
 						[i,j] = ndgrid(i_low:i_high, j_low);
 					case 4
-						gfid = nxf + sub2ind ([self.nelems(1), self.nelems(2)+1], i+1, j);
+						gfid = nxf + sub2ind ([self.nelems(1), self.nelems(2)+1], i, j+1);
 						[i,j] = ndgrid(i_low:i_high, j_high);
 				end 
         
