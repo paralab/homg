@@ -1,0 +1,51 @@
+Reviewing: 1
+
+Comments to the Author
+Comparison of Multigrid Algorithms for High-order Continuous Finite Element Discretizations By Hari Sundar, Georg Stadler, and George Biros
+
+Summary impression:
+
+Given the interest in high-order methods and the notable cost of the underlying solver for poisson-type problems in addition to the variety of options, the core thesis of the manuscript is well-placed.  Yet, the presentation of the numerics does not lead the reader to conclude anything from the comparison --- ie, there are too many ways to interpret the convergence based on iterations and the cost of the methods.  The primary concern as stated in the Contributions section was to address the "actual performance", but as it stands the results do not attempt to answer this.  Indeed, actual timings are avoided (and clearly stated this way), the performance model is not realistic (also as stated, since it can vary from implementation and architecture), and the iterations are not combined with the perceived cost in a clear way.  Again, the targeted contributions of this manuscript would be quite interesting, but the numerics and discussion could be significantly improved to support many of the statements.
+
+Non-Minor Concerns
+
+It's likely that h, p, or structured low-order MG are preferred to a pure AMG method, but the restricition to "discontinuous or anisotropic coefficients, nor consider ill-shaped elements" on page 3 should really consider the implications of this.  The three methods will be challenged in this setting whereas AMG has been used effectively.
+
+There is a consistent claim that matrix assembly for high-order should be avoided, but some context or citation is needed to support this (very) general remark.  If the coefficients and elements vary widely then the cost of reconstruction may benefit from a matrix assembly, particularly if it is repeatedly used.  From the results it's not clear at all that a SpMV based on an assembled matrix is *not* the most efficient action.  In the end was AMG tested?
+THe last line appears that it was: "When combined with algebraic multigrid for the low-order operator, the smoother on the finest mesh can either use the low-order or the high-order residual. Initial numerical tests indicate that the latter choice is advantageous, but this should be studied more systematically."
+Perhaps this is referring to some side tests; it is suggested then to support these statements more.  Also, the code appears to use the assembled matrix (cf.
+grid.m assemble_poisson()), so perhaps this referee is just confused about this point.  Is the matrix assembled or is everything matrix free?  And how is the cost compared?
+
+Figure 2 needs some work.  Column 1 displays the smoothing properties.  But why should we expect Jacobi, Chebyshev, and SSOR to display classic smoothing properties for high-order problems?  And why does weighted Jacobi anihilate all high-order modes (for linears) in the top corner plot?  In addition, the use of a single coarse grid is used here (so it should be labeled two-grid rather than V-cycle, but this is minor), but what is the coarse grid?  For presentation, a suggestion is to move the rather lengthy paragraph in the Figure 2 caption to the the section where it is cited.
+
+To use Cheychev, are the Arnoldi iterations considered in the cost?
+
+Algorithm 4.1 requires $M$ to be symmetric.  Are the smoothers applied symmetrically?  SSOR does not appear to do this in particular.
+
+Section 4 gets very long without reporting anything on relative efficiency.  The iteration counts show that the methods are converging in a reasonable fashion.
+But " As a consequence, the iteration numbers reported in the next section can be used to compare the efficiency of the different methods." on page 12 is as close as it gets to comparing the total work of the method(s).  The introduction reports this as a major contribution and so it should be central in section 4.
+
+A Few Minor Issues
+
+page 3: discretization -> discretizations page 3: on the performance -> in the performance page 3: The self references to 15-17 are unnecesary as presented.  If the intent is to motivate high-order, then other references should be used.  This happens again on page 5 in section 2.3 where [15-16] are mentioned with little connection to the current work.
+page 10: "number of multigrid v-cycles or of CG iterations" needs a rewording page 12: Table I should list these values as iterations counts somewhere (and there is a hanging sentence below the table from the itemize on the previous page)
+
+
+Reviewing: 2
+
+Comments to the Author
+The paper presents a very nice computational survey of the most natural (and popular) approaches for the application of geometric Multigrid to second order elliptic problems discretized with high-order finite elements. This is timely and interesting study, given the increasing importance of high-order methods on modern computing architectures. The authors are to be commended for the interesting choice of problems (high-order meshes, polynomial orders up to 16, etc.) as well as for the freely available companion Matlab software.
+
+I liked the presentation and I found the results interesting. I therefore recommend the manuscript for publication with the following minor remarks:
+
+1) Section 2 refers to Figure 1 (first paragraph on page 4), but discusses only the first two approaches depicted there. This can be confusing.
+
+2) Why are the h-Multigrid spaces nested for the domains in Figure 4?
+
+3) It looks like SSOR is amplifying some error components when used as a smoother in Figure 3 (e.g. for p=4). Isn't Ak SPD in this case?
+
+4) Have you tried using the l1-Jacobi smoother from [2]? This smoother is always convergent, so it may approve the results of e.g. Table II.
+
+5) What is the coarse grid in Section 3.2.2, the one obtained by h-coarsening (and interpolation)?
+
+6) A few typos: "loose" on page 1, "corresponds" on page 4, extra "rate" on page 7.

@@ -6,3 +6,7 @@
 *.aux*
 *.dat
 *.swp
+*/homg-figure*
+*.bbl
+*.blg
+
