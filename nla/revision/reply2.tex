@@ -1,0 +1,70 @@
+\documentclass[12pt]{article}
+\renewcommand*\familydefault{\sfdefault}
+%\usepackage{amssymb,amsmath,amsfonts,comment}
+%\usepackage{amsmath,amssymb,graphicx,subfigure,psfrag}
+\usepackage{amsmath,amssymb,graphicx,subfigure,psfrag}
+\usepackage{amssymb,mathrsfs}
+\usepackage[margin=1in]{geometry}
+\usepackage{graphicx}
+\usepackage{color,pdfcolmk}
+\newcommand{\todo}[1]{\noindent\emph{\textcolor{red}{Todo: #1\:}}}
+\newcommand{\note}[1]{\noindent\emph{\textcolor{blue}{Note: #1\:}}}
+\newcommand{\referee}[1]{\vspace{3ex}\noindent{\textcolor{blue}{#1}}\\[2ex]}
+\newcommand{\nnn}{\mathbf{n}}
+\newcommand{\fff}{\mathbf{f}}
+\newcommand{\uuu}{\mathbf{u}}
+\title{Reply to reviewer 1}
+
+\begin{document}
+
+\subsection*{Reply to Referee 2:}
+
+Thanks for the careful reading and the helpful comments.
+Please find below point-by-point replies to your comments and
+questions. To give you an overview of all the changes in the paper, we
+also provide a diff-document that highlights the changes between the
+initial submission and this resubmission.
+
+\subsubsection*{Detailed replies (your comments in blue)}
+
+\referee{ Comments to the Author\\[.2ex] The paper presents a very
+  nice computational survey of the most natural (and popular)
+  approaches for the application of geometric Multigrid to second
+  order elliptic problems discretized with high-order finite
+  elements. This is timely and interesting study, given the increasing
+  importance of high-order methods on modern computing
+  architectures. The authors are to be commended for the interesting
+  choice of problems (high-order meshes, polynomial orders up to 16,
+  etc.) as well as for the freely available companion Matlab
+  software. I liked the presentation and I found the results
+  interesting.}
+\noindent
+Thanks man!
+
+\referee{ I therefore recommend the manuscript for publication with
+  the following minor remarks:}
+
+\referee{ 1) Section 2 refers to Figure 1 (first paragraph on page 4),
+  but discusses only the first two approaches depicted there. This can
+  be confusing.}
+
+\referee{ 2) Why are the h-Multigrid spaces nested for the domains in
+  Figure 4?}
+
+\referee{ 3) It looks like SSOR is amplifying some error components
+  when used as a smoother in Figure 3 (e.g. for p=4). Isn't Ak SPD in
+  this case?}
+
+\referee{ 4) Have you tried using the l1-Jacobi smoother from [2]?
+  This smoother is always convergent, so it may approve the results of
+  e.g. Table II.}
+
+
+\referee{ 5) What is the coarse grid in Section 3.2.2, the one
+  obtained by h-coarsening (and interpolation)?}
+
+\referee{ 6) A few typos: "loose" on page 1, "corresponds" on page 4,
+  extra "rate" on page 7.}
+\noindent
+
+\end{document}
