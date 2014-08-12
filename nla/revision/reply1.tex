@@ -89,12 +89,14 @@ challenged in this setting whereas AMG has been used effectively.}
 
 \referee{
 To use Cheychev, are the Arnoldi iterations considered in the cost?}
+No, they are not included in the cost. As argued earlier, they add 10 matvecs
+to the cost. This has been clarified in the text.
 
 \referee{ Algorithm 4.1 requires $M$ to be symmetric.  Are the
   smoothers applied symmetrically?  SSOR does not appear to do this in
   particular.}
 \noindent
-Yes!
+Yes! All the smoothers are symmetrically applied, including Symmetric-SOR.
 
 \referee{ Section 4 gets very long without reporting anything on
   relative efficiency.  The iteration counts show that the methods are
@@ -109,25 +111,26 @@ Yes!
 \referee{
 A Few Minor Issues\\[.3ex]
 page 3: discretization $\rightarrow$ discretizations}
-
+has been corrected.
 \referee{
 page 3: on the performance $\rightarrow$ in the performance }
+has been corrected.
 
 \referee{
 page 3: The self references to 15-17 are unnecesary as presented.  If
 the intent is to motivate high-order, then other references should be
 used.  This happens again on page 5 in section 2.3 where [15-16] are
 mentioned with little connection to the current work.}
-
+We have removed these references.
 \referee{
 page 10: "number of multigrid v-cycles or of CG iterations" needs a
 rewording
 }
-
+This sentence has been rephrased.
 \referee{ page 12: Table I should list these values as iterations
   counts somewhere (and there is a hanging sentence below the table
   from the itemize on the previous page) }
-
 \noindent
+The table captions have been modified to indicate the iteration counts.
 
 \end{document}
