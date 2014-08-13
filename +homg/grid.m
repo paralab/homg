@@ -11,6 +11,7 @@ classdef grid < handle
         k_lam
         jacobi_omega
         jacobi_invdiag
+        jacobi_inv_l1_diag
         jacobi_inv_block_diag
         gs_G
         gs_c
@@ -356,10 +357,10 @@ classdef grid < handle
                 
            % 3. restrict
            res_coarse = grid.R * res;
-           % res_coarse(grid.Coarse.Boundary) = 0;
+           res_coarse(grid.Coarse.Boundary) = 0;
             
            % 4. ---------- recurse -----------
-           u_corr_coarse = grid.Coarse.vcycle(v2, v2, res_coarse, zeros(size(res_coarse)));
+           u_corr_coarse = grid.Coarse.vcycle(v1, v2, res_coarse, zeros(size(res_coarse)));
             
            % 5. prolong and correct
            u = u - grid.P * u_corr_coarse;
@@ -412,6 +413,9 @@ classdef grid < handle
             switch(grid.smoother)
                 case 'jacobi',
                     u = grid.smoother_jacobi(v, rhs, u);
+                    return;
+                case 'l1_jac',
+                    u = grid.smoother_l1_jacobi(v, rhs, u);
                     return;
                 case 'blk_jac',
                     u = grid.smoother_block_jacobi(v, rhs, u);
@@ -486,6 +490,25 @@ classdef grid < handle
                 % norm(r)
             end
         end % jacobi
+        
+        function u = smoother_l1_jacobi (grid, v, rhs, u)
+            % l1 jacobi smoother
+            if ( isempty(grid.jacobi_inv_l1_diag) )
+                
+                D = diag(grid.K) + sum(abs(grid.K - diag(diag(grid.K)) ), 2) ;
+                
+                grid.jacobi_inv_l1_diag = 1./D;
+            end
+            
+            for i=1:v
+                res  = grid.jacobi_inv_l1_diag .* grid.residual(rhs, u);
+                % res  = grid.jacobi_invdiag .* grid.residual(rhs, u);
+                u = u - grid.jacobi_omega.*res;
+                % r = norm(res);
+                % disp([grid.dbg_spaces num2str(r)]);
+                % norm(r)
+            end
+        end % l1-jacobi
         
         function u = smoother_block_jacobi (grid, v, rhs, u)
             % block jacobi smoother
