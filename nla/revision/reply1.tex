@@ -74,6 +74,18 @@ challenged in this setting whereas AMG has been used effectively.}
   referee is just confused about this point.  Is the matrix assembled
   or is everything matrix free?  And how is the cost compared?}
 
+Given an order $p$, the operation count for a tensorized matrix-free matvec
+is $\mathcal{O}(p^4)$ as opposed to $\mathcal{O}(p^6)$ for a fully assembled 
+matrix (Orszag, JCP 37(1)  1980). Please note that this is only considering the dense elemental matrix,
+so this is true for the best SpMV implementation possible. This has been
+clarified and cited in the paper as well.
+
+No, AMG was not tested. The text in the paper has been removed. 
+
+Yes, in the current matlab implementation, the matrix is assembled. This
+is the reason we are comparing the iteration counts (which is proportional to the
+number of matvecs). 
+
 \referee{ Figure 2 needs some work.  Column 1 displays the smoothing
   properties.  But why should we expect Jacobi, Chebyshev, and SSOR to
   display classic smoothing properties for high-order problems?  And
@@ -89,6 +101,7 @@ challenged in this setting whereas AMG has been used effectively.}
 
 \referee{
 To use Cheychev, are the Arnoldi iterations considered in the cost?}
+\noindent
 No, they are not included in the cost. As argued earlier, they add 10 matvecs
 to the cost. This has been clarified in the text.
 
@@ -96,7 +109,7 @@ to the cost. This has been clarified in the text.
   smoothers applied symmetrically?  SSOR does not appear to do this in
   particular.}
 \noindent
-Yes! All the smoothers are symmetrically applied, including Symmetric-SOR.
+Yes, All the smoothers are symmetrically applied, including Symmetric-SOR.
 
 \referee{ Section 4 gets very long without reporting anything on
   relative efficiency.  The iteration counts show that the methods are
@@ -107,6 +120,8 @@ Yes! All the smoothers are symmetrically applied, including Symmetric-SOR.
   introduction reports this as a major contribution and so it should
   be central in section 4.
 }
+We have rewritten this section to make this clear, as well as the arguments
+for the comparison based on the iteration counts. 
 
 \referee{
 A Few Minor Issues\\[.3ex]
