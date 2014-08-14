@@ -385,7 +385,8 @@ classdef grid < handle
               
               % RESTRICT
               res_coarse = grid.skel_to_cg (res, BData);
-
+              %res_coarse(grid.Coarse.Boundary) = 0;
+              
               % VCYCLE
               u_corr_coarse = grid.Coarse.vcycle(v1, v2, res_coarse, zeros(size(res_coarse)));
 
@@ -640,10 +641,11 @@ classdef grid < handle
         
         function u = smoother_gauss_seidel (grid, v, rhs, u)
             if ( isempty ( grid.gs_G ) )
-                Kc = (eye(size(grid.K)) - grid.ZeroBoundary) + grid.ZeroBoundary * grid.K * grid.ZeroBoundary;
+                Kc = grid.K; %(eye(size(grid.K)) - grid.ZeroBoundary) + grid.ZeroBoundary * grid.K * grid.ZeroBoundary;
                 LD = tril(Kc);
                 grid.gs_G = -LD \ triu(Kc, 1);
-                grid.gs_c = grid.ZeroBoundary *( LD \ rhs );
+                grid.gs_c = ( LD \ rhs );
+                grid.gs_c(grid.Boundary) = 0;
             end
             
             for i=1:v

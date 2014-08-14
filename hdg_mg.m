@@ -95,7 +95,7 @@ end
 
 Bdata = grid.Mesh.get_boundary_data(grid.refel, Uexact);
 
-u = grid.solve_hdg_mg(10, 'chebyshev', 3, 3, Forcing(:), zeros(size(Uexact(:))), Bdata);
+u = grid.solve_hdg_mg(10, 'gs', 3, 3, Forcing(:), zeros(size(Uexact(:))), Bdata);
 
 %% test errors ... 
 
