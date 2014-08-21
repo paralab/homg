@@ -12,7 +12,7 @@ order = 1;
 nelems = [16, 16];
 
 % generate mesh heirarchy 
-grid = create_hdg_grids(2, @homg.xform.identity, 1, 16);
+grid = create_hdg_grids(2, @homg.xform.identity, order, nelems(1));
 
 % generate the hexmesh with identity transform for now
 m = grid.Mesh; % homg.hexmesh(nelems,@homg.xform.identity); 
@@ -95,7 +95,7 @@ end
 
 Bdata = grid.Mesh.get_boundary_data(grid.refel, Uexact);
 
-u = grid.solve_hdg_mg(10, 'gs', 3, 3, Forcing(:), zeros(size(Uexact(:))), Bdata);
+u = grid.solve_hdg_mg(10, 'chebyshev', 3, 3, Forcing(:), zeros(size(Uexact(:))), Bdata);
 
 %% test errors ... 
 
