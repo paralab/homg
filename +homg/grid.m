@@ -91,12 +91,21 @@ classdef grid < handle
                 grid.Mesh.set_coeff (mu) ;
             end
             % assemble for this level ...
-            [grid.K, grid.M, grid.jacobi_inv_block_diag] = grid.Mesh.assemble_poisson(grid.Mesh.order);
-            syms x y z
-            if ( grid.Mesh.dim == 2 )
+            [grid.K, grid.M, grid.jacobi_inv_block_diag] = ...
+                grid.Mesh.assemble_poisson(grid.Mesh.order);
+            try
+              syms x y z
+              if ( grid.Mesh.dim == 2 )
                 fx = matlabFunction(-8*pi^2*(sin(2*pi*x) * sin(2*pi*y)));
-            else
+              else
                 fx =matlabFunction(-12*pi^2*(sin(2*pi*x) * sin(2*pi*y) * sin(2*pi*z) ));
+              end
+            catch
+              if ( grid.Mesh.dim == 2 )
+                fx = @(x,y) -8*pi^2*(sin(2*pi*x) * sin(2*pi*y));
+              else
+                fx = @(x,y,z) -12*pi^2*(sin(2*pi*x) * sin(2*pi*y) * sin(2*pi*z) );
+              end
             end
             
             grid.L = grid.Mesh.assemble_rhs(fx, grid.Mesh.order);
@@ -267,7 +276,7 @@ classdef grid < handle
             % BData = zeros(size(grid.Bmaps));
             % 1. compute skeletal trace
             u_hat = grid.extract_skeletal_data(u);
-            rhs_hat = grid.hdg_residual(u_hat, rhs, BData);
+            rhs_hat = -grid.hdg_residual(u_hat, rhs, BData);
 
             % 2. iterate - vcycles 
             r = grid.residual(rhs_hat, u_hat);
@@ -951,7 +960,7 @@ classdef grid < handle
                     if self.SkelAll2Interior(idx(1)) < eps
                         u_cg(cg_idx) = u_cg(cg_idx) + fac * rhs;
                     else
-                        u_cg(cg_idx) = u_cg(cg_idx) + 0.5 * fac * rhs;
+                        u_cg(cg_idx) = u_cg(cg_idx) + fac * rhs;
                     end
                     %------------------------------------------------------------------
                 end
@@ -961,7 +970,17 @@ classdef grid < handle
                 self.M = self.Mesh.assemble_mass(self.refel.N);
             end
             
-            u_cg = self.M \ u_cg;
+            bdy_index = ...
+                self.Mesh.get_boundary_node_indices(self.Mesh.order);
+            u_cg(bdy_index)  = 0; 
+
+            M = self.M;
+            
+            M(bdy_index,:) = 0;
+            M(:, bdy_index) = 0;
+            M((bdy_index - 1) * dof + bdy_index) = 1;
+            
+            u_cg = M \ u_cg;
         end
         
         
