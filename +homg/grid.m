@@ -173,7 +173,8 @@ classdef grid < handle
             %    rhs_hat = grid.extract_skeletal_data(rhs);
             %    r = grid.K*u_hat - rhs_hat;
             %else
-                r = grid.K*u - rhs;
+                % r = grid.K*u - rhs;
+                r = rhs - grid.K*u;
             % end
         end
         
@@ -340,7 +341,7 @@ classdef grid < handle
             % function u = vcycle(grid, v1, v2, rhs, u)
             % solve system using initial guess u, given rhs
             % with v1 pre and v2 post-smoothing steps
-            disp(['CG vcycle: order ' num2str(grid.Mesh.order) ', nelems: ' num2str(grid.Mesh.nelems(1)) 'X' num2str(grid.Mesh.nelems(2))]);
+            % disp(['CG vcycle: order ' num2str(grid.Mesh.order) ', nelems: ' num2str(grid.Mesh.nelems(1)) 'X' num2str(grid.Mesh.nelems(2))]);
             
             if ( isempty( grid.Coarse ) )
                 if (grid.linear_smoother)
@@ -372,7 +373,7 @@ classdef grid < handle
            u_corr_coarse = grid.Coarse.vcycle(v1, v2, res_coarse, zeros(size(res_coarse)));
             
            % 5. prolong and correct
-           u = u - grid.P * u_corr_coarse;
+           u = u + grid.P * u_corr_coarse;
            
            % 6. post-smooth
            u = grid.smooth ( v2, rhs, u );
@@ -382,7 +383,7 @@ classdef grid < handle
        
        % hDG v-cycle
         function u_hat = vcycle_hdg (grid, v1, v2, rhs_hat, u_hat) % <- u_hat and not u
-            disp(['hdg vcycle: order ' num2str(grid.refel.N) ', nelems: ' num2str(grid.Mesh.nelems(1)) 'X' num2str(grid.Mesh.nelems(2))]);
+            % disp(['hdg vcycle: order ' num2str(grid.refel.N) ', nelems: ' num2str(grid.Mesh.nelems(1)) 'X' num2str(grid.Mesh.nelems(2))]);
             % SMOOTH
             u_hat = grid.smooth ( v1, rhs_hat, u_hat );
 
@@ -400,7 +401,7 @@ classdef grid < handle
               u_corr_coarse = grid.Coarse.vcycle(v1, v2, res_coarse, zeros(size(res_coarse)));
 
               % PROLONG + correct 
-              u_hat = u_hat - grid.cg_to_skel (u_corr_coarse);
+              u_hat = u_hat + grid.cg_to_skel (u_corr_coarse);
 
             else
               % RESTRICT
@@ -410,7 +411,7 @@ classdef grid < handle
               u_corr_coarse = grid.Coarse.vcycle_hdg(v1, v2, res_coarse, zeros(size(res_coarse)));
 
               % PROLONG + correct
-              u_hat = u_hat - grid.hdg_prolong(u_corr_coarse);
+              u_hat = u_hat + grid.hdg_prolong(u_corr_coarse);
             end
 
             % SMOOTH 
@@ -494,7 +495,7 @@ classdef grid < handle
                     res  = grid.jacobi_invdiag .* grid.residual(rhs, u);
                 end
                 % res  = grid.jacobi_invdiag .* grid.residual(rhs, u);
-                u = u - grid.jacobi_omega.*res;
+                u = u + grid.jacobi_omega.*res;
                 % r = norm(res);
                 % disp([grid.dbg_spaces num2str(r)]);
                 % norm(r)
@@ -513,7 +514,7 @@ classdef grid < handle
             for i=1:v
                 res  = grid.jacobi_inv_l1_diag .* grid.residual(rhs, u);
                 % res  = grid.jacobi_invdiag .* grid.residual(rhs, u);
-                u = u - grid.jacobi_omega.*res;
+                u = u + grid.jacobi_omega.*res;
                 % r = norm(res);
                 % disp([grid.dbg_spaces num2str(r)]);
                 % norm(r)
@@ -534,7 +535,7 @@ classdef grid < handle
                     res  = grid.jacobi_inv_block_diag * grid.residual(rhs, u);
                 end
                 % res  = grid.jacobi_invdiag .* grid.residual(rhs, u);
-                u = u - grid.jacobi_omega.*res;
+                u = u + grid.jacobi_omega.*res;
                 % r = norm(res);
                 % disp([grid.dbg_spaces num2str(r)]);
                 % norm(r)
@@ -575,7 +576,7 @@ classdef grid < handle
                 else
                     r = grid.residual(rhs, u);
                 end
-                u = u - grid.ssor_M \ r;
+                u = u + grid.ssor_M \ r;
                 u = grid.ssor_M' \ (grid.ssor_N'*u + rhs);
             end
         end
@@ -774,9 +775,9 @@ classdef grid < handle
             
             % first loop
             if (grid.linear_smoother && ~grid.is_finest)
-                res = -grid.residual_lin ( rhs, u );
+                res = grid.residual_lin ( rhs, u );
             else
-                res = -grid.residual ( rhs, u );
+                res = grid.residual ( rhs, u );
             end
             d = res/theta.* grid.jacobi_invdiag;
             u = u + d;
@@ -787,9 +788,9 @@ classdef grid < handle
                 d2 = 2*rhokp1 / delta;
                 rhok = rhokp1;
                 if (grid.linear_smoother && ~grid.is_finest)
-                    res = -grid.residual_lin ( rhs, u );
+                    res = grid.residual_lin ( rhs, u );
                 else
-                    res = -grid.residual ( rhs, u );
+                    res = grid.residual ( rhs, u );
                 end
                 % disp([num2str(iter) ':' num2str(norm(res))]);
                 d = d1 * d + d2 * res.*grid.jacobi_invdiag;
