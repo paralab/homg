@@ -422,8 +422,11 @@ classdef grid < handle
             end
 
             % SMOOTH 
-            u_hat = grid.smooth ( v2, rhs_hat, u_hat );
 
+% $$$             u_hat = grid.smooth ( v2, rhs_hat, u_hat );
+% $$$ 
+            u_hat = u_hat + grid.smoother_chebyshev_adjoint (v2, rhs_hat, u_hat );
+ 
         end % v-cycle
         
         % smoothers
@@ -670,6 +673,21 @@ classdef grid < handle
             end
         end
         
+        function u = smoother_gauss_seidel_adjoint (grid, v, rhs, u)
+            if ( isempty ( grid.gs_G ) )
+                Kc = fliplr(grid.K); %(eye(size(grid.K)) - grid.ZeroBoundary) + grid.ZeroBoundary * grid.K * grid.ZeroBoundary;
+                LD = tril(Kc);
+                grid.gs_G = -LD \ triu(Kc, 1);
+                grid.gs_c = ( LD \ rhs );
+                grid.gs_c(grid.Boundary) = 0;
+            end
+            
+            for i=1:v
+                u = grid.gs_G*u + grid.gs_c;
+            end
+            u = flipud(u);
+        end
+        
         function u = smoother_hybrid (grid, v, rhs, u)
             % u = grid.smoother_gauss_seidel (v, rhs, u);
             u = grid.smoother_chebyshev (v, rhs, u);
@@ -804,7 +822,57 @@ classdef grid < handle
                 u = u + d;
             end
         end % chebyshev
-        
+
+        function u = smoother_chebyshev_adjoint (grid, v, rhs, u)
+            if ( isempty ( grid.eig_max ) )
+              K = fliplr(grid.K);
+              D = diag(K);
+              grid.jacobi_invdiag = 1./D;
+              Kc = spdiags(grid.jacobi_invdiag,0,length(D), length(D)) * K;
+              
+              opts.tol = 0.01;
+              grid.eig_max = eigs(Kc, 1, 'lm', opts);
+                % grid.eig_min = eigs(Kc, 1, 'sm');
+            end
+            
+            % adjust the eigenvalues to hit the upper spectrum
+            beta = grid.eig_max;
+            alpha = 0.25*grid.eig_max;% (grid.eig_min + grid.eig_max)/2;
+            
+            delta = (beta - alpha)/2;
+            theta = (beta + alpha)/2;
+            s1 = theta/delta;
+            rhok = 1./s1;
+            
+            d = zeros(size(u));
+            
+            % first loop
+            if (grid.linear_smoother && ~grid.is_finest)
+                res = grid.residual_lin ( rhs, u );
+            else
+                res = grid.residual ( rhs, u );
+            end
+            d = res/theta.* grid.jacobi_invdiag;
+            u = u + d;
+            
+            for iter = 2:v
+                rhokp1 = 1/ (2*s1 - rhok);
+                d1 = rhokp1 * rhok;
+                d2 = 2*rhokp1 / delta;
+                rhok = rhokp1;
+                if (grid.linear_smoother && ~grid.is_finest)
+                    res = grid.residual_lin ( rhs, u );
+                else
+                    res = grid.residual ( rhs, u );
+                end
+                % disp([num2str(iter) ':' num2str(norm(res))]);
+                d = d1 * d + d2 * res.*grid.jacobi_invdiag;
+                u = u + d;
+            end
+
+            u = flipud(u);
+        end % chebyshev
+
         
         function [evec, eval] = get_eigenvectors(grid)
             % generate the correct matrix
