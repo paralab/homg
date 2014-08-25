@@ -277,18 +277,18 @@ classdef grid < handle
             % BData = zeros(size(grid.Bmaps));
             % 1. compute skeletal trace
             u_hat = grid.extract_skeletal_data(u);
-            rhs_hat = -grid.hdg_residual(u_hat, rhs, BData);
+            b = -grid.hdg_residual(u_hat, rhs, BData);
 
             % 2. iterate - vcycles 
-            r = grid.residual(rhs_hat, u_hat);
+            r = grid.residual(b, u_hat);
             
             disp(['Initial residual is ' num2str(norm(r),'\t%8.4e')]);
             disp('------------------------------------------');
             r0 = norm(r);
             
             for i=1:num_vcyc
-                u_hat = grid.vcycle_hdg(v1, v2, rhs_hat, u_hat);
-                r = grid.residual(rhs_hat, u_hat);
+                u_hat = u_hat + grid.vcycle_hdg(v1, v2, r, u_hat);
+                r = grid.residual(b, u_hat);
                 disp([num2str(i, '%03d\t') ': |res| = ' num2str(norm(r),'\t%8.4e')]);
                 if (norm(r)/r0 < 1e-8)
                     iter = i;
@@ -385,7 +385,7 @@ classdef grid < handle
         function u_hat = vcycle_hdg (grid, v1, v2, rhs_hat, u_hat) % <- u_hat and not u
             % disp(['hdg vcycle: order ' num2str(grid.refel.N) ', nelems: ' num2str(grid.Mesh.nelems(1)) 'X' num2str(grid.Mesh.nelems(2))]);
             % SMOOTH
-            u_hat = grid.smooth ( v1, rhs_hat, u_hat );
+            u_hat = grid.smooth ( v1, rhs_hat, zeros(size(u_hat)) );
 
             % Compute RESIDUAL
             res = grid.residual(rhs_hat, u_hat);
@@ -414,8 +414,10 @@ classdef grid < handle
               u_hat = u_hat + grid.hdg_prolong(u_corr_coarse);
             end
 
+            res = grid.residual(rhs_hat, u_hat);
+            
             % SMOOTH 
-            u_hat = grid.smooth ( v2, rhs_hat, u_hat );
+            u_hat = u_hat + grid.smooth ( v2, res, zeros(size(u_hat)) );
 
         end % v-cycle
         
