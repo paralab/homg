@@ -8,8 +8,8 @@ LIFT  = HDG.LIFT;
 VtoF  = HDG.VtoF;
 
 % predefined normal vector, don't like it but stick with it for now
-nx = [-1, 1, 0, 0];
-ny = [0, 0, -1, 1];
+nx = HDG.nx;
+ny = HDG.ny;
 
 % the number of volume point
 Nv = refel.Nrp ^ (refel.dim);
