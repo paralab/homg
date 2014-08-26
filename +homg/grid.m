@@ -276,20 +276,26 @@ classdef grid < handle
             
             % BData = zeros(size(grid.Bmaps));
             % 1. compute skeletal trace
-            u_hat = grid.extract_skeletal_data(u);
+            u_hat_t = grid.extract_skeletal_data(u);
+            u_hat = zeros(size(u_hat_t));
             rhs_hat = -grid.hdg_residual(u_hat, rhs, BData);
 
             % 2. iterate - vcycles 
             r = grid.residual(rhs_hat, u_hat);
             
-            disp(['Initial residual is ' num2str(norm(r),'\t%8.4e')]);
+            temp = u_hat - u_hat_t;
+            err = sqrt(temp.' * grid.K * temp);
+            disp(['Initial residual is ' num2str(err,'\t%8.4e')]);
             disp('------------------------------------------');
             r0 = norm(r);
             
             for i=1:num_vcyc
                 u_hat = grid.vcycle_hdg(v1, v2, rhs_hat, u_hat);
                 r = grid.residual(rhs_hat, u_hat);
-                disp([num2str(i, '%03d\t') ': |res| = ' num2str(norm(r),'\t%8.4e')]);
+                temp = u_hat - u_hat_t;
+                err = sqrt(temp.' * grid.K * temp);
+                disp([num2str(i, '%03d\t') ': |res| = ' num2str(err,'\t%8.4e')]);
+
                 if (norm(r)/r0 < 1e-8)
                     iter = i;
                     rr = norm(r)/r0;
