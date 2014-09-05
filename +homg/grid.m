@@ -393,12 +393,13 @@ classdef grid < handle
             % SMOOTH
             grid.pre_smooth = 1;
             u_hat = grid.smooth ( v1, rhs_hat, zeros(size(u_hat)) );
-
+            u_hat = grid.clear_skel_boundary(u_hat);
+            
             % Compute RESIDUAL
             res = grid.residual(rhs_hat, u_hat);
 
-            % grid.plot_hdg_skel(u_hat);
-            % getframe();
+            grid.plot_hdg_skel(u_hat);
+            getframe();
             
             if ( ~ grid.Coarse.is_hDG_solve )
               BData = zeros(size(grid.Bmaps));
@@ -430,7 +431,7 @@ classdef grid < handle
             % SMOOTH 
 % $$$             u_hat = u_hat + grid.smoother_chebyshev_adjoint (v2, res, zeros(size(u_hat)) );
             u_hat = u_hat + grid.smooth( v2, res, zeros(size(u_hat)) );
-
+            % u_hat = grid.clear_skel_boundary(u_hat);
         end % v-cycle
         
         % smoothers
@@ -1053,7 +1054,7 @@ classdef grid < handle
                     Jf = self.Mesh.geometric_factors_face(self.refel, e, fid);
                     Md = self.refel.w .* Jf;
                     Mf = self.refel.q1d' * diag(Md) * self.refel.q1d;
-                    rhs = Mf * lamAll(idx);
+                    rhs = Mf * lamAll(idx);  
                     % rhs = Jf .* (self.refel.Mr * lamAll(idx));
                     
                     if self.SkelAll2Interior(idx(1)) < eps
@@ -1480,6 +1481,16 @@ classdef grid < handle
           imagesc(u_cg);
           colorbar;
         end % plot_hdg_skel
+        
+        function u_hat_z = clear_skel_boundary(self, u_hat)
+          Nfp = self.refel.Nrp ^ (self.refel.dim - 1);
+          
+          lamAll = zeros(self.Mesh.Ns_faces * Nfp,1);
+       
+          lamAll(self.SkelInterior2All) = u_hat;
+          lamAll(self.Bmaps) = 0;
+          u_hat_z = lamAll(self.SkelInterior2All);
+        end
         
     end %methods
     
