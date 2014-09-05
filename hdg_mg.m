@@ -4,7 +4,7 @@
 % modified for multigrid, 02 Jan 2014
 
 % addpath /workspace/tanbui/tanbui/WithHari/homg/
-
+ 
 % solution order
 order = 1;
 
@@ -12,7 +12,9 @@ order = 1;
 nelems = [16, 16];
 
 % generate mesh heirarchy 
-grid = create_hdg_grids(2, @homg.xform.identity, order, nelems(1));
+grid = create_hdg_grids(2, @homg.xform.identity, 1, 16);
+% grid.debug = 1;
+% grid.get_u0();
 
 % generate the hexmesh with identity transform for now
 m = grid.Mesh; % homg.hexmesh(nelems,@homg.xform.identity); 
@@ -95,7 +97,7 @@ end
 
 Bdata = grid.Mesh.get_boundary_data(grid.refel, Uexact);
 
-u = grid.solve_hdg_mg(10, 'chebyshev', 1, 1, Forcing(:), Uexact(:), Bdata);
+u = grid.solve_hdg_mg(20, 'chebyshev', 1, 1, Forcing(:), Uexact(:), Bdata);
 
 %% test errors ... 
 

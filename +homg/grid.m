@@ -46,6 +46,8 @@ classdef grid < handle
         Bmaps
         LIFT
         VtoF
+        
+        pre_smooth
     end % properties
     
     methods
@@ -285,16 +287,17 @@ classdef grid < handle
             
             temp = u_hat - u_hat_t;
             err = sqrt(temp.' * grid.K * temp);
-            disp(['Initial residual is ' num2str(err,'\t%8.4e')]);
+            disp(['Initial residual is ' num2str(norm(r),'\t%8.4e') ' -- ' num2str(err,'\t%8.4e')]);
             disp('------------------------------------------');
             r0 = norm(r);
             
             for i=1:num_vcyc
                 u_hat = grid.vcycle_hdg(v1, v2, rhs_hat, u_hat);
+                grid.plot_spectrum(u_hat, 'b', rhs_hat);
                 r = grid.residual(rhs_hat, u_hat);
                 temp = u_hat - u_hat_t;
                 err = sqrt(temp.' * grid.K * temp);
-                disp([num2str(i, '%03d\t') ': |res| = ' num2str(err,'\t%8.4e')]);
+                disp([num2str(i, '%03d\t') ': |res| = ' num2str(norm(r),'\t%8.4e') ' -- ' num2str(err,'\t%8.4e')]);
 
                 if (norm(r)/r0 < 1e-8)
                     iter = i;
@@ -391,11 +394,15 @@ classdef grid < handle
         function u_hat = vcycle_hdg (grid, v1, v2, rhs_hat, u_hat) % <- u_hat and not u
             % disp(['hdg vcycle: order ' num2str(grid.refel.N) ', nelems: ' num2str(grid.Mesh.nelems(1)) 'X' num2str(grid.Mesh.nelems(2))]);
             % SMOOTH
+            grid.pre_smooth = 1;
             u_hat = grid.smooth ( v1, rhs_hat, u_hat );
 
             % Compute RESIDUAL
             res = grid.residual(rhs_hat, u_hat);
 
+            % grid.plot_hdg_skel(u_hat);
+            % getframe();
+            
             if ( ~ grid.Coarse.is_hDG_solve )
               BData = zeros(size(grid.Bmaps));
               
@@ -405,9 +412,10 @@ classdef grid < handle
               
               % VCYCLE
               u_corr_coarse = grid.Coarse.vcycle(v1, v2, res_coarse, zeros(size(res_coarse)));
-
+              
               % PROLONG + correct 
-              u_hat = u_hat + grid.cg_to_skel (u_corr_coarse);
+              u_hat_corr = grid.cg_to_skel (u_corr_coarse);
+              u_hat = u_hat + u_hat_corr; 
 
             else
               % RESTRICT
@@ -421,6 +429,7 @@ classdef grid < handle
             end
 
             % SMOOTH 
+            grid.pre_smooth = 0;
             u_hat = grid.smooth ( v2, rhs_hat, u_hat );
 
         end % v-cycle
@@ -582,8 +591,21 @@ classdef grid < handle
                 else
                     r = grid.residual(rhs, u);
                 end
-                u = u + grid.ssor_M \ r;
-                u = grid.ssor_M' \ (grid.ssor_N'*u + rhs);
+                
+%                 if ( grid.is_hDG_solve) 
+%                    if (grid.pre_smooth)
+%                        u = u + grid.ssor_M \ r;
+%                    else
+%                        u = grid.ssor_M' \ (grid.ssor_N'*u + rhs);
+%                    end
+%                 else
+                    u = u + grid.ssor_M \ r;
+                    u = grid.ssor_M' \ (grid.ssor_N'*u + rhs);
+                    
+                    res = grid.residual ( rhs, u );
+                    r = norm(res);
+                    disp([' ---- ' num2str(i) ' : ' num2str(r)]);
+%                 end
             end
         end
         
@@ -665,7 +687,11 @@ classdef grid < handle
             end
             
             for i=1:v
-                u = grid.gs_G*u + grid.gs_c;
+                if (grid.pre_smooth)
+                    u = grid.gs_G*u + grid.gs_c;
+                else
+                    u = grid.gs_G' * u + grid.gs_c;
+                end
             end
         end
         
@@ -798,7 +824,7 @@ classdef grid < handle
                 else
                     res = grid.residual ( rhs, u );
                 end
-                % disp([num2str(iter) ':' num2str(norm(res))]);
+                disp(['  -- ' num2str(iter) ' : ' num2str(norm(res))]);
                 d = d1 * d + d2 * res.*grid.jacobi_invdiag;
                 u = u + d;
             end
@@ -817,20 +843,20 @@ classdef grid < handle
         
         function plot_spectrum(g, u, clr, rhs)
             if (g.debug)
-                subplot(1,2,1);
-                a = g.M * u;
+%                 subplot(1,2,1);
+                a = u; % g.M * 
                 q = repmat(a, 1, 80);
                 b = abs(dot (g.k_evec, q));
                 % plot eigenvalues
                 plot(b, clr); hold on;
-                subplot(1,2,2);
-                rr = g.residual(rhs, u);
-                n = sqrt(length(rr));
-                imagesc(reshape(rr, n, n)); colorbar; hold off;
-                % grid on;
-                odr = g.Mesh.fem.shape;
-                set(gca, 'xtick', odr+0.5:odr:odr*g.Mesh.nelem);
-                set(gca, 'ytick', odr+0.5:odr:odr*g.Mesh.nelem);
+%                 subplot(1,2,2);
+%                 rr = g.residual(rhs, u);
+%                 n = sqrt(length(rr));
+%                 imagesc(reshape(rr, n, n)); colorbar; hold off;
+%                 % grid on;
+%                 odr = g.Mesh.fem.shape;
+%                 set(gca, 'xtick', odr+0.5:odr:odr*g.Mesh.nelem);
+%                 set(gca, 'ytick', odr+0.5:odr:odr*g.Mesh.nelem);
             end
         end
         
@@ -922,6 +948,8 @@ classdef grid < handle
                     lamAll(idx) = u_cg(cg_idx);
                 end
             end
+            
+            lamAll(self.Bmaps) = 0;
             
             Bdata  = lamAll(self.Bmaps);
             u_skel = lamAll(self.SkelInterior2All);
@@ -1347,6 +1375,47 @@ classdef grid < handle
             qy = qyMatrix * u + qyrhs;
             
         end
+        
+        function u_cg = plot_hdg_skel (self, u_hat)
+          % ignores BData
+          
+          Nfp = self.refel.Nrp ^ (self.refel.dim - 1);
+          num_elem = prod(self.Mesh.nelems);
+          
+          lamAll = zeros(self.Mesh.Ns_faces * Nfp,1);
+          dof = prod(self.Mesh.nelems*self.refel.N + 1);
+          
+          % create zero array of CG size
+          u_cg = zeros(dof,1);
+
+          lamAll(self.SkelInterior2All) = u_hat; 
+
+          % loop over elements
+          for e=1:num_elem
+            % TODO: remove hard-coding with 4 here
+            for fid=1:4
+              idx = self.Mesh.get_skeletal_face_indices(self.refel, e, fid);
+              [cg_idx, gfid] = self.Mesh.get_continuous_face_indices(self.refel, e, fid);
+              
+              % Prolongate CG linear solution to HDG linear skeleton
+              u_cg(cg_idx) = u_cg(cg_idx) + lamAll(idx);
+            end
+          end
+          
+          u_cg = reshape(u_cg, self.Mesh.nelems(1)+1, self.Mesh.nelems(2)+1);
+          % scale values ...
+          u_cg(2:end-1,2:end-1) = u_cg(2:end-1,2:end-1) * 0.25;
+          
+          u_cg(1,2:end-1) = u_cg(1,2:end-1)*0.5;
+          u_cg(end,2:end-1) = u_cg(end,2:end-1)*0.5;
+          
+          u_cg(2:end-1,1) = u_cg(2:end-1,1)*0.5;
+          u_cg(2:end-1,end) = u_cg(2:end-1,end)*0.5;
+          
+          % draw
+          imagesc(u_cg);
+          colorbar;
+        end % plot_hdg_skel
         
     end %methods
     
