@@ -397,8 +397,9 @@ classdef grid < handle
             
             % Compute RESIDUAL
             res = grid.residual(rhs_hat, u_hat);
+            res = grid.clear_skel_boundary(res);
 
-            grid.plot_hdg_skel(u_hat);
+            grid.plot_hdg_skel(res);
             getframe();
             
             if ( ~ grid.Coarse.is_hDG_solve )
@@ -413,6 +414,7 @@ classdef grid < handle
               
               % PROLONG + correct 
               u_hat_corr = grid.cg_to_skel (u_corr_coarse);
+              u_hat_corr = grid.clear_skel_boundary(u_hat_corr);
               u_hat = u_hat + u_hat_corr; 
 
             else
@@ -431,7 +433,8 @@ classdef grid < handle
             % SMOOTH 
 % $$$             u_hat = u_hat + grid.smoother_chebyshev_adjoint (v2, res, zeros(size(u_hat)) );
             u_hat = u_hat + grid.smooth( v2, res, zeros(size(u_hat)) );
-            % u_hat = grid.clear_skel_boundary(u_hat);
+            u_hat = grid.clear_skel_boundary(u_hat);
+  
         end % v-cycle
         
         % smoothers
@@ -1469,7 +1472,7 @@ classdef grid < handle
           
           u_cg = reshape(u_cg, self.Mesh.nelems(1)+1, self.Mesh.nelems(2)+1);
           % scale values ...
-          u_cg(2:end-1,2:end-1) = u_cg(2:end-1,2:end-1) * 0.25;
+          u_cg(2:end-1,2:end-1) = u_cg(2:end-1,2:end-1) * 0.125;
           
           u_cg(1,2:end-1) = u_cg(1,2:end-1)*0.5;
           u_cg(end,2:end-1) = u_cg(end,2:end-1)*0.5;
@@ -1485,11 +1488,36 @@ classdef grid < handle
         function u_hat_z = clear_skel_boundary(self, u_hat)
           Nfp = self.refel.Nrp ^ (self.refel.dim - 1);
           
+          Ni = self.Mesh.Ni_faces;
+          nelems = self.Mesh.nelems;
+          
+          nxf = nelems(2)*(nelems(1)+1);
+          
           lamAll = zeros(self.Mesh.Ns_faces * Nfp,1);
-       
+          
           lamAll(self.SkelInterior2All) = u_hat;
-          lamAll(self.Bmaps) = 0;
+          
+          % clear lower x-faces
+          for i=1:(nelems(1)+1)
+            lamAll((i-1)*Nfp + 1) = 0;
+          end
+          %clear upper x-faces
+          for i=((nelems(1)+1)*(nelems(2)-1)+1):(nelems(2)*(nelems(1)+1))
+            lamAll(i*Nfp) = 0;
+          end
+          
+%           % clear lower x-faces
+          for i=1:(nelems(2)+1)
+            lamAll((nxf+nelems(1))*Nfp + (i-1)*nelems(1)*Nfp + 1) = 0;
+            lamAll((nxf+nelems(1))*Nfp + (i-1)*nelems(1)*Nfp) = 0;
+          end
+%           %clear upper x-faces
+%           for i=((nelems(2)+1)*(nelems(1)-1)+1):(nelems(1)*(nelems(2)+1))
+%             lamAll((nxf)*Nfp + (i-1)*nelems(1)*Nfp) = 6;
+%           end
+
           u_hat_z = lamAll(self.SkelInterior2All);
+          
         end
         
     end %methods
