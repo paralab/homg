@@ -278,9 +278,22 @@ classdef grid < handle
             
             % BData = zeros(size(grid.Bmaps));
             % 1. compute skeletal trace
-            u_hat_t = grid.extract_skeletal_data(u);
-            u_hat = zeros(size(u_hat_t));
+            u_hat = grid.extract_skeletal_data(u);
             b = -grid.hdg_residual(u_hat, rhs, BData);
+            
+            %%------ strongly enforce zero on the boundary----
+            foo = ones(size(u_hat)); dof = length(foo);
+            foo = grid.clear_skel_boundary(foo);
+            index = find(foo < 0.5);
+            b(index) = 0;
+            K = grid.K;
+            K(index,:) = 0;
+            K(:,index) = 0;
+            K((index - 1) * dof + index) = 1;
+            grid.K = K;
+            %%-----------------------------------------------
+            
+            u_hat_t = grid.K \ b;
 
             % 2. iterate - vcycles 
             r = grid.residual(b, u_hat);
@@ -289,8 +302,15 @@ classdef grid < handle
             disp('------------------------------------------');
             r0 = norm(r);
             
+            grid.plot_hdg_skel(u_hat_t);
+ %           v = caxis;
+            figure
             for i=1:num_vcyc
-                u_hat = u_hat + grid.vcycle_hdg(v1, v2, r, u_hat);
+                grid.plot_hdg_skel(u_hat-u_hat_t);
+%                caxis(v);
+                getframe();
+                keyboard
+                u_hat = u_hat + grid.vcycle_hdg(v1, v2, r, zeros(size(u_hat)));
                 r = grid.residual(b, u_hat);
                 temp = u_hat - u_hat_t;
                 err = sqrt(temp.' * grid.K * temp);
@@ -393,14 +413,14 @@ classdef grid < handle
             % SMOOTH
             grid.pre_smooth = 1;
             u_hat = grid.smooth ( v1, rhs_hat, zeros(size(u_hat)) );
-            u_hat = grid.clear_skel_boundary(u_hat);
+%            u_hat = grid.clear_skel_boundary(u_hat);
             
             % Compute RESIDUAL
             res = grid.residual(rhs_hat, u_hat);
-            res = grid.clear_skel_boundary(res);
+%            res = grid.clear_skel_boundary(res);
 
-            grid.plot_hdg_skel(res);
-            getframe();
+% $$$             grid.plot_hdg_skel(u_hat);
+% $$$             getframe();
             
             if ( ~ grid.Coarse.is_hDG_solve )
               BData = zeros(size(grid.Bmaps));
@@ -414,7 +434,7 @@ classdef grid < handle
               
               % PROLONG + correct 
               u_hat_corr = grid.cg_to_skel (u_corr_coarse);
-              u_hat_corr = grid.clear_skel_boundary(u_hat_corr);
+%              u_hat_corr = grid.clear_skel_boundary(u_hat_corr);
               u_hat = u_hat + u_hat_corr; 
 
             else
@@ -433,7 +453,7 @@ classdef grid < handle
             % SMOOTH 
 % $$$             u_hat = u_hat + grid.smoother_chebyshev_adjoint (v2, res, zeros(size(u_hat)) );
             u_hat = u_hat + grid.smooth( v2, res, zeros(size(u_hat)) );
-            u_hat = grid.clear_skel_boundary(u_hat);
+%            u_hat = grid.clear_skel_boundary(u_hat);
   
         end % v-cycle
         
