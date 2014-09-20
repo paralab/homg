@@ -282,15 +282,15 @@ classdef grid < handle
             b = -grid.hdg_residual(u_hat, rhs, BData);
             
             %%------ strongly enforce zero on the boundary----
-            foo = ones(size(u_hat)); dof = length(foo);
-            foo = grid.clear_skel_boundary(foo);
-            index = find(foo < 0.5);
-            b(index) = 0;
-            K = grid.K;
-            K(index,:) = 0;
-            K(:,index) = 0;
-            K((index - 1) * dof + index) = 1;
-            grid.K = K;
+%             foo = ones(size(u_hat)); dof = length(foo);
+%             foo = grid.clear_skel_boundary(foo);
+%             index = find(foo < 0.5);
+%             b(index) = 0;
+%             K = grid.K;
+%             K(index,:) = 0;
+%             K(:,index) = 0;
+%             K((index - 1) * dof + index) = 1;
+%             grid.K = K;
             %%-----------------------------------------------
             
             u_hat_t = grid.K \ b;
@@ -306,12 +306,14 @@ classdef grid < handle
  %           v = caxis;
             figure
             for i=1:num_vcyc
-                grid.plot_hdg_skel(u_hat-u_hat_t);
+                % grid.plot_hdg_skel(u_hat-u_hat_t);
 %                caxis(v);
                 getframe();
-                keyboard
+                % keyboard
                 u_hat = u_hat + grid.vcycle_hdg(v1, v2, r, zeros(size(u_hat)));
+                % u_hat = grid.vcycle_hdg(v1, v2, r, u_hat);
                 r = grid.residual(b, u_hat);
+                grid.plot_hdg_skel(r);
                 temp = u_hat - u_hat_t;
                 err = sqrt(temp.' * grid.K * temp);
                 disp([num2str(i, '%03d\t') ': |res| = ' num2str(norm(r),'\t%8.4e') ' -- ' num2str(err,'\t%8.4e')]);
@@ -326,6 +328,12 @@ classdef grid < handle
             iter = num_vcyc;
             rr = norm(r)/r0;
 
+            % grid.clear_skel_boundary(u_hat);
+            % r = grid.residual(b, u_hat);
+            grid.plot_hdg_skel(u_hat - u_hat_t);
+            figure
+            grid.plot_hdg_skel(u_hat);
+            
             % 3. local solve
             lamAll = zeros(grid.Mesh.Ns_faces * Nfp,1);
             lamAll(grid.Bmaps) = BData;
@@ -1037,7 +1045,7 @@ classdef grid < handle
                 end
             end
             
-            lamAll(self.Bmaps) = 0;
+            % lamAll(self.Bmaps) = 0;
             
             Bdata  = lamAll(self.Bmaps);
             u_skel = lamAll(self.SkelInterior2All);
@@ -1501,8 +1509,41 @@ classdef grid < handle
           u_cg(2:end-1,end) = u_cg(2:end-1,end)*0.5;
           
           % draw
+          subplot(1,2,1);
           imagesc(u_cg);
           colorbar;
+
+          % special plot ...
+          gamma = zeros(self.Mesh.nelems(1)*Nfp + self.Mesh.nelems(1) + 1, ...
+                        self.Mesh.nelems(2)*Nfp + self.Mesh.nelems(2) + 1);
+          
+          for e=1:num_elem
+            for fid=1:4
+              idx = self.Mesh.get_skeletal_face_indices(self.refel, e, fid);
+              [i,j] = ind2sub (self.Mesh.nelems, e);
+              
+              switch fid
+                case 1
+                  xidx = (i-1)*(Nfp+1) + 1;
+                  yidx = (j-1)*(Nfp+1) + 1 + (1:Nfp);
+                  
+                case 2
+                  xidx = i*(Nfp+1) + 1;
+                  yidx = (j-1)*(Nfp+1) + 1 + (1:Nfp);
+                  
+                case 3
+                  xidx = (i-1)*(Nfp+1) + 1 + (1:Nfp);
+                  yidx = (j-1)*(Nfp+1) + 1;
+                case 4
+                  xidx = (i-1)*(Nfp+1) + 1 + (1:Nfp);
+                  yidx = j*(Nfp+1) + 1;
+              end
+              
+              gamma(xidx, yidx) = lamAll(idx);
+            end
+          end
+          subplot(1,2,2);
+          imagesc(gamma); colorbar;
         end % plot_hdg_skel
         
         function u_hat_z = clear_skel_boundary(self, u_hat)
