@@ -23,6 +23,8 @@ classdef grid < handle
         smoother
         linear_smoother
         K
+        I
+        Q
         L
         K_lin
         K_CG
@@ -1044,14 +1046,18 @@ classdef grid < handle
                     lamAll(idx) = u_cg(cg_idx);
                 end
             end
-            
+
             % lamAll(self.Bmaps) = 0;
             
             Bdata  = lamAll(self.Bmaps);
             u_skel = lamAll(self.SkelInterior2All);
+            
+% $$$             Bdata  = zeros(length(self.Bmaps),1);
+% $$$             u_skel = self.I'*u_cg;
         end
-        
+                
         function u_cg = skel_to_cg (self, u_skel, Bdata)
+
             Nfp = self.refel.Nrp ^ (self.refel.dim - 1);
             
             dof = prod(self.Mesh.nelems*self.refel.N + 1);
@@ -1104,6 +1110,9 @@ classdef grid < handle
             bdy_index = ...
                 self.Mesh.get_boundary_node_indices(self.Mesh.order);
             u_cg(bdy_index)  = 0; 
+        
+%                u_cg = self.I * u_skel;
+
 
             M = self.M;
             
@@ -1383,6 +1392,101 @@ classdef grid < handle
             
             self.K = A;
             self.is_hDG_solve = true;
+        end
+
+        function I = skel_to_cg_matrix (self)
+            Nfp = self.refel.Nrp ^ (self.refel.dim - 1);
+            
+            dof = prod(self.Mesh.nelems*self.refel.N + 1);
+            hdg_dof = length(self.SkelInterior2All);
+            
+            num_elem = prod(self.Mesh.nelems);
+            
+            nx = self.Mesh.nelems(1);
+            ny = self.Mesh.nelems(2);
+            
+            % TODO: need to replace 1.0 with the actual domain length
+            hx = 1.0/nx; hy = 1.0/ny;
+            fac = hx*hy / (2*(hx+hy));
+            
+            % add Bdata to skel to get linear dg
+            lamAll = zeros(self.Mesh.Ns_faces * Nfp,1);
+            lamAll(self.Bmaps) = 0;
+            u_skel = zeros(hdg_dof,1);
+            I = zeros(dof,hdg_dof);
+            u_cg = zeros(dof,1);
+            
+            for nhdg = 1:hdg_dof
+              u_skel(nhdg) = 1;
+              lamAll(self.SkelInterior2All) = u_skel;
+              u_cg(:) = 0; 
+              
+              % loop over elements
+              for e=1:num_elem
+                % TODO: remove hard-coding with 4 here
+                for fid=1:4
+                    idx = self.Mesh.get_skeletal_face_indices(self.refel, e, fid);
+                    [cg_idx, gfid] = self.Mesh.get_continuous_face_indices(self.refel, e, fid);
+                    
+                    %----Restrict HDG linear skeleton solution to linear CG mesh-------
+                    % (Q_0 mu, v)_0 = (mu, I_1 v)_1
+                    Jf = self.Mesh.geometric_factors_face(self.refel, e, fid);
+                    Md = self.refel.w .* Jf;
+                    Mf = self.refel.q1d' * diag(Md) * self.refel.q1d;
+                    rhs = Mf * lamAll(idx);  
+                    % rhs = Jf .* (self.refel.Mr * lamAll(idx));
+                    
+                    if self.SkelAll2Interior(idx(1)) < eps
+                      if norm(rhs) > 1.e-14
+                        error('rhs must be zero here');
+                      end
+                        u_cg(cg_idx) = u_cg(cg_idx) + fac * rhs;
+                    else
+                        u_cg(cg_idx) = u_cg(cg_idx) + fac * rhs;
+                    end
+                    %------------------------------------------------------------------
+                end
+            end
+            
+% $$$             bdy_index = ...
+% $$$                 self.Mesh.get_boundary_node_indices(self.Mesh.order);
+% $$$             u_cg(bdy_index)  = 0; 
+            I(:,nhdg) = u_cg;
+            u_skel(nhdg) = 0;
+            end
+            self.I = I;
+        end
+        
+        function [Q] = cg_to_skel_matrix (self)
+            Nfp = self.refel.Nrp ^ (self.refel.dim - 1);
+            num_elem = prod(self.Mesh.nelems);
+            dof = prod(self.Mesh.nelems*self.refel.N + 1);
+            hdg_dof = length(self.SkelInterior2All);
+            
+            lamAll = zeros(self.Mesh.Ns_faces * Nfp,1);
+                        
+            u_cg = zeros(dof,1);
+            Q = zeros(hdg_dof, dof);
+            
+            for ncg = 1:dof
+              u_cg(ncg)  = 1;
+              lamAll(:) = 0;
+              % loop over elements
+              for e=1:num_elem
+                % TODO: remove hard-coding with 4 here
+                for fid=1:4
+                  idx = self.Mesh.get_skeletal_face_indices(self.refel, e, fid);
+                  [cg_idx, gfid] = self.Mesh.get_continuous_face_indices(self.refel, e, fid);
+                  
+                  % Prolongate CG linear solution to HDG linear skeleton
+                  lamAll(idx) = u_cg(cg_idx);
+                end
+              end
+
+              Q(:,ncg) = lamAll(self.SkelInterior2All);
+              u_cg(ncg) = 0;
+            end
+            self.Q = Q;
         end
         
         function [u,qx,qy] = localSolver (self, e1, lam, forcing)
