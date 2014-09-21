@@ -283,17 +283,17 @@ classdef grid < handle
             u_hat = grid.extract_skeletal_data(u);
             b = -grid.hdg_residual(u_hat, rhs, BData);
             
-            %%------ strongly enforce zero on the boundary----
-%             foo = ones(size(u_hat)); dof = length(foo);
-%             foo = grid.clear_skel_boundary(foo);
-%             index = find(foo < 0.5);
-%             b(index) = 0;
-%             K = grid.K;
-%             K(index,:) = 0;
-%             K(:,index) = 0;
-%             K((index - 1) * dof + index) = 1;
-%             grid.K = K;
-            %%-----------------------------------------------
+% $$$             %%------ strongly enforce zero on the boundary----
+% $$$             foo = ones(size(u_hat)); dof = length(foo);
+% $$$             foo = grid.clear_skel_boundary(foo);
+% $$$             index = find(foo < 0.5);
+% $$$             b(index) = 0;
+% $$$             K = grid.K;
+% $$$             K(index,:) = 0;
+% $$$             K(:,index) = 0;
+% $$$             K((index - 1) * dof + index) = 1;
+% $$$             grid.K = K;
+% $$$             %%-----------------------------------------------
             
             u_hat_t = grid.K \ b;
 
