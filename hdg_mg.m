@@ -9,10 +9,10 @@
 order = 1;
 
 % number of elements in x and y directions
-nelems = [16, 16];
+nelems = 8*[2, 2];
 
 % generate mesh heirarchy 
-grid = create_hdg_grids(2, @homg.xform.identity, 1, 16);
+grid = create_hdg_grids(2, @homg.xform.identity, order, nelems(1));
 % grid.debug = 1;
 % grid.get_u0();
 
@@ -97,7 +97,7 @@ end
 
 Bdata = grid.Mesh.get_boundary_data(grid.refel, Uexact);
 
-u = grid.solve_hdg_mg(20, 'chebyshev', 1, 1, Forcing(:), zeros(size(Uexact(:))), Bdata);
+u = grid.solve_hdg_mg(100, 'chebyshev', 1, 1, Forcing(:), zeros(size(Uexact(:))), Bdata);
 
 %% test errors ... 
 
