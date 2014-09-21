@@ -384,6 +384,7 @@ classdef grid < handle
                     u = grid.K_lin \ rhs;
                 else
                     u = grid.K \ rhs;
+%                    u = grid.K \ (grid.M * rhs);
                 end
                 
                 return;
@@ -1092,9 +1093,13 @@ classdef grid < handle
                     Md = self.refel.w .* Jf;
                     Mf = self.refel.q1d' * diag(Md) * self.refel.q1d;
                     rhs = Mf * lamAll(idx);  
+%                    rhs = lamAll(idx);
                     % rhs = Jf .* (self.refel.Mr * lamAll(idx));
-                    
+
                     if self.SkelAll2Interior(idx(1)) < eps
+                      if norm(rhs) > 1.e-14
+                        error('rhs must be zero here');
+                      end
                         u_cg(cg_idx) = u_cg(cg_idx) + fac * rhs;
                     else
                         u_cg(cg_idx) = u_cg(cg_idx) + fac * rhs;
@@ -1119,6 +1124,8 @@ classdef grid < handle
             M(bdy_index,:) = 0;
             M(:, bdy_index) = 0;
             M((bdy_index - 1) * dof + bdy_index) = 1;
+            
+%            self.M = M;
             
             u_cg = M \ u_cg;
         end
