@@ -300,6 +300,14 @@ classdef grid < handle
             % 2. iterate - vcycles 
             r = grid.residual(b, u_hat);
             
+% $$$             %---------- Testing (Q_0 r, Q_0 r)_0 = (r, I_1 Q_0 r)_1-----
+% $$$             BData = zeros(size(grid.Bmaps));
+% $$$             Q_r = grid.skel_to_cg (r, BData);
+% $$$             I_Q_r = grid.cg_to_skel(Q_r);
+% $$$             norm(Q_r.' * grid.M * Q_r - r.'* I_Q_r)
+% $$$             keyboard
+% $$$             %-----------------------------------------------------
+            
             disp(['Initial residual is ' num2str(norm(r),'\t%8.4e')]);
             disp('------------------------------------------');
             r0 = norm(r);
@@ -311,7 +319,7 @@ classdef grid < handle
                 % grid.plot_hdg_skel(u_hat-u_hat_t);
 %                caxis(v);
                 getframe();
-                % keyboard
+                keyboard
                 u_hat = u_hat + grid.vcycle_hdg(v1, v2, r, zeros(size(u_hat)));
                 % u_hat = grid.vcycle_hdg(v1, v2, r, u_hat);
                 r = grid.residual(b, u_hat);
@@ -1089,20 +1097,20 @@ classdef grid < handle
                     
                     %----Restrict HDG linear skeleton solution to linear CG mesh-------
                     % (Q_0 mu, v)_0 = (mu, I_1 v)_1
-                    Jf = self.Mesh.geometric_factors_face(self.refel, e, fid);
-                    Md = self.refel.w .* Jf;
-                    Mf = self.refel.q1d' * diag(Md) * self.refel.q1d;
-                    rhs = Mf * lamAll(idx);  
-%                    rhs = lamAll(idx);
+% $$$                     Jf = self.Mesh.geometric_factors_face(self.refel, e, fid);
+% $$$                     Md = self.refel.w .* Jf;
+% $$$                     Mf = self.refel.q1d' * diag(Md) * self.refel.q1d;
+% $$$                     rhs = Mf * lamAll(idx);  
+                    rhs = lamAll(idx);
                     % rhs = Jf .* (self.refel.Mr * lamAll(idx));
 
                     if self.SkelAll2Interior(idx(1)) < eps
                       if norm(rhs) > 1.e-14
                         error('rhs must be zero here');
                       end
-                        u_cg(cg_idx) = u_cg(cg_idx) + fac * rhs;
+                        u_cg(cg_idx) = u_cg(cg_idx) + rhs;
                     else
-                        u_cg(cg_idx) = u_cg(cg_idx) + fac * rhs;
+                        u_cg(cg_idx) = u_cg(cg_idx) + 0.5 * rhs;
                     end
                     %------------------------------------------------------------------
                 end
@@ -1111,23 +1119,23 @@ classdef grid < handle
             if ( isempty(self.M) )
                 self.M = self.Mesh.assemble_mass(self.refel.N);
             end
+% $$$             
+% $$$             bdy_index = ...
+% $$$                 self.Mesh.get_boundary_node_indices(self.Mesh.order);
+% $$$             u_cg(bdy_index)  = 0; 
+% $$$         
+% $$$ %                u_cg = self.I * u_skel;
+% $$$ 
+% $$$ 
+% $$$             M = self.M;
+% $$$             
+% $$$             M(bdy_index,:) = 0;
+% $$$             M(:, bdy_index) = 0;
+% $$$             M((bdy_index - 1) * dof + bdy_index) = 1;
+% $$$             
+% $$$             self.M = M;
             
-            bdy_index = ...
-                self.Mesh.get_boundary_node_indices(self.Mesh.order);
-            u_cg(bdy_index)  = 0; 
-        
-%                u_cg = self.I * u_skel;
-
-
-            M = self.M;
-            
-            M(bdy_index,:) = 0;
-            M(:, bdy_index) = 0;
-            M((bdy_index - 1) * dof + bdy_index) = 1;
-            
-%            self.M = M;
-            
-            u_cg = M \ u_cg;
+%            u_cg = self.M \ u_cg;
         end
         
         
