@@ -312,18 +312,17 @@ classdef grid < handle
             disp('------------------------------------------');
             r0 = norm(r);
             
-            grid.plot_hdg_skel(u_hat_t);
+            %grid.plot_hdg_skel(u_hat_t);
  %           v = caxis;
-            figure
             for i=1:num_vcyc
                 % grid.plot_hdg_skel(u_hat-u_hat_t);
 %                caxis(v);
-                getframe();
-                keyboard
+                %getframe();
+                % keyboard
                 u_hat = u_hat + grid.vcycle_hdg(v1, v2, r, zeros(size(u_hat)));
                 % u_hat = grid.vcycle_hdg(v1, v2, r, u_hat);
                 r = grid.residual(b, u_hat);
-                grid.plot_hdg_skel(r);
+                % grid.plot_hdg_skel(r);
                 temp = u_hat - u_hat_t;
                 err = sqrt(temp.' * grid.K * temp);
                 disp([num2str(i, '%03d\t') ': |res| = ' num2str(norm(r),'\t%8.4e') ' -- ' num2str(err,'\t%8.4e')]);
@@ -340,9 +339,9 @@ classdef grid < handle
 
             % grid.clear_skel_boundary(u_hat);
             % r = grid.residual(b, u_hat);
-            grid.plot_hdg_skel(u_hat - u_hat_t);
-            figure
-            grid.plot_hdg_skel(u_hat);
+            %grid.plot_hdg_skel(u_hat - u_hat_t);
+            %figure
+            %grid.plot_hdg_skel(u_hat);
             
             % 3. local solve
             lamAll = zeros(grid.Mesh.Ns_faces * Nfp,1);
@@ -1176,7 +1175,6 @@ classdef grid < handle
         function res = hdg_residual(self, lamInterior, forcing, Bdata)
             % InteriorF2AllF = HDG.InteriorF2AllF;
             
-            refel = self.refel;
             K = prod(self.Mesh.nelems);
             Nfp = self.refel.Nrp ^ (self.refel.dim - 1);
             Nfaces = self.refel.dim * 2;
@@ -1197,20 +1195,22 @@ classdef grid < handle
                 [u, qx, qy] = self.localSolver(e, lamAll, forcing);
                 
                 for f = 1:Nfaces
-                    idxf = self.Mesh.get_skeletal_face_indices(refel, e, f);
+                    idxf = self.Mesh.get_skeletal_face_indices(self.refel, e, f);
                     
                     if abs( self.SkelAll2Interior( idxf(1) ) ) < eps
                         continue;
                     end
                     lam = lamAll(idxf);
                     
-                    Jf   = self.Mesh.geometric_factors_face(refel,e,f);
-                    idxv = self.Mesh.get_discontinuous_face_indices(refel, 1, f);
-                    
+                    Jf   = self.Mesh.geometric_factors_face(self.refel,e,f);
+                    idxv = self.Mesh.get_discontinuous_face_indices(self.refel, 1, f);
                     
                     % construct the residual
-                    Fhat = Jf .* (refel.Mr * (qx(idxv) * nx(f) + qy(idxv) * ny(f) + ...
-                        taur * (u(idxv) - lam)));
+                    Fhat = Jf .* ...
+                           ( self.refel.Mg * self.refel.q1d * (qx(idxv) * nx(f) + ...
+                             qy(idxv) * ny(f)             + ...
+                             taur * (u(idxv) - lam)) ...
+                           );
                     
                     res(self.SkelAll2Interior(idxf)) = res(self.SkelAll2Interior(idxf)) + Fhat;
                 end
@@ -1362,9 +1362,9 @@ classdef grid < handle
                     dqx_dlam_f = dqx_dlam(idxv,index);
                     dqy_dlam_f = dqy_dlam(idxv,index);
                     
-                    dFhat_dlam = self.refel.Mr * (diag(Jf .* nx(f)) * dqx_dlam_f +...
-                        diag(Jf .* ny(f)) * dqy_dlam_f +...
-                        diag(Jf .* taur)  * (du_dlam_f - I));
+                    dFhat_dlam = self.refel.q1d' * self.refel.Mg * (diag(Jf .* nx(f)) * self.refel.q1d * dqx_dlam_f +...
+                        diag(Jf .* ny(f)) * self.refel.q1d * dqy_dlam_f +...
+                        diag(Jf .* taur)  * self.refel.q1d * (du_dlam_f - I));
                     
                     %    res(SkelAll2Interior(idxf)) = res(SkelAll2Interior(idxf)) + Fhat;
                     % self derivative
@@ -1388,9 +1388,9 @@ classdef grid < handle
                         dqx_dlam_fn = dqx_dlam(idxv,indexn);
                         dqy_dlam_fn = dqy_dlam(idxv,indexn);
                         
-                        dFhat_dlamn = self.refel.Mr * (diag(Jf .* nx(f)) * dqx_dlam_fn +...
-                            diag(Jf .* ny(f)) * dqy_dlam_fn +...
-                            diag(Jf .* taur)  * du_dlam_fn );
+                        dFhat_dlamn = self.refel.q1d' * self.refel.Mg * (diag(Jf .* nx(f)) * self.refel.q1d * dqx_dlam_fn +...
+                            diag(Jf .* ny(f)) * self.refel.q1d * dqy_dlam_fn +...
+                            diag(Jf .* taur)  * self.refel.q1d * du_dlam_fn );
                         
                         % neighbor derivative
                         II(nnzeros+1:nnzeros+Nfp2) = repmat(idxf_interior, 1, Nfp);

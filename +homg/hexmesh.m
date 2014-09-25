@@ -1080,7 +1080,7 @@ end
         pts_face = pts(idx, 1);
       end
 
-      [J, D] = self.geometric_factors_gll ( ref_face, pts_face );
+      [J, D] = self.geometric_factors ( ref_face, pts_face );
     end
     
     function coords = linear_element_nodes(self, elem, order) 
@@ -1304,7 +1304,7 @@ end
 			VtoF = zeros(Nfp, Nv, Nfaces);
 			for f = 1:Nfaces
 			  idxv = self.get_discontinuous_face_indices(refel, 1, f);
-			  LIFT(idxv,:,f) = refel.Mr;
+			  LIFT(idxv,:,f) = refel.Mg; 
 			  for fp = 1:Nfp
 			    VtoF(fp,idxv(fp),f) = 1;
 			  end
