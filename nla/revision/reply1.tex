@@ -45,8 +45,22 @@ cost in a clear way.  Again, the targeted contributions of this
 manuscript would be quite interesting, but the numerics and discussion
 could be significantly improved to support many of the statements.}
 \noindent
-\note{I guess we've to point out that our metric (and what we call
-  performance---maybe we should call this differently) is the no of matvecs.}
+Our ``performance metric'' is not the solution time, which strongly
+depends on the architecture and the implementation, but the number of
+fine-grid MatVecs required for convergence. These MatVecs are the main
+building block of all algorithm variants compared in our manuscript as
+they dominate the computation both in terms of memory reads/writes and
+floating point operations. Thus, our performance model only counts the
+number of fine-grid MatVecs. The actual time-to-solution is---at first
+order---the number of required MatVecs multiplied by the
+time-per-MatVec, which strongly depends on architecture and
+implementation. In the revised manuscript, we have tried to better
+work out and explain that difference, and we added references to
+papers that study the time-per-MatVec and compare matrix-fee versus
+assembled MatVecs on specific architectures for hexahedral elements
+([pTatin3D; our SC08 paper; Fischer's book?]).
+\todo{Incorporate that in paper; should we use a different term
+  instead of ``performance''?}
 
 \referee{
 Non-Minor Concerns\\[2ex]
@@ -56,6 +70,14 @@ coefficients, nor consider ill-shaped elements" on page 3 should
 really consider the implications of this.  The three methods will be
 challenged in this setting whereas AMG has been used effectively.}
 \noindent
+We are not trying to make the point that $h$ or $p$ geometric
+multigrid is superior to AMG. However, note that the limitations we
+emphasize are not fundamental limitations of geometric MG, but we are
+trying to be explicit about which test problems we consider in this
+paper, and which \emph{not}. 
+\note{We have added language to the manuscript to clarify the
+  advantages and robustness of AMG.}
+
 
 \referee{ There is a consistent claim that matrix assembly for
   high-order should be avoided, but some context or citation is needed
@@ -74,7 +96,6 @@ challenged in this setting whereas AMG has been used effectively.}
   assembled matrix (cf.  grid.m assemblepoisson()), so perhaps this
   referee is just confused about this point.  Is the matrix assembled
   or is everything matrix free?  And how is the cost compared?}
-
 \noindent
 Given an order $p$, the operation count for a tensorized matrix-free
 matvec is $\mathcal{O}(p^4)$ as opposed to $\mathcal{O}(p^6)$ for a
