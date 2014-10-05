@@ -74,30 +74,45 @@ challenged in this setting whereas AMG has been used effectively.}
   referee is just confused about this point.  Is the matrix assembled
   or is everything matrix free?  And how is the cost compared?}
 
-Given an order $p$, the operation count for a tensorized matrix-free matvec
-is $\mathcal{O}(p^4)$ as opposed to $\mathcal{O}(p^6)$ for a fully assembled 
-matrix (Orszag, JCP 37(1)  1980). Please note that this is only considering the dense elemental matrix,
-so this is true for the best SpMV implementation possible. This has been
-clarified and cited in the paper as well.
+\noindent
+Given an order $p$, the operation count for a tensorized matrix-free
+matvec is $\mathcal{O}(p^4)$ as opposed to $\mathcal{O}(p^6)$ for a
+fully assembled matrix (Orszag, JCP 37(1) 1980). Please note that this
+is only considering the dense elemental matrix, so this is true for
+the best SpMV implementation possible. This has been clarified and
+cited in the paper as well.
+\note{Not only the assembly is the problem; the Matvec itself; we've
+  to make that clear somewhere}
+\\[1ex]
 
-No, AMG was not tested. The text in the paper has been removed. 
+\noindent
+No, AMG was not tested. The text in the paper has been removed.\\[1ex]
 
-Yes, in the current matlab implementation, the matrix is assembled. This
-is the reason we are comparing the iteration counts (which is proportional to the
-number of matvecs). 
+\noindent
+Yes, in the current MATLAB implementation, the matrix is
+assembled. This is the reason we are comparing the iteration counts
+(which is proportional to the number of matvecs).
 
 \referee{ Figure 2 needs some work.  Column 1 displays the smoothing
   properties.  But why should we expect Jacobi, Chebyshev, and SSOR to
   display classic smoothing properties for high-order problems?  And
-  why does weighted Jacobi anihilate all high-order modes (for
+  why does weighted Jacobi annihilate all high-order modes (for
   linears) in the top corner plot?  In addition, the use of a single
   coarse grid is used here (so it should be labeled two-grid rather
   than V-cycle, but this is minor), but what is the coarse grid?  For
   presentation, a suggestion is to move the rather lengthy paragraph
-  in the Figure 2 caption to the the section where it is cited.
+  in the Figure 2 caption to the section where it is cited.
 }
 \noindent
-...
+\note{We do not expect classical smoothing properties\ldots}\\
+Weighted Jacobi does not annihilate the high-order error components
+completely, but these error components are decreased so strongly
+that they are out of the range of the $y$-axis (note that we are using
+a logarithmic scale for the error).\\[1ex]
+Thanks for the suggestion to replace ``v-cycle'' by ``two-grid
+correction''.\todo{Need to actually do that in the paper}\\[1ex]
+\note{GS: I'm fine with moving some of the text in the caption to the section.}
+
 
 \referee{
 To use Cheychev, are the Arnoldi iterations considered in the cost?}
@@ -136,6 +151,7 @@ page 3: The self references to 15-17 are unnecesary as presented.  If
 the intent is to motivate high-order, then other references should be
 used.  This happens again on page 5 in section 2.3 where [15-16] are
 mentioned with little connection to the current work.}
+\noindent
 We have removed these references.
 \referee{
 page 10: "number of multigrid v-cycles or of CG iterations" needs a
