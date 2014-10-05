@@ -8,7 +8,7 @@
 \usepackage{graphicx}
 \usepackage{color,pdfcolmk}
 \newcommand{\todo}[1]{\noindent\emph{\textcolor{red}{Todo: #1\:}}}
-\newcommand{\note}[1]{\noindent\emph{\textcolor{blue}{Note: #1\:}}}
+\newcommand{\note}[1]{\noindent\emph{\textcolor{green}{Note: #1\:}}}
 \newcommand{\referee}[1]{\vspace{3ex}\noindent{\textcolor{blue}{#1}}\\[2ex]}
 \newcommand{\nnn}{\mathbf{n}}
 \newcommand{\fff}{\mathbf{f}}
@@ -45,7 +45,8 @@ cost in a clear way.  Again, the targeted contributions of this
 manuscript would be quite interesting, but the numerics and discussion
 could be significantly improved to support many of the statements.}
 \noindent
-our text here
+\note{I guess we've to point out that our metric (and what we call
+  performance---maybe we should call this differently) is the no of matvecs.}
 
 \referee{
 Non-Minor Concerns\\[2ex]
@@ -124,7 +125,7 @@ to the cost. This has been clarified in the text.
   smoothers applied symmetrically?  SSOR does not appear to do this in
   particular.}
 \noindent
-Yes, All the smoothers are symmetrically applied, including Symmetric-SOR.
+Yes, all the smoothers are symmetrically applied, including Symmetric-SOR.
 
 \referee{ Section 4 gets very long without reporting anything on
   relative efficiency.  The iteration counts show that the methods are
@@ -141,10 +142,12 @@ for the comparison based on the iteration counts.
 \referee{
 A Few Minor Issues\\[.3ex]
 page 3: discretization $\rightarrow$ discretizations}
-has been corrected.
+\noindent
+Thanks--has been corrected.
 \referee{
 page 3: on the performance $\rightarrow$ in the performance }
-has been corrected.
+\noindent
+Corrected.
 
 \referee{
 page 3: The self references to 15-17 are unnecesary as presented.  If
@@ -157,6 +160,7 @@ We have removed these references.
 page 10: "number of multigrid v-cycles or of CG iterations" needs a
 rewording
 }
+\noindent
 This sentence has been rephrased.
 \referee{ page 12: Table I should list these values as iterations
   counts somewhere (and there is a hanging sentence below the table
