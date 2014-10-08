@@ -1293,6 +1293,11 @@ end
 			    if (e1 > 0) && (e2 > 0), 
 			      % global trace index for f1
 			      idxf = self.get_skeletal_face_indices(refel, e1, f1);
+                              idxfp = self.get_skeletal_face_indices(refel, e2, f2);
+                              if (norm(idxf - idxfp) > 1.e-14)
+                                error(['wrong in ' ...
+                                       'skeletal_face_indices']);
+                              end
 			      SkelInterior2All(iindex+1:iindex+Nfp) = idxf;
 			      SkelAll2Interior(idxf) = iindex+1:iindex+Nfp;
 			      iindex = iindex + Nfp;
@@ -1305,9 +1310,10 @@ end
 			for f = 1:Nfaces
 			  idxv = self.get_discontinuous_face_indices(refel, 1, f);
 			  LIFT(idxv,:,f) = refel.Mr;
-			  for fp = 1:Nfp
-			    VtoF(fp,idxv(fp),f) = 1;
-			  end
+                          VtoF(:,idxv,f) = 1;
+% $$$ 			  for fp = 1:Nfp
+% $$$ 			    VtoF(fp,idxv(fp),f) = 1;
+% $$$ 			  end
 			end
 		end
 
