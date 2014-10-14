@@ -8,7 +8,7 @@
 \usepackage{graphicx}
 \usepackage{color,pdfcolmk}
 \newcommand{\todo}[1]{\noindent\emph{\textcolor{red}{Todo: #1\:}}}
-\newcommand{\note}[1]{\noindent\emph{\textcolor{blue}{Note: #1\:}}}
+\newcommand{\note}[1]{\noindent\emph{\textcolor{green}{Note: #1\:}}}
 \newcommand{\referee}[1]{\vspace{3ex}\noindent{\textcolor{blue}{#1}}\\[2ex]}
 \newcommand{\nnn}{\mathbf{n}}
 \newcommand{\fff}{\mathbf{f}}
@@ -45,7 +45,22 @@ cost in a clear way.  Again, the targeted contributions of this
 manuscript would be quite interesting, but the numerics and discussion
 could be significantly improved to support many of the statements.}
 \noindent
-our text here
+Our ``performance metric'' is not the solution time, which strongly
+depends on the architecture and the implementation, but the number of
+fine-grid MatVecs required for convergence. These MatVecs are the main
+building block of all algorithm variants compared in our manuscript as
+they dominate the computation both in terms of memory reads/writes and
+floating point operations. Thus, our performance model only counts the
+number of fine-grid MatVecs. The actual time-to-solution is---at first
+order---the number of required MatVecs multiplied by the
+time-per-MatVec, which strongly depends on architecture and
+implementation. In the revised manuscript, we have tried to better
+work out and explain that difference, and we added references to
+papers that study the time-per-MatVec and compare matrix-fee versus
+assembled MatVecs on specific architectures for hexahedral elements
+([pTatin3D; our SC08 paper; Fischer's book?]).
+\todo{Incorporate that in paper; should we use a different term
+  instead of ``performance''?}
 
 \referee{
 Non-Minor Concerns\\[2ex]
@@ -55,6 +70,14 @@ coefficients, nor consider ill-shaped elements" on page 3 should
 really consider the implications of this.  The three methods will be
 challenged in this setting whereas AMG has been used effectively.}
 \noindent
+We are not trying to make the point that $h$ or $p$ geometric
+multigrid is superior to AMG. However, note that the limitations we
+emphasize are not fundamental limitations of geometric MG, but we are
+trying to be explicit about which test problems we consider in this
+paper, and which \emph{not}. 
+\note{We have added language to the manuscript to clarify the
+  advantages and robustness of AMG.}
+
 
 \referee{ There is a consistent claim that matrix assembly for
   high-order should be avoided, but some context or citation is needed
@@ -73,31 +96,77 @@ challenged in this setting whereas AMG has been used effectively.}
   assembled matrix (cf.  grid.m assemblepoisson()), so perhaps this
   referee is just confused about this point.  Is the matrix assembled
   or is everything matrix free?  And how is the cost compared?}
+\noindent
+Since we employ hexahedral elements\footnote{For tetrahedral elements,
+  this difference might be less pronounced.} in combination with a
+tensorial finite element basis, the effect of matrix-free operations
+for higher-order elements can be quite significant in terms of
+floating point operations, memory requirements, and actual run time:
 
-Given an order $p$, the operation count for a tensorized matrix-free matvec
-is $\mathcal{O}(p^4)$ as opposed to $\mathcal{O}(p^6)$ for a fully assembled 
-matrix (Orszag, JCP 37(1)  1980). Please note that this is only considering the dense elemental matrix,
-so this is true for the best SpMV implementation possible. This has been
-clarified and cited in the paper as well.
+\begin{itemize}
+\item \emph{Memory requirements for assembled matrices:} For an order
+  $p$, assembled element matrices are dense and of the size
+  $(p+1)^3\times(p+1)^3$. For $p=9$, for instance, $(p+1)^3=1000$ and
+  thus each element contributes $10^6$ entries to the assembled
+  stiffness matrix, and each row in the matrix contains, on average,
+  several 1000 nonzero entries. Thus, for high orders, memory becomes
+  a significant issue.
+\item \emph{Floating point operations for matrix-free versus assembled
+  MatVec:} For hexahedral elements, the operation count for a
+  tensorized matrix-free matvec is $\mathcal{O}(p^4)$ as opposed to
+  $\mathcal{O}(p^6)$ for a fully assembled matrix (Orszag, JCP 37(1)
+  1980). Please note that this is only considering the dense elemental
+  matrix, so this is true for the best SpMV implementation possible
+  \note{I know what you mean, but the last sentence is still a bit
+    confusing}. This has been clarified and cited in the paper as
+  well.
+\end{itemize}
+We have better incorporated these arguments into the paper, and refer
+to [Orszag, Fischer, pTatin3D] for floating point operation estimates
+and memory access arguments, and to [pTatin, our-SC08-paper,...] for
+experiments and comparisons between matrix-free and assembled matvecs
+on modern hardware. We acknowledge that results depend on $p$ (for
+$p\le 2 or 3$, a MatVec based on an assembled matrix can be faster),
+on the spatial dimension (2 vs.\ 3), on the equation (scalar
+vs.\ vector system), the geometry deformation of the mesh (high-order
+vs.\ low-order geometry transformation), and on the hardware (GPGPU,
+CPU, etc.). However, to keep our comparison simple and avoid mixing
+too many factors, we decided to use the fine-grid MatVecs as our
+``performance measure''.\\[1ex]
 
-No, AMG was not tested. The text in the paper has been removed. 
 
-Yes, in the current matlab implementation, the matrix is assembled. This
-is the reason we are comparing the iteration counts (which is proportional to the
-number of matvecs). 
+\noindent
+No, AMG was not tested. The text in the paper has been removed.\\[1ex]
+
+\noindent
+Yes, in the current MATLAB implementation, the matrix is
+assembled. This is the reason we are comparing the iteration counts
+(which is proportional to the number of matvecs).
 
 \referee{ Figure 2 needs some work.  Column 1 displays the smoothing
   properties.  But why should we expect Jacobi, Chebyshev, and SSOR to
   display classic smoothing properties for high-order problems?  And
-  why does weighted Jacobi anihilate all high-order modes (for
+  why does weighted Jacobi annihilate all high-order modes (for
   linears) in the top corner plot?  In addition, the use of a single
   coarse grid is used here (so it should be labeled two-grid rather
   than V-cycle, but this is minor), but what is the coarse grid?  For
   presentation, a suggestion is to move the rather lengthy paragraph
-  in the Figure 2 caption to the the section where it is cited.
+  in the Figure 2 caption to the section where it is cited.
 }
 \noindent
-...
+We do \emph{not} expect these iterative methods to display classical
+smoothing properties; their performance and robustness is actually
+what we try to study numerically. \todo{Check Ronquist/Patera 87 if
+  they can prove something in 1D.}
+
+Weighted Jacobi does not annihilate the high-order error components
+completely, but these error components are decreased so strongly
+that they are out of the range of the $y$-axis (note that we are using
+a logarithmic scale for the error).\\[1ex]
+Thanks for the suggestion to replace ``v-cycle'' by ``two-grid
+correction''.\todo{Need to actually do that in the paper}\\[1ex]
+\note{GS: I'm fine with moving some of the text in the caption to the section.}
+
 
 \referee{
 To use Cheychev, are the Arnoldi iterations considered in the cost?}
@@ -109,7 +178,7 @@ to the cost. This has been clarified in the text.
   smoothers applied symmetrically?  SSOR does not appear to do this in
   particular.}
 \noindent
-Yes, All the smoothers are symmetrically applied, including Symmetric-SOR.
+Yes, all the smoothers are symmetrically applied, including Symmetric-SOR.
 
 \referee{ Section 4 gets very long without reporting anything on
   relative efficiency.  The iteration counts show that the methods are
@@ -126,21 +195,25 @@ for the comparison based on the iteration counts.
 \referee{
 A Few Minor Issues\\[.3ex]
 page 3: discretization $\rightarrow$ discretizations}
-has been corrected.
+\noindent
+Thanks--has been corrected.
 \referee{
 page 3: on the performance $\rightarrow$ in the performance }
-has been corrected.
+\noindent
+Corrected.
 
 \referee{
 page 3: The self references to 15-17 are unnecesary as presented.  If
 the intent is to motivate high-order, then other references should be
 used.  This happens again on page 5 in section 2.3 where [15-16] are
 mentioned with little connection to the current work.}
+\noindent
 We have removed these references.
 \referee{
 page 10: "number of multigrid v-cycles or of CG iterations" needs a
 rewording
 }
+\noindent
 This sentence has been rephrased.
 \referee{ page 12: Table I should list these values as iterations
   counts somewhere (and there is a hanging sentence below the table

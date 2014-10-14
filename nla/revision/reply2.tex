@@ -8,7 +8,7 @@
 \usepackage{graphicx}
 \usepackage{color,pdfcolmk}
 \newcommand{\todo}[1]{\noindent\emph{\textcolor{red}{Todo: #1\:}}}
-\newcommand{\note}[1]{\noindent\emph{\textcolor{blue}{Note: #1\:}}}
+\newcommand{\note}[1]{\noindent\emph{\textcolor{green}{Note: #1\:}}}
 \newcommand{\referee}[1]{\vspace{3ex}\noindent{\textcolor{blue}{#1}}\\[2ex]}
 \newcommand{\nnn}{\mathbf{n}}
 \newcommand{\fff}{\mathbf{f}}
@@ -47,28 +47,45 @@ Thanks.
 \referee{ 1) Section 2 refers to Figure 1 (first paragraph on page 4),
   but discusses only the first two approaches depicted there. This can
   be confusing.}
+\noindent 
 We have changed the figure reference to focus on the first two approaches. 
 
 \referee{ 2) Why are the h-Multigrid spaces nested for the domains in
   Figure 4?}
+\noindent
+We use a reference mesh for basis functions of polynomial degree $p$,
+as well as for restriction and prolongation. These polynomial basis
+functions are then mapped to the actual geometry (on which they might
+not be polynomials of order $p$ anymore). On the reference domain, the
+finite element spaces are nested.
+\todo{I've to think about this a bit more; I know that this is how we
+  do things, but it's not described in the paper at all.}
 
 \referee{ 3) It looks like SSOR is amplifying some error components
   when used as a smoother in Figure 3 (e.g. for p=4). Isn't Ak SPD in
   this case?}
+\noindent
+Yes, the matrix is symmetric and positive definite. However,
+convergence proofs of Jacobi and Gauss-Seidel smoothers that show that
+every components is decreased usually require stronger assumptions,
+such as diagonal dominance, which is not satisfied for first-order
+discretizations, but not for high-order FEM-based discretizations.
 
 \referee{ 4) Have you tried using the l1-Jacobi smoother from [2]?
   This smoother is always convergent, so it may approve the results of
   e.g. Table II.}
+\noindent
 We will add these.
 
 \referee{ 5) What is the coarse grid in Section 3.2.2, the one
   obtained by h-coarsening (and interpolation)?}
+\noindent
 Yes, we have clarified this in the text as well.
 
 \referee{ 6) A few typos: "loose" on page 1, "corresponds" on page 4,
   extra "rate" on page 7.}
 \noindent
-These have been corrected.
+Thanks---these have been corrected.
 
 \end{document}
 
