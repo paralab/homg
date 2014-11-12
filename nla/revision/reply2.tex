@@ -58,8 +58,9 @@ as well as for restriction and prolongation. These polynomial basis
 functions are then mapped to the actual geometry (on which they might
 not be polynomials of order $p$ anymore). On the reference domain, the
 finite element spaces are nested.
-\todo{I've to think about this a bit more; I know that this is how we
-  do things, but it's not described in the paper at all.}
+
+%\todo{I've to think about this a bit more; I know that this is how we
+%  do things, but it's not described in the paper at all.}
 
 \referee{ 3) It looks like SSOR is amplifying some error components
   when used as a smoother in Figure 3 (e.g. for p=4). Isn't Ak SPD in
@@ -68,14 +69,18 @@ finite element spaces are nested.
 Yes, the matrix is symmetric and positive definite. However,
 convergence proofs of Jacobi and Gauss-Seidel smoothers that show that
 every components is decreased usually require stronger assumptions,
-such as diagonal dominance, which is not satisfied for first-order
+such as diagonal dominance, which is satisfied for first-order
 discretizations, but not for high-order FEM-based discretizations.
 
-\referee{ 4) Have you tried using the l1-Jacobi smoother from [2]?
+\referee{ 4) Have you tried using the $\ell_1$-Jacobi smoother from [2]?
   This smoother is always convergent, so it may approve the results of
   e.g. Table II.}
 \noindent
-We will add these.
+We have added the implementation and results for the $\ell_1$-Jacobi smoother. Indeed,
+having a always convergent smoother is reassuring, but as the results indicate, it 
+was not always very efficient. It was interesting to observe that in many cases using
+point-wise jacobi as a smoother with multigrid as a preconditioner for CG worked better
+than using the $\ell_1$-smoother.
 
 \referee{ 5) What is the coarse grid in Section 3.2.2, the one
   obtained by h-coarsening (and interpolation)?}
@@ -86,6 +91,11 @@ Yes, we have clarified this in the text as well.
   extra "rate" on page 7.}
 \noindent
 Thanks---these have been corrected.
+
+
+\bibliographystyle{unsrt}
+\bibliography{../ccgo,../mg}
+
 
 \end{document}
 

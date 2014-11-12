@@ -58,9 +58,8 @@ implementation. In the revised manuscript, we have tried to better
 work out and explain that difference, and we added references to
 papers that study the time-per-MatVec and compare matrix-fee versus
 assembled MatVecs on specific architectures for hexahedral elements
-([pTatin3D; our SC08 paper; Fischer's book?]).
-\todo{Incorporate that in paper; should we use a different term
-  instead of ``performance''?}
+\cite{ptatin3d,BursteddeGhattasGurnisEtAl08,DevilleFischerMund02}.
+% \todo{Incorporate that in paper; should we use a different term instead of ``performance''?}
 
 \referee{
 Non-Minor Concerns\\[2ex]
@@ -75,8 +74,7 @@ multigrid is superior to AMG. However, note that the limitations we
 emphasize are not fundamental limitations of geometric MG, but we are
 trying to be explicit about which test problems we consider in this
 paper, and which \emph{not}. 
-\note{We have added language to the manuscript to clarify the
-  advantages and robustness of AMG.}
+% \note{We have added language to the manuscript to clarify the advantages and robustness of AMG.}
 
 
 \referee{ There is a consistent claim that matrix assembly for
@@ -114,16 +112,16 @@ floating point operations, memory requirements, and actual run time:
 \item \emph{Floating point operations for matrix-free versus assembled
   MatVec:} For hexahedral elements, the operation count for a
   tensorized matrix-free matvec is $\mathcal{O}(p^4)$ as opposed to
-  $\mathcal{O}(p^6)$ for a fully assembled matrix (Orszag, JCP 37(1)
-  1980). Please note that this is only considering the dense elemental
+  $\mathcal{O}(p^6)$ for a fully assembled matrix \cite{orszag80}.
+   Please note that this is only considering the dense elemental
   matrix, so this is true for the best SpMV implementation possible
-  \note{I know what you mean, but the last sentence is still a bit
-    confusing}. This has been clarified and cited in the paper as
+  % \note{I know what you mean, but the last sentence is still a bit confusing}. 
+    This has been clarified and cited in the paper as
   well.
 \end{itemize}
 We have better incorporated these arguments into the paper, and refer
-to [Orszag, Fischer, pTatin3D] for floating point operation estimates
-and memory access arguments, and to [pTatin, our-SC08-paper,...] for
+to \cite{orszag80,DevilleFischerMund02,ptatin3d} for floating point operation estimates
+and memory access arguments, and to \cite{ptatin3d,BursteddeGhattasGurnisEtAl08} for
 experiments and comparisons between matrix-free and assembled matvecs
 on modern hardware. We acknowledge that results depend on $p$ (for
 $p\le 2 or 3$, a MatVec based on an assembled matrix can be faster),
@@ -156,16 +154,17 @@ assembled. This is the reason we are comparing the iteration counts
 \noindent
 We do \emph{not} expect these iterative methods to display classical
 smoothing properties; their performance and robustness is actually
-what we try to study numerically. \todo{Check Ronquist/Patera 87 if
-  they can prove something in 1D.}
+what we try to study numerically. 
+% \todo{Check Ronquist/Patera 87 if  they can prove something in 1D.}
 
 Weighted Jacobi does not annihilate the high-order error components
 completely, but these error components are decreased so strongly
 that they are out of the range of the $y$-axis (note that we are using
 a logarithmic scale for the error).\\[1ex]
 Thanks for the suggestion to replace ``v-cycle'' by ``two-grid
-correction''.\todo{Need to actually do that in the paper}\\[1ex]
-\note{GS: I'm fine with moving some of the text in the caption to the section.}
+correction''.
+%\todo{Need to actually do that in the paper}\\[1ex]
+%\note{GS: I'm fine with moving some of the text in the caption to the section.}
 
 
 \referee{
@@ -220,5 +219,10 @@ This sentence has been rephrased.
   from the itemize on the previous page) }
 \noindent
 The table captions have been modified to indicate the iteration counts.
+
+
+\bibliographystyle{unsrt}
+\bibliography{../ccgo,../mg}
+
 
 \end{document}

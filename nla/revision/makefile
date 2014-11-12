@@ -5,7 +5,11 @@ compPdftex=pdflatex
 
 all:
 	${compile}  ${filename1}
+	-bibtex ${filename1}
+	bibtex ${filename1}
 	${compile}  ${filename2}
+	-bibtex ${filename2}
+	bibtex ${filename2}
 	@echo Done ....!
 
 clean:

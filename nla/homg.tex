@@ -69,7 +69,7 @@ The  University of Texas at Austin, Austin, TX\break
 \affilnum{4}Department of Mechanical Engineering,
 The University of Texas at Austin, Austin, TX
 }
-\corraddr{Email: hari@ices.utexas.edu}
+\corraddr{Email: hari@cs.utah.edu}
 
 \begin{abstract}
 We present a comparison of different multigrid approaches for the
@@ -375,11 +375,13 @@ methods.
 {\em Contributions:} 
 % While high-order methods and their analysis have obtained significant attention, there is not as much work on efficient solvers. In particular, results studying the practical behavior of multigrid methods for high-order systems are scattered and a systematic comparison does not appear to be available. Thus, here we present a comparison of different combinations of multigrid hierarchies and smoothers for the solution of elliptic problems, which have been discretized by high-order continuous finite elements. We provide a simple and easily extendable Matlab implementation,\footnote{\url{http://hsundar.github.io/homg/}} which allows a systematic comparison of the different methods in the same framework. Our comparison does not use a high performance implementation, but we discuss aspects of high performance and distributed memory parallel implementations.
 There has been a lot of work on high-order discretization methods and on the efficient application of the resulting operators. However, efficient solvers for such
-discretization schemes have received significantly less attention. In particular, theoretical and experimental studies are scattered regarding the actual performance of
+discretization schemes have received significantly less attention. In particular, theoretical and experimental studies are scattered regarding the actual performance (say the number of vcycles or matrix-vector products to solve a system) of
 the different schemes under different scenarios. A systematic analysis of such performance is not available.
 In this, paper we address this gap in the existing literature. In particular we (1) consider high-order continuous Galerkin discretizations up to 16th order, (2) examine three different multigrid hierarchies ($h$, $p$, and first-order), (3) examine several different smoothers: Jacobi, polynomial, SSOR, and block Jacobi, (4) consider different settings (constant, mildly variable, and highly variable) of coefficients and (5) consider problems in 2D and 3D.
 To our knowledge, this is the first study of this kind. Our results demonstrate significant variability in the performance of the different schemes for the higher-order
-elements, highlighting the need for further research on the smoothers. Finally, we provide an easily extendable Matlab
+elements, highlighting the need for further research on the smoothers. 
+Although the overall runtime will depend on several factors---including the implementation and the target architecture---in this work we limit ourselves to characterizing performance as the number of fine-grid matrix-vector products needed for convergence. This is the most dominant cost and is also independent of the implementaion and architecture, allowing for easier interpretation and systematic comparison with other approached. 
+Finally, we provide an easily extendable Matlab
 implementation,\footnote{\url{http://hsundar.github.io/homg/}} which allows a systematic comparison of the different methods in the same framework.
 
 %study smoothers; 
@@ -636,6 +638,32 @@ restricted to conforming meshes that can be mapped to a square (in 2D) or a
 cube (in 3D). While, in practice, matrix assembly for
 high-order discretizations is discouraged, we use sparse
 assembled operators in this prototype implementation.
+
+\subsubsection{Matrix-free vs. matrix assembly} % (fold)
+\label{ssub:matrix_free_vs_matrix_assembly}
+
+Since we employ hexahedral elements in combination with a
+tensorial finite element basis, the effect of matrix-free operations
+for higher-order elements can be quite significant\footnote{For tetrahedral elements,
+  this difference might be less pronounced.} in terms of
+floating point operations, memory requirements, and actual run time:
+
+\begin{itemize}
+\item \emph{Memory requirements for assembled matrices:} For an order
+  $p$, assembled element matrices are dense and of the size
+  $(p+1)^3\times(p+1)^3$. For $p=9$, for instance, $(p+1)^3=1000$ and
+  thus each element contributes $10^6$ entries to the assembled
+  stiffness matrix, and each row in the matrix contains, on average,
+  several 1000 nonzero entries. Thus, for high orders, memory becomes
+  a significant issue.
+\item \emph{Floating point operations for matrix-free versus assembled
+  MatVec:} For hexahedral elements, the operation count for a
+  tensorized matrix-free matvec is $\mathcal{O}(p^4)$ as opposed to
+  $\mathcal{O}(p^6)$ for a fully assembled matrix \cite{orszag80,DevilleFischerMund02}.
+\end{itemize}
+  
+  Detailed theoretical and experimental arguments in favor of matrix-free approaches, especially for high-order discretizations can be found in \cite{DevilleFischerMund02,BursteddeGhattasGurnisEtAl08,ptatin3d}
+% subsubsection matrix_free_vs_matrix_assembly (end)
 
 % Coarser meshes
 %required for geometric multigrid are generated by using the

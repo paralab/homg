@@ -1,6 +1,6 @@
 filename=homg
 abstract=homg_abstract
-filename_diff=${filename}_diff
+filename_diff=diff
 compilePdfOptions=-shell-escape
 
 compile= ${compPdftex}
@@ -34,9 +34,10 @@ clean:
 	${compile} $* 
 
 diff:
-	latexdiff ${filename}_submitted.tex ${filename}.tex > ${filename_diff}.tex
-	${compile} ${filename_diff}
+	latexdiff -c diffcfg ${filename}_submitted.tex ${filename}.tex > ${filename_diff}.tex
+	${compPdftex} ${filename_diff}
 	-bibtex ${filename_diff}
 	bibtex ${filename_diff}
+	${compPdftex} ${filename_diff}
 
 # eof
