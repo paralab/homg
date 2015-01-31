@@ -69,7 +69,7 @@ end
 
 
 
-uqx=-uqx;  
+uqx=-uqx  
 uqy=-uqy;  
 
 qxMatrix = eMatInv * Kex;  
