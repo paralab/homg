@@ -9,6 +9,7 @@ clear all
 % HDG structure
 HDGdata = [];
 
+
 % solution order
 order = 2;
 

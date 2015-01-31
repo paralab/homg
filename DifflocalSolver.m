@@ -11,6 +11,7 @@ LIFT  = HDG.LIFT;
 VtoF  = HDG.VtoF;
 Nfp   = HDG.Nfp;
 
+
 % predefined normal vector, don't like it but stick with it for now
 nx = [-1, 1, 0, 0];
 ny = [0, 0, -1, 1];

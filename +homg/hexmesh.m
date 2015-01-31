@@ -20,6 +20,7 @@ classdef hexmesh < handle
     
     
     
+    
     % problem specific
     coeff
 		muvec

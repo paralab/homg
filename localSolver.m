@@ -11,6 +11,7 @@ VtoF  = HDG.VtoF;
 nx = [-1, 1, 0, 0];
 ny = [0, 0, -1, 1];
 
+
 % the number of volume point
 Nv = refel.Nrp ^ (refel.dim);
 
@@ -69,7 +70,7 @@ end
 
 
 
-uqx=-uqx  
+uqx=-uqx;  
 uqy=-uqy;  
 
 qxMatrix = eMatInv * Kex;  
