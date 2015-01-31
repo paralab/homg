@@ -281,7 +281,7 @@ classdef grid < handle
             % BData = zeros(size(grid.Bmaps));
             % 1. compute skeletal trace
             u_hat = grid.extract_skeletal_data(u);
-            b = -grid.hdg_residual(u_hat, rhs, BData);
+            b = grid.hdg_residual(u_hat, rhs, BData);
             
 % $$$             %%------ strongly enforce zero on the boundary----
 % $$$             foo = ones(size(u_hat)); dof = length(foo);
@@ -993,7 +993,7 @@ classdef grid < handle
             
             lamInterior = zeros(size(self.SkelInterior2All));
             
-            rhs = -self.hdg_residual(lamInterior, forcing, Bdata);
+            rhs = self.hdg_residual(lamInterior, forcing, Bdata);
             
             lamInterior = self.K \ rhs;
             
@@ -1545,8 +1545,8 @@ classdef grid < handle
             % advection stiffness
             [Kex,Key] = m.element_stiffness_advection(e1, refel, Jv, Dv);
             
-            uqx = Kex;
-            uqy = Key;
+            uqx = -Kex;
+            uqy = -Key;
             % residual for qx and qy equations
             for f = 1:Nfaces %
                 idxf = m.get_skeletal_face_indices(refel, e1, f);
@@ -1556,13 +1556,13 @@ classdef grid < handle
                 idxv = m.get_discontinuous_face_indices(refel, 1, f);
                 
                 % residual due to lambda
-                rhsfx = Jf .* (refel.Mr * lam(idxf)) * nx(f);
-                rhsfy = Jf .* (refel.Mr * lam(idxf)) * ny(f);
+                rhsfx = -Jf .* (refel.Mr * lam(idxf)) * nx(f);
+                rhsfy = -Jf .* (refel.Mr * lam(idxf)) * ny(f);
                 % lift to volume residual q equation
                 rhsqx(idxv) = rhsqx(idxv) + rhsfx;
                 rhsqy(idxv) = rhsqy(idxv) + rhsfy;
                 % lift to volume residual u equation
-                rhsu(idxv)  = rhsu(idxv) - ...
+                rhsu(idxv)  = rhsu(idxv) + ...
                     taur * Jf .* (refel.Mr * lam(idxf));
                 
                 % lift to volume for uu
@@ -1570,15 +1570,15 @@ classdef grid < handle
                 bdryx = LIFT(:,:,f) * (diag(Jf) * VtoF(:,:,f)) * nx(f);
                 bdryy = LIFT(:,:,f) * (diag(Jf) * VtoF(:,:,f)) * ny(f);
                 
-                uu  = uu  - taur * bdry;
-                uqx = uqx -        bdryx;
-                uqy = uqy -        bdryy;
+                uu  = uu  + taur * bdry;
+                uqx = uqx +        bdryx;
+                uqy = uqy +        bdryy;
             end
             
-            qxMatrix = -eMatInv * Kex;
+            qxMatrix = eMatInv * Kex;
             qxrhs = eMatInv * rhsqx;
             
-            qyMatrix = -eMatInv * Key;
+            qyMatrix = eMatInv * Key;
             qyrhs = eMatInv * rhsqy;
             
             F = rhsu - uqx * qxrhs - uqy * qyrhs;
