@@ -1,3 +1,5 @@
+
+
 clear all
 % Tan Bui and Hari Sundar, Oct 28, 2013
 % Testing HDG method for 2D Laplace equation
@@ -11,7 +13,7 @@ HDGdata = [];
 order = 2;
 
 % number of elements in x and y directions
-nelems = [8,8];
+nelems = [2,2];
 
 % generate the hexmesh with identity transform for now
 m = homg.hexmesh(nelems,@homg.xform.identity);
@@ -54,9 +56,9 @@ forcing = @(pts) (sin(2.0 * pi * pts(:,1)) .* sin(pi * pts(:,2)));
 % exact solution
 % u = 0.5/pi^2 * forcing;
 uexact = @(pts) 0.2 / pi^2 * forcing(pts);
-qxexact = @(pts) 0.4/pi * (cos(2*pi * pts(:,1)) ...
+qxexact = @(pts) -0.4/pi * (cos(2*pi * pts(:,1)) ...  %since q=-grad u there is negative sign
                            .* sin(pi * pts(:,2)));
-qyexact = @(pts) 0.2/pi * (sin(2*pi * pts(:,1)) ...
+qyexact = @(pts) -0.2/pi * (sin(2*pi * pts(:,1)) ...
                            .* cos(pi * pts(:,2)));
 
 % Number of volume unknown for a scalar
@@ -141,6 +143,7 @@ for  sf=1:Nsfaces
       iindex = iindex + Nfp;
     end
 end
+
 HDGdata.Nbfaces = Nbfaces;
 HDGdata.Bmaps = Bmaps;
 
@@ -157,8 +160,9 @@ for  sf=1:Nsfaces
     [e1, f1, e2, f2]  =m.get_face_elements(sf);
     
     % interior faces
-    if (e1 > 0) && (e2 > 0), 
-      % global trace index for f1
+    if ((e1 > 0) && (e2 > 0)) 
+      % global trace index for f1h = [4,8,16,32];
+
       idxf = m.get_skeletal_face_indices(refel, e1, f1);
       SkelInterior2All(iindex+1:iindex+Nfp) = idxf;
       SkelAll2Interior(idxf) = iindex+1:iindex+Nfp;
@@ -176,59 +180,64 @@ HDGdata.InteriorF2AllF = InteriorF2AllF;
 %-------- form the RHS------------------
 lamInterior = zeros(size(HDGdata.SkelInterior2All));
 %rhs = -residual(lamInterior,HDGdata,forcing, Bdata);
-rhs = -residualFast(lamInterior,HDGdata,forcing, Bdata);
+rhs = residualFast(lamInterior,HDGdata,forcing, Bdata);
 %--------- end form the RHS------------
 
 % form the HDG matrix
-A = HDGmatrix(HDGdata);
+A = -HDGmatrix(HDGdata);
+
 
 % $$$ % Quick, dirty, and expensive way
-% $$$ %--------- Construct the HDG matrix-------
-% $$$ forcingn = @(pts) zeros(size(pts,1),1);
-% $$$ Bdatan = zeros(size(Bdata));
-% $$$ Nh = Nfp*Nifaces;
+%--------- Construct the HDG matrix-------
+% forcingn = @(pts) zeros(size(pts,1),1);
+% Bdatan = zeros(size(Bdata));
+% Nh = Nfp*Nifaces; 
+% maxnnzeros = 5 * Nh;
+% II = zeros(maxnnzeros,1);
+% JJ = zeros(maxnnzeros,1);
+% SS = zeros(maxnnzeros,1);
 % $$$ 
-% $$$ maxnnzeros = 5 * Nh;
-% $$$ II = zeros(maxnnzeros,1);
-% $$$ JJ = zeros(maxnnzeros,1);
-% $$$ SS = zeros(maxnnzeros,1);
+% nnzeros = 0;
 % $$$ 
-% $$$ nnzeros = 0;
-% $$$ 
-% $$$ for n = 1:Nh
-% $$$   lamInterior(n) = 1;
+% for n = 1:Nh
+%   lamInterior(n) = 1;
 % $$$   
-% $$$   %  Aj = residual(lamInterior,HDGdata,forcingn, Bdatan);
-% $$$   Aj = residualFast(lamInterior,HDGdata,forcingn, Bdatan);
+%     Aj = residual(lamInterior,HDGdata,forcingn, Bdatan);    
+     %Aj = residualFast(lamInterior,HDGdata,forcingn, Bdatan);
 % $$$   
-% $$$   [i,j,s] = find(Aj); j(:) = n;
+%   [i,j,s] = find(Aj); j(:) = n;
 % $$$   
-% $$$   ni = length(i);
+%ni = length(i);
 % $$$   
-% $$$   if (nnzeros + ni) > maxnnzeros,
-% $$$     maxnnzeros = 2*maxnnzeros;
-% $$$     II(maxnnzeros) = 0;
-% $$$     JJ(maxnnzeros) = 0;
-% $$$     SS(maxnnzeros) = 0;
-% $$$   end
+%   if (nnzeros + ni) > maxnnzeros,
+%     maxnnzeros = 2*maxnnzeros;
+%     II(maxnnzeros) = 0;
+%     JJ(maxnnzeros) = 0;
+%     SS(maxnnzeros) = 0;
+%   end
 % $$$   
-% $$$   maxnnzeros = 2*maxnnzeros;
+%   maxnnzeros = 2*maxnnzeros;
 % $$$   
-% $$$   II(nnzeros+1:nnzeros+ni) = i;
-% $$$   JJ(nnzeros+1:nnzeros+ni) = j;
-% $$$   SS(nnzeros+1:nnzeros+ni) = s;
+%   II(nnzeros+1:nnzeros+ni) = i;
+%   JJ(nnzeros+1:nnzeros+ni) = j;
+%   SS(nnzeros+1:nnzeros+ni) = s;
 % $$$   
-% $$$   nnzeros = nnzeros + ni; 
+%   nnzeros = nnzeros + ni; 
 % $$$   
-% $$$   lamInterior(n) = 0;
+%   lamInterior(n) = 0;
 % $$$   
-% $$$ end
-% $$$ Aa = sparse(II(1:nnzeros),JJ(1:nnzeros),SS(1:nnzeros),Nh,Nh);
+% end
+% Aa = sparse(II(1:nnzeros),JJ(1:nnzeros),SS(1:nnzeros),Nh,Nh);
 % $$$ 
 % $$$ keyboard
 
 % Now solve for lam
 lamInterior = A \ rhs;
+
+%eig_A=eig((A+A')/2);
+
+%eig_A
+
 
 lamAll = zeros(Nsfaces * Nfp,1);
 lamAll(Bmaps) = Bdata;
@@ -259,9 +268,12 @@ for e = 1:K
   L2eqy = L2eqy +  eqy' * eMat * eqy;
   
 end
+
 fprintf('L2 norm error for u  = %1.15e \n',sqrt(L2eu));
 fprintf('L2 norm error for qx = %1.15e \n',sqrt(L2eqx));
 fprintf('L2 norm error for qy = %1.15e \n',sqrt(L2eqy));
+
+
 
 
 

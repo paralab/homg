@@ -1,3 +1,0 @@
-K 	 N 	 U_L2_Error 	 qx_L2_Error 	 qy_L2_Error
-2 	 2 	 0.00549659 	 0.0105994 	 0.0172052
-

@@ -2,6 +2,7 @@ function [du_dlam, dqx_dlam, dqy_dlam] = DifflocalSolver(HDG, e1)
 % $$$ function [u,qx,qy] = DifflocalSolver(HDG, e1, lam, forcing)
 % Tan Bui Dec 11, 2013
 % compute derivatives for the local solver
+%modified the equation format by Sriram Jan 27 2015
 
 m     = HDG.m;
 refel = HDG.refel;
@@ -11,8 +12,8 @@ VtoF  = HDG.VtoF;
 Nfp   = HDG.Nfp;
 
 % predefined normal vector, don't like it but stick with it for now
-nx = HDG.nx;
-ny = HDG.ny;
+nx = [-1, 1, 0, 0];
+ny = [0, 0, -1, 1];
 
 % the number of volume point
 Nv = refel.Nrp ^ (refel.dim);
@@ -88,27 +89,30 @@ for f = 1:Nfaces %
   drhsqy_dlam(:,index) = LIFT(:,:,f) * (diag(Jf .* ny(f)));
   
   % lift to volume residual u equation
-  % rhsu(idxv)  = rhsu(idxv) - ...
+  % rhsu(idxv)  = rhsu(idxv) + ...
   %    taur * Jf .* (refel.Mr * lamlocal);
-  drhsu_dlam(:,index) = -LIFT(:,:,f) * (diag(Jf .* taur));
+  drhsu_dlam(:,index) = LIFT(:,:,f) * (diag(Jf .* taur)); 
   
   % lift to volume for uu
   bdry =  LIFT(:,:,f) * (diag(Jf) * VtoF(:,:,f));
   bdryx = LIFT(:,:,f) * (diag(Jf) * VtoF(:,:,f)) * nx(f);
   bdryy = LIFT(:,:,f) * (diag(Jf) * VtoF(:,:,f)) * ny(f);
   
-  uu  = uu  - taur * bdry; 
+  uu  = uu  + taur * bdry;  
   uqx = uqx -        bdryx;
   uqy = uqy -        bdryy;
 end
 
-qxMatrix = -eMatInv * Kex;
-% qxrhs = eMatInv * rhsqx;
-drhsqx_dlam = eMatInv * drhsqx_dlam;
+uqx=-uqx;  
+uqy=-uqy;  
 
-qyMatrix = -eMatInv * Key;
-%qyrhs = eMatInv * rhsqy;
-drhsqy_dlam = eMatInv * drhsqy_dlam;
+qxMatrix = eMatInv * Kex;  
+% qxrhs = -eMatInv * rhsqx;
+drhsqx_dlam = -eMatInv * drhsqx_dlam;  
+
+qyMatrix = eMatInv * Key;  
+%qyrhs = -eMatInv * rhsqy;
+drhsqy_dlam = -eMatInv * drhsqy_dlam;  
 
 %F = rhsu - uqx * qxrhs - uqy * qyrhs;
 dF_dlam = drhsu_dlam - uqx * drhsqx_dlam - uqy * drhsqy_dlam;

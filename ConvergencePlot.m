@@ -16,12 +16,12 @@ clear all
 % p: the degree of polynomials
 
 
-iVar = 1; % 1 for u, 2 for qx, 3 for qy
+iVar = 3; % 1 for u, 2 for qx, 3 for qy
 
-%h = [4,8,16,32];
-h=[2];
-%p = [1,2,3,4];
-p=[2];
+h = [4,8,16,32];
+%h=[2];
+p = [1,2,3,4];
+%p=[2];
 nh = length(h);
 np = length(p);
 nVar = 3; %u, qx, qy

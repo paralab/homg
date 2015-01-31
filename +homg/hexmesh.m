@@ -12,7 +12,7 @@ classdef hexmesh < handle
 	
   properties (SetAccess = private)
     dim=2;
-    nelems=[8 8];
+    nelems%=[8 8];
     order
     
     % coords       % element vertices

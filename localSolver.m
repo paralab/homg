@@ -8,8 +8,8 @@ LIFT  = HDG.LIFT;
 VtoF  = HDG.VtoF;
 
 % predefined normal vector, don't like it but stick with it for now
-nx = HDG.nx;
-ny = HDG.ny;
+nx = [-1, 1, 0, 0];
+ny = [0, 0, -1, 1];
 
 % the number of volume point
 Nv = refel.Nrp ^ (refel.dim);
@@ -54,24 +54,29 @@ for f = 1:Nfaces %
   rhsqx(idxv) = rhsqx(idxv) + rhsfx;
   rhsqy(idxv) = rhsqy(idxv) + rhsfy;
   % lift to volume residual u equation
-  rhsu(idxv)  = rhsu(idxv) - ...
-      taur * Jf .* (refel.Mr * lam(idxf));
+  rhsu(idxv)  = rhsu(idxv) + ...
+      taur * Jf .* (refel.Mr * lam(idxf));  
   
   % lift to volume for uu
   bdry =  LIFT(:,:,f) * (diag(Jf) * VtoF(:,:,f));
   bdryx = LIFT(:,:,f) * (diag(Jf) * VtoF(:,:,f)) * nx(f);
   bdryy = LIFT(:,:,f) * (diag(Jf) * VtoF(:,:,f)) * ny(f);
   
-  uu  = uu  - taur * bdry; 
+  uu  = uu  + taur * bdry;     
   uqx = uqx -        bdryx;
   uqy = uqy -        bdryy;
 end
 
-qxMatrix = -eMatInv * Kex;
-qxrhs = eMatInv * rhsqx;
 
-qyMatrix = -eMatInv * Key;
-qyrhs = eMatInv * rhsqy;
+
+uqx=-uqx;  
+uqy=-uqy;  
+
+qxMatrix = eMatInv * Kex;  
+qxrhs = -eMatInv * rhsqx;  
+
+qyMatrix = eMatInv * Key;  
+qyrhs = -eMatInv * rhsqy;  
 
 F = rhsu - uqx * qxrhs - uqy * qyrhs;
 dF = uqx * qxMatrix + uqy * qyMatrix + uu;
