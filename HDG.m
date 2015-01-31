@@ -8,7 +8,7 @@ clear all
 HDGdata = [];
 
 % solution order
-order = 2;
+order = 3;
 
 % number of elements in x and y directions
 nelems = [8,8];
@@ -54,9 +54,9 @@ forcing = @(pts) (sin(2.0 * pi * pts(:,1)) .* sin(pi * pts(:,2)));
 % exact solution
 % u = 0.5/pi^2 * forcing;
 uexact = @(pts) 0.2 / pi^2 * forcing(pts);
-qxexact = @(pts) 0.4/pi * (cos(2*pi * pts(:,1)) ...
+qxexact = @(pts) -0.4/pi * (cos(2*pi * pts(:,1)) ...
                            .* sin(pi * pts(:,2)));
-qyexact = @(pts) 0.2/pi * (sin(2*pi * pts(:,1)) ...
+qyexact = @(pts) -0.2/pi * (sin(2*pi * pts(:,1)) ...
                            .* cos(pi * pts(:,2)));
 
 % Number of volume unknown for a scalar
@@ -176,11 +176,11 @@ HDGdata.InteriorF2AllF = InteriorF2AllF;
 %-------- form the RHS------------------
 lamInterior = zeros(size(HDGdata.SkelInterior2All));
 %rhs = -residual(lamInterior,HDGdata,forcing, Bdata);
-rhs = -residualFast(lamInterior,HDGdata,forcing, Bdata);
+rhs = residualFast(lamInterior,HDGdata,forcing, Bdata);
 %--------- end form the RHS------------
 
 % form the HDG matrix
-A = HDGmatrix(HDGdata);
+A = -HDGmatrix(HDGdata);
 
 % $$$ % Quick, dirty, and expensive way
 % $$$ %--------- Construct the HDG matrix-------
