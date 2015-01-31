@@ -319,7 +319,6 @@ classdef grid < handle
                 % grid.plot_hdg_skel(u_hat-u_hat_t);
 %                caxis(v);
                 getframe();
-                keyboard
                 u_hat = u_hat + grid.vcycle_hdg(v1, v2, r, zeros(size(u_hat)));
                 % u_hat = grid.vcycle_hdg(v1, v2, r, u_hat);
                 r = grid.residual(b, u_hat);
@@ -1254,8 +1253,8 @@ classdef grid < handle
             % advection stiffness
             [Kex, Key] = self.Mesh.element_stiffness_advection (e1, self.refel, Jv, Dv);
             
-            uqx = Kex;
-            uqy = Key;
+            uqx = -Kex;
+            uqy = -Key;
             
             % residual for qx and qy equations
             for f = 1:Nfaces %
@@ -1268,32 +1267,32 @@ classdef grid < handle
                 % rhsfx = Jf .* (refel.Mr * lamlocal) * nx(f);
                 %-- lift to volume residual q equation
                 % rhsqx(idxv) = rhsqx(idxv) + rhsfx;
-                drhsqx_dlam(:,index) = self.LIFT(:,:,f) * (diag(Jf .* nx(f)));
+                drhsqx_dlam(:,index) = -self.LIFT(:,:,f) * (diag(Jf .* nx(f)));
                 
                 % rhsfy = Jf .* (refel.Mr * lamlocal) * ny(f);
                 % rhsqy(idxv) = rhsqy(idxv) + rhsfy;
-                drhsqy_dlam(:,index) = self.LIFT(:,:,f) * (diag(Jf .* ny(f)));
+                drhsqy_dlam(:,index) = -self.LIFT(:,:,f) * (diag(Jf .* ny(f)));
                 
                 % lift to volume residual u equation
                 % rhsu(idxv)  = rhsu(idxv) - ...
                 %    taur * Jf .* (refel.Mr * lamlocal);
-                drhsu_dlam(:,index) = -self.LIFT(:,:,f) * (diag(Jf .* taur));
+                drhsu_dlam(:,index) = self.LIFT(:,:,f) * (diag(Jf .* taur));
                 
                 % lift to volume for uu
                 bdry =  self.LIFT(:,:,f) * (diag(Jf) * self.VtoF(:,:,f));
                 bdryx = self.LIFT(:,:,f) * (diag(Jf) * self.VtoF(:,:,f)) * nx(f);
                 bdryy = self.LIFT(:,:,f) * (diag(Jf) * self.VtoF(:,:,f)) * ny(f);
                 
-                uu  = uu  - taur * bdry;
-                uqx = uqx -        bdryx;
-                uqy = uqy -        bdryy;
+                uu  = uu  + taur * bdry;
+                uqx = uqx +        bdryx;
+                uqy = uqy +        bdryy;
             end
             
-            qxMatrix = -eMatInv * Kex;
+            qxMatrix = eMatInv * Kex;
             % qxrhs = eMatInv * rhsqx;
             drhsqx_dlam = eMatInv * drhsqx_dlam;
             
-            qyMatrix = -eMatInv * Key;
+            qyMatrix = eMatInv * Key;
             %qyrhs = eMatInv * rhsqy;
             drhsqy_dlam = eMatInv * drhsqy_dlam;
             
@@ -1405,7 +1404,7 @@ classdef grid < handle
             
             A = sparse(II(1:nnzeros),JJ(1:nnzeros),SS(1:nnzeros), self.Mesh.Ni_faces * Nfp, self.Mesh.Ni_faces * Nfp);
             
-            self.K = A;
+            self.K = -A;
             self.is_hDG_solve = true;
         end
 
