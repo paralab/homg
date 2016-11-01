@@ -49,7 +49,9 @@ for i=1:num_pgrids
   disp(['Creating hDG-grid: ' num2str(i+num_hgrids) ' of ' num2str(num_grids) ', order = ' num2str(orders(i)) ', nelem = ' num2str(hfine)]);
   m = homg.hexmesh(repmat(hfine, 1, dim), xform);
   grid = homg.grid(m, orders(i), coarse);
-  grid.gen_hdg_matrix(); 
+  grid.gen_hdg_matrix();
+%  grid.skel_to_cg_matrix();
+%  grid.cg_to_skel_matrix();
   coarse = grid;
 end
 

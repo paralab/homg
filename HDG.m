@@ -11,7 +11,7 @@ HDGdata = [];
 
 
 % solution order
-order = 2;
+order = 3;
 
 % number of elements in x and y directions
 nelems = [2,2];
@@ -57,7 +57,7 @@ forcing = @(pts) (sin(2.0 * pi * pts(:,1)) .* sin(pi * pts(:,2)));
 % exact solution
 % u = 0.5/pi^2 * forcing;
 uexact = @(pts) 0.2 / pi^2 * forcing(pts);
-qxexact = @(pts) -0.4/pi * (cos(2*pi * pts(:,1)) ...  %since q=-grad u there is negative sign
+qxexact = @(pts) -0.4/pi * (cos(2*pi * pts(:,1)) ...
                            .* sin(pi * pts(:,2)));
 qyexact = @(pts) -0.2/pi * (sin(2*pi * pts(:,1)) ...
                            .* cos(pi * pts(:,2)));

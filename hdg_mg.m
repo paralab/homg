@@ -4,15 +4,17 @@
 % modified for multigrid, 02 Jan 2014
 
 % addpath /workspace/tanbui/tanbui/WithHari/homg/
-
+ 
 % solution order
 order = 1;
 
 % number of elements in x and y directions
-nelems = [16, 16];
+nelems = 8*[2, 2];
 
 % generate mesh heirarchy 
 grid = create_hdg_grids(2, @homg.xform.identity, order, nelems(1));
+% grid.debug = 1;
+% grid.get_u0();
 
 % generate the hexmesh with identity transform for now
 m = grid.Mesh; % homg.hexmesh(nelems,@homg.xform.identity); 
@@ -42,15 +44,15 @@ lam = zeros(Nfp * Nsfaces,1);
 lamRes = zeros(Nfp * Nsfaces, 1);
 
 % forcing
-forcing = @(pts) (sin(2.0 * pi * pts(:,1)) .* sin(pi * pts(:,2)));
+forcing = @(pts) (sin(2.0 * pi * pts(:,1)) .* sin(2.0 * pi * pts(:,2)));
 
 % exact solution
 % u = 0.5/pi^2 * forcing;
-uexact = @(pts) 0.2 / pi^2 * forcing(pts);
-qxexact = @(pts) 0.4/pi * (cos(2*pi * pts(:,1)) ...
-                           .* sin(pi * pts(:,2)));
-qyexact = @(pts) 0.2/pi * (sin(2*pi * pts(:,1)) ...
-                           .* cos(pi * pts(:,2)));
+uexact = @(pts) 1 /8/ pi^2 * forcing(pts);
+qxexact = @(pts) -1/4/pi * (cos(2*pi * pts(:,1)) ...
+                           .* sin(2*pi * pts(:,2)));
+qyexact = @(pts) -1/4/pi * (sin(2*pi * pts(:,1)) ...
+                           .* cos(2*pi * pts(:,2)));
 
 % Number of volume unknown for a scalar
 rhsqx = zeros(Nv,1);
@@ -95,7 +97,7 @@ end
 
 Bdata = grid.Mesh.get_boundary_data(grid.refel, Uexact);
 
-u = grid.solve_hdg_mg(20, 'chebyshev', 1, 1, Forcing(:), zeros(size(Uexact(:))), Bdata);
+u = grid.solve_hdg_mg(100, 'chebyshev', 1, 1, Forcing(:), zeros(size(Uexact(:))), Bdata);
 
 %% test errors ... 
 

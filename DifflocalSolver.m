@@ -13,8 +13,8 @@ Nfp   = HDG.Nfp;
 
 
 % predefined normal vector, don't like it but stick with it for now
-nx = [-1, 1, 0, 0];
-ny = [0, 0, -1, 1];
+nx = HDG.nx; %[-1, 1, 0, 0];
+ny = HDG.ny; %[0, 0, -1, 1];
 
 % the number of volume point
 Nv = refel.Nrp ^ (refel.dim);
@@ -52,8 +52,8 @@ dF_dlam     = zeros(Nv, Nfp * Nfaces);
 % advection stiffness
 [Kex,Key] = m.element_stiffness_advection(e1, refel, Jv, Dv);
 
-uqx = Kex;
-uqy = Key;
+uqx = -Kex;
+uqy = -Key;
 % residual for qx and qy equations
 for f = 1:Nfaces %
   index = (f-1)*Nfp+1:f*Nfp;
@@ -69,7 +69,7 @@ for f = 1:Nfaces %
   % rhsfx = Jf .* (refel.Mr * lamlocal) * nx(f);
   %% lift to volume residual q equation
   % rhsqx(idxv) = rhsqx(idxv) + rhsfx;
-  drhsqx_dlam(:,index) = LIFT(:,:,f) * (diag(Jf .* nx(f)));
+  drhsqx_dlam(:,index) = -LIFT(:,:,f) * (diag(Jf .* nx(f)));
 
 % $$$   %-------- Testing ------------
 % $$$   idxf = m.get_skeletal_face_indices(refel, e1, f);      
@@ -87,29 +87,30 @@ for f = 1:Nfaces %
   
   % rhsfy = Jf .* (refel.Mr * lamlocal) * ny(f);
   % rhsqy(idxv) = rhsqy(idxv) + rhsfy;
-  drhsqy_dlam(:,index) = LIFT(:,:,f) * (diag(Jf .* ny(f)));
+  drhsqy_dlam(:,index) = -LIFT(:,:,f) * (diag(Jf .* ny(f)));
   
   % lift to volume residual u equation
   % rhsu(idxv)  = rhsu(idxv) + ...
   %    taur * Jf .* (refel.Mr * lamlocal);
-  drhsu_dlam(:,index) = LIFT(:,:,f) * (diag(Jf .* taur)); 
+  drhsu_dlam(:,index) = LIFT(:,:,f) * (diag(Jf .* taur));
   
   % lift to volume for uu
   bdry =  LIFT(:,:,f) * (diag(Jf) * VtoF(:,:,f));
   bdryx = LIFT(:,:,f) * (diag(Jf) * VtoF(:,:,f)) * nx(f);
   bdryy = LIFT(:,:,f) * (diag(Jf) * VtoF(:,:,f)) * ny(f);
   
-  uu  = uu  + taur * bdry;  
-  uqx = uqx -        bdryx;
-  uqy = uqy -        bdryy;
+  uu  = uu  + taur * bdry; 
+  uqx = uqx +        bdryx;
+  uqy = uqy +        bdryy;
 end
 
-uqx=-uqx;  
-uqy=-uqy;  
+qxMatrix = eMatInv * Kex;
+% qxrhs = eMatInv * rhsqx;
+drhsqx_dlam = eMatInv * drhsqx_dlam;
 
-qxMatrix = eMatInv * Kex;  
-% qxrhs = -eMatInv * rhsqx;
-drhsqx_dlam = -eMatInv * drhsqx_dlam;  
+qyMatrix = eMatInv * Key;
+%qyrhs = eMatInv * rhsqy;
+drhsqy_dlam = eMatInv * drhsqy_dlam;
 
 qyMatrix = eMatInv * Key;  
 %qyrhs = -eMatInv * rhsqy;
