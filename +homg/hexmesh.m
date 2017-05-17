@@ -514,6 +514,7 @@ classdef hexmesh < handle
                 eMat = self.element_stiffness(e, refel, detJac, Jac);
                 stiff_val(st:en) = eMat(:);
             end
+            K = sparse(I,J,stiff_val,dof,dof);
         end
         
         function [K, M, iK] = assemble_poisson(self, order)
